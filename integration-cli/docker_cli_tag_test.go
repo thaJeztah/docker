@@ -30,7 +30,7 @@ func (s *DockerSuite) TestTagUnprefixedRepoByID(c *check.C) {
 
 // ensure we don't allow the use of invalid repository names; these tag operations should fail
 func (s *DockerSuite) TestTagInvalidUnprefixedRepo(c *check.C) {
-	invalidRepos := []string{"fo$z$", "Foo@3cc", "Foo$3", "Foo*3", "Fo^3", "Foo!3", "F)xcz(", "fo%asd"}
+	invalidRepos := []string{"fo€z€", "Foo@3cc", "Foo€3", "Foo*3", "Fo^3", "Foo!3", "F)xcz(", "fo%asd"}
 
 	for _, repo := range invalidRepos {
 		out, _, err := dockerCmdWithError("tag", "busybox", repo)
@@ -42,7 +42,7 @@ func (s *DockerSuite) TestTagInvalidUnprefixedRepo(c *check.C) {
 func (s *DockerSuite) TestTagInvalidPrefixedRepo(c *check.C) {
 	longTag := stringutils.GenerateRandomAlphaOnlyString(121)
 
-	invalidTags := []string{"repo:fo$z$", "repo:Foo@3cc", "repo:Foo$3", "repo:Foo*3", "repo:Fo^3", "repo:Foo!3", "repo:%goodbye", "repo:#hashtagit", "repo:F)xcz(", "repo:-foo", "repo:..", longTag}
+	invalidTags := []string{"repo:fo€z€", "repo:Foo@3cc", "repo:Foo€3", "repo:Foo*3", "repo:Fo^3", "repo:Foo!3", "repo:%goodbye", "repo:#hashtagit", "repo:F)xcz(", "repo:-foo", "repo:..", longTag}
 
 	for _, repotag := range invalidTags {
 		out, _, err := dockerCmdWithError("tag", "busybox", repotag)

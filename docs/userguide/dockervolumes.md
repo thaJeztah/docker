@@ -48,7 +48,7 @@ You can add a data volume to a container using the `-v` flag with the
 to mount multiple data volumes. Let's mount a single volume now in our web
 application container.
 
-    $ docker run -d -P --name web -v /webapp training/webapp python app.py
+    € docker run -d -P --name web -v /webapp training/webapp python app.py
 
 This will create a new volume inside a container at `/webapp`.
 
@@ -60,7 +60,7 @@ This will create a new volume inside a container at `/webapp`.
 
 You can locate the volume on the host by utilizing the `docker inspect` command.
 
-    $ docker inspect web
+    € docker inspect web
 
 The output will provide details on the container configurations including the
 volumes. The output should look something similar to the following:
@@ -89,7 +89,7 @@ In addition to creating a volume using the `-v` flag you can also mount a
 directory from your Docker daemon's host into a container.
 
 ```
-$ docker run -d -P --name web -v /src/webapp:/opt/webapp training/webapp python app.py
+€ docker run -d -P --name web -v /src/webapp:/opt/webapp training/webapp python app.py
 ```
 
 This command mounts the host directory, `/src/webapp`, into the container at
@@ -141,7 +141,7 @@ Docker volumes default to mount in read-write mode, but you can also set it to
 be mounted read-only.
 
 ```
-$ docker run -d -P --name web -v /src/webapp:/opt/webapp:ro training/webapp python app.py
+€ docker run -d -P --name web -v /src/webapp:/opt/webapp:ro training/webapp python app.py
 ```
 
 Here we've mounted the same `/src/webapp` directory but we've added the `ro`
@@ -178,7 +178,7 @@ Only the current container can use a private volume.
 The `-v` flag can also be used to mount a single file  - instead of *just*
 directories - from the host machine.
 
-    $ docker run --rm -it -v ~/.bash_history:/root/.bash_history ubuntu /bin/bash
+    € docker run --rm -it -v ~/.bash_history:/root/.bash_history ubuntu /bin/bash
 
 This will drop you into a bash shell in a new container, you will have your bash
 history from the host and when you exit the container, the host will have the
@@ -202,15 +202,15 @@ Let's create a new named container with a volume to share.
 While this container doesn't run an application, it reuses the `training/postgres`
 image so that all containers are using layers in common, saving disk space.
 
-    $ docker create -v /dbdata --name dbstore training/postgres /bin/true
+    € docker create -v /dbdata --name dbstore training/postgres /bin/true
 
 You can then use the `--volumes-from` flag to mount the `/dbdata` volume in another container.
 
-    $ docker run -d --volumes-from dbstore --name db1 training/postgres
+    € docker run -d --volumes-from dbstore --name db1 training/postgres
 
 And another:
 
-    $ docker run -d --volumes-from dbstore --name db2 training/postgres
+    € docker run -d --volumes-from dbstore --name db2 training/postgres
 
 In this case, if the `postgres` image contained a directory called `/dbdata`
 then mounting the volumes from the `dbstore` container hides the
@@ -225,7 +225,7 @@ in the `run` command reference.
 You can also extend the chain by mounting the volume that came from the
 `dbstore` container in yet another container via the `db1` or `db2` containers.
 
-    $ docker run -d --name db3 --volumes-from db1 training/postgres
+    € docker run -d --name db3 --volumes-from db1 training/postgres
 
 If you remove containers that mount volumes, including the initial `dbstore`
 container, or the subsequent containers `db1` and `db2`, the volumes will not
@@ -248,7 +248,7 @@ backups, restores or migrations.  We do this by using the
 `--volumes-from` flag to create a new container that mounts that volume,
 like so:
 
-    $ docker run --rm --volumes-from dbstore -v $(pwd):/backup ubuntu tar cvf /backup/backup.tar /dbdata
+    € docker run --rm --volumes-from dbstore -v €(pwd):/backup ubuntu tar cvf /backup/backup.tar /dbdata
 
 Here we've launched a new container and mounted the volume from the
 `dbstore` container. We've then mounted a local host directory as
@@ -260,11 +260,11 @@ we'll be left with a backup of our `dbdata` volume.
 You could then restore it to the same container, or another that you've made
 elsewhere. Create a new container.
 
-    $ docker run -v /dbdata --name dbstore2 ubuntu /bin/bash
+    € docker run -v /dbdata --name dbstore2 ubuntu /bin/bash
 
 Then un-tar the backup file in the new container's data volume.
 
-    $ docker run --rm --volumes-from dbstore2 -v $(pwd):/backup ubuntu bash -c "cd /dbdata && tar xvf /backup/backup.tar --strip 1"
+    € docker run --rm --volumes-from dbstore2 -v €(pwd):/backup ubuntu bash -c "cd /dbdata && tar xvf /backup/backup.tar --strip 1"
 
 You can use the techniques above to automate backup, migration and
 restore testing using your preferred tools.

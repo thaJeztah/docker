@@ -28,7 +28,7 @@ When you install Docker, it creates three networks automatically. You can list
 these networks using the `docker network ls` command:
 
 ```
-$ docker network ls
+€ docker network ls
 NETWORK ID          NAME                DRIVER
 7fca4eb8c647        bridge              bridge
 9f904ee27bf5        none                null
@@ -46,7 +46,7 @@ by default. You can see this bridge as part of a host's network stack by using
 the `ifconfig` command on the host.
 
 ```
-ubuntu@ip-172-31-36-118:~$ ifconfig
+ubuntu@ip-172-31-36-118:~€ ifconfig
 docker0   Link encap:Ethernet  HWaddr 02:42:47:bc:3a:eb  
           inet addr:172.17.0.1  Bcast:0.0.0.0  Mask:255.255.0.0
           inet6 addr: fe80::42:47ff:febc:3aeb/64 Scope:Link
@@ -60,7 +60,7 @@ docker0   Link encap:Ethernet  HWaddr 02:42:47:bc:3a:eb
 The `none` network adds a container to a container-specific network stack. That container lacks a network interface. Attaching to such a container and looking at it's stack you see this:
 
 ```
-ubuntu@ip-172-31-36-118:~$ docker attach nonenetcontainer
+ubuntu@ip-172-31-36-118:~€ docker attach nonenetcontainer
 
 / # cat /etc/hosts
 127.0.0.1	localhost
@@ -98,7 +98,7 @@ worth looking at the `default` network a bit.
 The default bridge network is present on all Docker hosts. The `docker network inspect`
 
 ```
-$ docker network inspect bridge
+€ docker network inspect bridge
 [
    {
        "Name": "bridge",
@@ -130,17 +130,17 @@ The Engine automatically creates a `Subnet` and `Gateway` to the network.
 The `docker run` command automatically adds new containers to this network.
 
 ```
-$ docker run -itd --name=container1 busybox
+€ docker run -itd --name=container1 busybox
 3386a527aa08b37ea9232cbcace2d2458d49f44bb05a6b775fba7ddd40d8f92c
 
-$ docker run -itd --name=container2 busybox
+€ docker run -itd --name=container2 busybox
 94447ca479852d29aeddca75c28f7104df3c3196d7b6d83061879e339946805c
 ```
 
 Inspecting the `bridge` network again after starting two containers shows both newly launched containers in the network. Their ids show up in the container
 
 ```
-$ docker network inspect bridge
+€ docker network inspect bridge
 {[
     {
         "Name": "bridge",
@@ -187,7 +187,7 @@ The `docker network inspect` command above shows all the connected containers an
 You can `attach` to a running `container` and investigate its configuration:
 
 ```
-$ docker attach container1
+€ docker attach container1
 
 / # ifconfig
 ifconfig
@@ -239,7 +239,7 @@ ff02::2	ip6-allrouters
 To detach from a `container1` and leave it running use `CTRL-p CTRL-q`.Then, attach to `container2` and repeat these three commands.
 
 ```
-$ docker attach container2
+€ docker attach container2
 
 / # ifconfig
 eth0      Link encap:Ethernet  HWaddr 02:42:AC:11:00:03  
@@ -304,10 +304,10 @@ is similar to the historical, default `docker0` network. There are some added
 features and some old features that aren't available.
 
 ```
-$ docker network create --driver bridge isolated_nw
+€ docker network create --driver bridge isolated_nw
 1196a4c5af43a21ae38ef34515b6af19236a3fc48122cf585e3f3054d509679b
 
-$ docker network inspect isolated_nw
+€ docker network inspect isolated_nw
 [
     {
         "Name": "isolated_nw",
@@ -328,7 +328,7 @@ $ docker network inspect isolated_nw
     }
 ]
 
-$ docker network ls
+€ docker network ls
 NETWORK ID          NAME                DRIVER
 9f904ee27bf5        none                null
 cf03ee007fb4        host                host
@@ -340,10 +340,10 @@ c5ee82f76de3        isolated_nw         bridge
 After you create the network, you can launch containers on it using  the `docker run --net=<NETWORK>` option.
 
 ```
-$ docker run --net=isolated_nw -itd --name=container3 busybox
+€ docker run --net=isolated_nw -itd --name=container3 busybox
 8c1a0a5be480921d669a073393ade66a3fc49933f08bcc5515b37b8144f6d47c
 
-$ docker network inspect isolated_nw
+€ docker network inspect isolated_nw
 [
     {
         "Name": "isolated_nw",
@@ -444,7 +444,7 @@ Docker Engine for use with `overlay` network. There are two options to set:
 
 Create an `overlay` network on one of the machines in the Swarm.
 
-    $ docker network create --driver overlay my-multi-host-network
+    € docker network create --driver overlay my-multi-host-network
 
 This results in a single network spanning multiple hosts. An `overlay` network
 provides complete isolation for the containers.
@@ -453,7 +453,7 @@ provides complete isolation for the containers.
 
 Then, on each host, launch containers making sure to specify the network name.
 
-    $ docker run -itd --net=my-multi-host-network busybox
+    € docker run -itd --net=my-multi-host-network busybox
 
 Once connected, each container has access to all the containers in the network
 regardless of which Docker host the container was launched on.
@@ -477,7 +477,7 @@ encompasses installation, starting, stopping and activation.
 Once you have created and installed a custom network driver, you use it like the
 built-in network drivers. For example:
 
-    $ docker network create --driver weave mynet
+    € docker network create --driver weave mynet
 
 You can inspect it, add containers too and from it, and so forth. Of course,
 different plugins may make use of different technologies or frameworks. Custom

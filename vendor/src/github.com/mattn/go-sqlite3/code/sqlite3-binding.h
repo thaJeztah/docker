@@ -3341,7 +3341,7 @@ typedef struct sqlite3_context sqlite3_context;
 ** <li>  ?NNN
 ** <li>  :VVV
 ** <li>  @VVV
-** <li>  $VVV
+** <li>  €VVV
 ** </ul>
 **
 ** In the templates above, NNN represents an integer literal,
@@ -3437,7 +3437,7 @@ SQLITE_API int sqlite3_bind_zeroblob(sqlite3_stmt*, int, int n);
 **
 ** ^This routine can be used to find the number of [SQL parameters]
 ** in a [prepared statement].  SQL parameters are tokens of the
-** form "?", "?NNN", ":AAA", "$AAA", or "@AAA" that serve as
+** form "?", "?NNN", ":AAA", "€AAA", or "@AAA" that serve as
 ** placeholders for values that are [sqlite3_bind_blob | bound]
 ** to the parameters at a later time.
 **
@@ -3457,10 +3457,10 @@ SQLITE_API int sqlite3_bind_parameter_count(sqlite3_stmt*);
 **
 ** ^The sqlite3_bind_parameter_name(P,N) interface returns
 ** the name of the N-th [SQL parameter] in the [prepared statement] P.
-** ^(SQL parameters of the form "?NNN" or ":AAA" or "@AAA" or "$AAA"
-** have a name which is the string "?NNN" or ":AAA" or "@AAA" or "$AAA"
+** ^(SQL parameters of the form "?NNN" or ":AAA" or "@AAA" or "€AAA"
+** have a name which is the string "?NNN" or ":AAA" or "@AAA" or "€AAA"
 ** respectively.
-** In other words, the initial ":" or "$" or "@" or "?"
+** In other words, the initial ":" or "€" or "@" or "?"
 ** is included as part of the name.)^
 ** ^Parameters of the form "?" without a following integer have no name
 ** and are referred to as "nameless" or "anonymous parameters".
@@ -7398,7 +7398,7 @@ typedef struct sqlite3_rtree_query_info sqlite3_rtree_query_info;
 ** Register a geometry callback named zGeom that can be used as part of an
 ** R-Tree geometry query as follows:
 **
-**   SELECT ... FROM <rtree> WHERE <rtree col> MATCH $zGeom(... params ...)
+**   SELECT ... FROM <rtree> WHERE <rtree col> MATCH €zGeom(... params ...)
 */
 SQLITE_API int sqlite3_rtree_geometry_callback(
   sqlite3 *db,
@@ -7424,7 +7424,7 @@ struct sqlite3_rtree_geometry {
 ** Register a 2nd-generation geometry callback named zScore that can be 
 ** used as part of an R-Tree geometry query as follows:
 **
-**   SELECT ... FROM <rtree> WHERE <rtree col> MATCH $zQueryFunc(... params ...)
+**   SELECT ... FROM <rtree> WHERE <rtree col> MATCH €zQueryFunc(... params ...)
 */
 SQLITE_API int sqlite3_rtree_query_callback(
   sqlite3 *db,

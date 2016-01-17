@@ -33,7 +33,7 @@ Once you decide which driver is best, you set this driver on the Docker daemon a
 
 To find out which storage driver is set on the daemon , you use the `docker info` command:
 
-    $ docker info
+    € docker info
     Containers: 0
     Images: 0
     Storage Driver: overlay
@@ -62,9 +62,9 @@ You can set the storage driver by passing the `--storage-driver=<name>` option t
 
 The following command shows how to start the Docker daemon with the `devicemapper` storage driver using the `docker daemon` command:
 
-    $ docker daemon --storage-driver=devicemapper &
+    € docker daemon --storage-driver=devicemapper &
 
-    $ docker info
+    € docker info
     Containers: 0
     Images: 0
     Storage Driver: devicemapper

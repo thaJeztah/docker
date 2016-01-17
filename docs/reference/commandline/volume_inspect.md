@@ -25,9 +25,9 @@ details of the format.
 
 Example output:
 
-    $ docker volume create
+    € docker volume create
     85bffb0677236974f93955d8ecc4df55ef5070117b0e53333cc1b443777be24d
-    $ docker volume inspect 85bffb0677236974f93955d8ecc4df55ef5070117b0e53333cc1b443777be24d
+    € docker volume inspect 85bffb0677236974f93955d8ecc4df55ef5070117b0e53333cc1b443777be24d
     [
       {
           "Name": "85bffb0677236974f93955d8ecc4df55ef5070117b0e53333cc1b443777be24d",
@@ -36,5 +36,5 @@ Example output:
       }
     ]
 
-    $ docker volume inspect --format '{{ .Mountpoint }}' 85bffb0677236974f93955d8ecc4df55ef5070117b0e53333cc1b443777be24d
+    € docker volume inspect --format '{{ .Mountpoint }}' 85bffb0677236974f93955d8ecc4df55ef5070117b0e53333cc1b443777be24d
     /var/lib/docker/volumes/85bffb0677236974f93955d8ecc4df55ef5070117b0e53333cc1b443777be24d/_data

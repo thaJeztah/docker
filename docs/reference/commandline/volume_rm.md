@@ -18,5 +18,5 @@ parent = "smn_cli"
 
 Removes one or more volumes. You cannot remove a volume that is in use by a container.
 
-    $ docker volume rm hello
+    € docker volume rm hello
     hello

@@ -39,15 +39,15 @@ quick access to a test container.
 
 Build the image using:
 
-    $ docker build -t eg_sshd .
+    € docker build -t eg_sshd .
 
 ## Run a `test_sshd` container
 
 Then run it. You can then use `docker port` to find out what host port
 the container's port 22 is mapped to:
 
-    $ docker run -d -P --name test_sshd eg_sshd
-    $ docker port test_sshd 22
+    € docker run -d -P --name test_sshd eg_sshd
+    € docker port test_sshd 22
     0.0.0.0:49154
 
 And now you can ssh as `root` on the container's IP address (you can find it
@@ -55,9 +55,9 @@ with `docker inspect`) or on port `49154` of the Docker daemon's host IP address
 (`ip address` or `ifconfig` can tell you that) or `localhost` if on the
 Docker daemon host:
 
-    $ ssh root@192.168.1.2 -p 49154
+    € ssh root@192.168.1.2 -p 49154
     # The password is ``screencast``.
-    $$
+    €€
 
 ## Environment variables
 
@@ -78,7 +78,7 @@ short script to do the same before you start `sshd -D` and then replace the
 Finally, clean up after your test by stopping and removing the
 container, and then removing the image.
 
-    $ docker stop test_sshd
-    $ docker rm test_sshd
-    $ docker rmi eg_sshd
+    € docker stop test_sshd
+    € docker rm test_sshd
+    € docker rmi eg_sshd
 

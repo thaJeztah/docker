@@ -69,27 +69,27 @@ So, you'll need an entry for both the servers in your local `/etc/hosts` file.
 
 1. Add an entry for the `notaryserver` to `/etc/hosts`.
 
-        $ sudo sh -c 'echo "127.0.0.1 notaryserver" >> /etc/hosts'
+        € sudo sh -c 'echo "127.0.0.1 notaryserver" >> /etc/hosts'
 
 2. Add an entry for the `sandboxregistry` to `/etc/hosts`.
 
-        $ sudo sh -c 'echo "127.0.0.1 sandboxregistry" >> /etc/hosts'
+        € sudo sh -c 'echo "127.0.0.1 sandboxregistry" >> /etc/hosts'
 
 
 ### Build the notarytest image
 
 1. Create a `notarytest` directory on your system.
 
-        $ mkdir notarysandbox
+        € mkdir notarysandbox
 
 2. Change into your `notarysandbox` directory.
 
-        $ cd notarysandbox
+        € cd notarysandbox
 
 3. Create a `notarytest` directory then change into that.
 
-        $ mkdir notarytest
-        $ cd notarytest
+        € mkdir notarytest
+        € cd notarytest
 
 4. Create a filed called `Dockerfile` with your favorite editor.
 
@@ -118,7 +118,7 @@ So, you'll need an entry for both the servers in your local `/etc/hosts` file.
 
 7. Build the testing container.
 
-        $ docker build -t notarysandbox .
+        € docker build -t notarysandbox .
         Sending build context to Docker daemon 2.048 kB
         Step 1 : FROM debian:jessie
          ...
@@ -132,19 +132,19 @@ Then, you'll use Docker Compose to build and start them on your local system.
 
 1. Change to back to the root of your  `notarysandbox` directory.
 
-        $ cd notarysandbox
+        € cd notarysandbox
 
 2. Clone the `notary` project.
 
-          $ git clone -b trust-sandbox https://github.com/docker/notary.git
+          € git clone -b trust-sandbox https://github.com/docker/notary.git
 
 3. Clone the `distribution` project.
 
-        $ git clone https://github.com/docker/distribution.git
+        € git clone https://github.com/docker/distribution.git
 
 4. Change to the `notary` project directory.
 
-        $ cd notary
+        € cd notary
 
    The directory contains a `docker-compose` file that you'll use to run a
    notary server together with a notary signer and the corresponding MySQL
@@ -152,13 +152,13 @@ Then, you'll use Docker Compose to build and start them on your local system.
 
 5. Build the server images.
 
-        $  docker-compose build
+        €  docker-compose build
 
     The first time you run this, the build takes some time.
 
 6. Run the server containers on your local system.
 
-        $ docker-compose up -d
+        € docker-compose up -d
 
     Once the trust services are up, you'll setup a local version of the Docker
     Registry v2.
@@ -167,11 +167,11 @@ Then, you'll use Docker Compose to build and start them on your local system.
 
 8. Build the `sandboxregistry` server.
 
-        $ docker build -t sandboxregistry .
+        € docker build -t sandboxregistry .
 
 9. Start the `sandboxregistry` server running.
 
-        $ docker run -p 5000:5000 --name sandboxregistry sandboxregistry &
+        € docker run -p 5000:5000 --name sandboxregistry sandboxregistry &
 
 ## Playing in the sandbox
 
@@ -186,7 +186,7 @@ In this procedure, you start the `notarysandbox` and link it to the running
 communication among the containers.
 
 ```
-$ docker run -it -v /var/run/docker.sock:/var/run/docker.sock --link notary_notaryserver_1:notaryserver --link sandboxregistry:sandboxregistry notarysandbox
+€ docker run -it -v /var/run/docker.sock:/var/run/docker.sock --link notary_notaryserver_1:notaryserver --link sandboxregistry:sandboxregistry notarysandbox
 root@0710762bb59a:/#
 ```
 
@@ -278,7 +278,7 @@ data. Then, you try and pull it.
 
 2. Open a new bash terminal from your host into the `sandboxregistry`.
 
-        $ docker exec -it sandboxregistry bash
+        € docker exec -it sandboxregistry bash
         296db6068327#
 
 3. Change into the registry storage.

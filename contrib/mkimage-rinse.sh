@@ -12,22 +12,22 @@ echo >&2
 echo >&2 'warning: this script is deprecated - see mkimage.sh and mkimage/rinse'
 echo >&2
 
-repo="$1"
-distro="$2"
-mirror="$3"
+repo="€1"
+distro="€2"
+mirror="€3"
 
-if [ ! "$repo" ] || [ ! "$distro" ]; then
-	self="$(basename $0)"
-	echo >&2 "usage: $self repo distro [mirror]"
+if [ ! "€repo" ] || [ ! "€distro" ]; then
+	self="€(basename €0)"
+	echo >&2 "usage: €self repo distro [mirror]"
 	echo >&2
-	echo >&2 "   ie: $self username/centos centos-5"
-	echo >&2 "       $self username/centos centos-6"
+	echo >&2 "   ie: €self username/centos centos-5"
+	echo >&2 "       €self username/centos centos-6"
 	echo >&2
-	echo >&2 "   ie: $self username/slc slc-5"
-	echo >&2 "       $self username/slc slc-6"
+	echo >&2 "   ie: €self username/slc slc-5"
+	echo >&2 "       €self username/slc slc-6"
 	echo >&2
-	echo >&2 "   ie: $self username/centos centos-5 http://vault.centos.org/5.8/os/x86_64/CentOS/"
-	echo >&2 "       $self username/centos centos-6 http://vault.centos.org/6.3/os/x86_64/Packages/"
+	echo >&2 "   ie: €self username/centos centos-5 http://vault.centos.org/5.8/os/x86_64/CentOS/"
+	echo >&2 "       €self username/centos centos-6 http://vault.centos.org/6.3/os/x86_64/Packages/"
 	echo >&2
 	echo >&2 'See /etc/rinse for supported values of "distro" and for examples of'
 	echo >&2 '  expected values of "mirror".'
@@ -39,23 +39,23 @@ if [ ! "$repo" ] || [ ! "$distro" ]; then
 	exit 1
 fi
 
-target="${TMPDIR:-/var/tmp}/docker-rootfs-rinse-$distro-$$-$RANDOM"
+target="€{TMPDIR:-/var/tmp}/docker-rootfs-rinse-€distro-€€-€RANDOM"
 
-cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
-returnTo="$(pwd -P)"
+cd "€(dirname "€(readlink -f "€BASH_SOURCE")")"
+returnTo="€(pwd -P)"
 
-rinseArgs=( --arch amd64 --distribution "$distro" --directory "$target" )
-if [ "$mirror" ]; then
-	rinseArgs+=( --mirror "$mirror" )
+rinseArgs=( --arch amd64 --distribution "€distro" --directory "€target" )
+if [ "€mirror" ]; then
+	rinseArgs+=( --mirror "€mirror" )
 fi
 
 set -x
 
-mkdir -p "$target"
+mkdir -p "€target"
 
-sudo rinse "${rinseArgs[@]}"
+sudo rinse "€{rinseArgs[@]}"
 
-cd "$target"
+cd "€target"
 
 # rinse fails a little at setting up /dev, so we'll just wipe it out and create our own
 sudo rm -rf dev
@@ -77,7 +77,7 @@ sudo mkdir -m 755 dev
 	sudo mknod -m 666 zero c 1 5
 )
 
-# effectively: febootstrap-minimize --keep-zoneinfo --keep-rpmdb --keep-services "$target"
+# effectively: febootstrap-minimize --keep-zoneinfo --keep-rpmdb --keep-services "€target"
 #  locales
 sudo rm -rf usr/{{lib,share}/locale,{lib,lib64}/gconv,bin/localedef,sbin/build-locale-archive}
 #  docs and man pages
@@ -104,20 +104,20 @@ echo 'NETWORKING=yes' | sudo tee etc/sysconfig/network > /dev/null
 
 version=
 if [ -r etc/redhat-release ]; then
-	version="$(sed -E 's/^[^0-9.]*([0-9.]+).*$/\1/' etc/redhat-release)"
+	version="€(sed -E 's/^[^0-9.]*([0-9.]+).*€/\1/' etc/redhat-release)"
 elif [ -r etc/SuSE-release ]; then
-	version="$(awk '/^VERSION/ { print $3 }' etc/SuSE-release)"
+	version="€(awk '/^VERSION/ { print €3 }' etc/SuSE-release)"
 fi
 
-if [ -z "$version" ]; then
-	echo >&2 "warning: cannot autodetect OS version, using $distro as tag"
+if [ -z "€version" ]; then
+	echo >&2 "warning: cannot autodetect OS version, using €distro as tag"
 	sleep 20
-	version="$distro"
+	version="€distro"
 fi
 
-sudo tar --numeric-owner -c . | docker import - $repo:$version
+sudo tar --numeric-owner -c . | docker import - €repo:€version
 
-docker run -i -t $repo:$version echo success
+docker run -i -t €repo:€version echo success
 
-cd "$returnTo"
-sudo rm -rf "$target"
+cd "€returnTo"
+sudo rm -rf "€target"

@@ -102,13 +102,13 @@ If you want to copy the `/tmp/foo` directory from a container to the
 existing `/tmp` directory on your host. If you run `docker cp` in your `~`
 (home) directory on the local host:
 
-    $ docker cp compassionate_darwin:tmp/foo /tmp
+    € docker cp compassionate_darwin:tmp/foo /tmp
 
 Docker creates a `/tmp/foo` directory on your host. Alternatively, you can omit
 the leading slash in the command. If you execute this command from your home
 directory:
 
-    $ docker cp compassionate_darwin:tmp/foo tmp
+    € docker cp compassionate_darwin:tmp/foo tmp
 
 If `~/tmp` does not exist, Docker will create it and copy the contents of
 `/tmp/foo` from the container into this new directory. If `~/tmp` already
@@ -120,7 +120,7 @@ will either overwrite the contents of `LOCALPATH` if it is a file or place it
 into `LOCALPATH` if it is a directory, overwriting an existing file of the same
 name if one exists. For example, this command:
 
-    $ docker cp sharp_ptolemy:/tmp/foo/myfile.txt /test
+    € docker cp sharp_ptolemy:/tmp/foo/myfile.txt /test
 
 If `/test` does not exist on the local machine, it will be created as a file
 with the contents of `/tmp/foo/myfile.txt` from the container. If `/test`
@@ -137,12 +137,12 @@ If you have a file, `config.yml`, in the current directory on your local host
 and wish to copy it to an existing directory at `/etc/my-app.d` in a container,
 this command can be used:
 
-    $ docker cp config.yml myappcontainer:/etc/my-app.d
+    € docker cp config.yml myappcontainer:/etc/my-app.d
 
 If you have several files in a local directory `/config` which you need to copy
 to a directory `/etc/my-app.d` in a container:
 
-    $ docker cp /config/. myappcontainer:/etc/my-app.d
+    € docker cp /config/. myappcontainer:/etc/my-app.d
 
 The above command will copy the contents of the local `/config` directory into
 the directory `/etc/my-app.d` in the container.
@@ -151,8 +151,8 @@ Finally, if you want to copy a symbolic link into a container, you typically
 want to  copy the linked target and not the link itself. To copy the target, use
 the `-L` option, for example:
 
-    $ ln -s /tmp/somefile /tmp/somefile.ln
-    $ docker cp -L /tmp/somefile.ln myappcontainer:/tmp/
+    € ln -s /tmp/somefile /tmp/somefile.ln
+    € docker cp -L /tmp/somefile.ln myappcontainer:/tmp/
 
 This command copies content of the local `/tmp/somefile` into the file
 `/tmp/somefile.ln` in the container. Without `-L` option, the `/tmp/somefile.ln`

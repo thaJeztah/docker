@@ -36,7 +36,7 @@ func nullDispatch(b *Builder, args []string, attributes map[string]bool, origina
 // ENV foo bar
 //
 // Sets the environment variable foo to bar, also makes interpolation
-// in the dockerfile available from the next statement on via ${foo}.
+// in the dockerfile available from the next statement on via €{foo}.
 //
 func env(b *Builder, args []string, attributes map[string]bool, original string) error {
 	if len(args) == 0 {

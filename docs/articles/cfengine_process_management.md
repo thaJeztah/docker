@@ -75,7 +75,7 @@ The first two steps can be done as part of a Dockerfile, as follows.
 
     # install latest CFEngine
     RUN wget -qO- http://cfengine.com/pub/gpg.key | apt-key add -
-    RUN echo "deb http://cfengine.com/pub/apt $(lsb_release -cs) main" > /etc/apt/sources.list.d/cfengine-community.list
+    RUN echo "deb http://cfengine.com/pub/apt €(lsb_release -cs) main" > /etc/apt/sources.list.d/cfengine-community.list
     RUN apt-get update && apt-get install -y cfengine-community
 
     # install cfe-docker process management policy
@@ -100,7 +100,7 @@ your image with the docker build command, e.g.,
 Start the container with `apache2` and `sshd` running and managed, forwarding
 a port to our SSH instance:
 
-    $ docker run -p 127.0.0.1:222:22 -d managed_image "/usr/sbin/sshd" "/etc/init.d/apache2 start"
+    € docker run -p 127.0.0.1:222:22 -d managed_image "/usr/sbin/sshd" "/etc/init.d/apache2 start"
 
 We now clearly see one of the benefits of the cfe-docker integration: it
 allows to start several processes as part of a normal `docker run` command.

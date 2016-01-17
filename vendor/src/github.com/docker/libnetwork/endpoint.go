@@ -275,7 +275,7 @@ func (ep *endpoint) KeyPrefix() []string {
 }
 
 func (ep *endpoint) networkIDFromKey(key string) (string, error) {
-	// endpoint Key structure : docker/libnetwork/endpoint/${network-id}/${endpoint-id}
+	// endpoint Key structure : docker/libnetwork/endpoint/€{network-id}/€{endpoint-id}
 	// it's an invalid key if the key doesn't have all the 5 key elements above
 	keyElements := strings.Split(key, "/")
 	if !strings.HasPrefix(key, datastore.Key(datastore.EndpointKeyPrefix)) || len(keyElements) < 5 {

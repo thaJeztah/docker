@@ -132,7 +132,7 @@
 			<key>comment</key>
 			<string>comment.line</string>
 			<key>match</key>
-			<string>^(\s*)((#).*$\n?)</string>
+			<string>^(\s*)((#).*€\n?)</string>
 		</dict>
 	</array>
 	<key>scopeName</key>

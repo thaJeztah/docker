@@ -120,5 +120,5 @@ func capture(res ...*regexp.Regexp) *regexp.Regexp {
 
 // anchored anchors the regular expression by adding start and end delimiters.
 func anchored(res ...*regexp.Regexp) *regexp.Regexp {
-	return match(`^` + expression(res...).String() + `$`)
+	return match(`^` + expression(res...).String() + `€`)
 }

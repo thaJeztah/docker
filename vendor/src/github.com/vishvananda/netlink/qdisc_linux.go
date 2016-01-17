@@ -11,20 +11,20 @@ import (
 )
 
 // QdiscDel will delete a qdisc from the system.
-// Equivalent to: `tc qdisc del $qdisc`
+// Equivalent to: `tc qdisc del €qdisc`
 func QdiscDel(qdisc Qdisc) error {
 	return qdiscModify(syscall.RTM_DELQDISC, 0, qdisc)
 }
 
 // QdiscChange will change a qdisc in place
-// Equivalent to: `tc qdisc change $qdisc`
+// Equivalent to: `tc qdisc change €qdisc`
 // The parent and handle MUST NOT be changed.
 func QdiscChange(qdisc Qdisc) error {
 	return qdiscModify(syscall.RTM_NEWQDISC, 0, qdisc)
 }
 
 // QdiscReplace will replace a qdisc to the system.
-// Equivalent to: `tc qdisc replace $qdisc`
+// Equivalent to: `tc qdisc replace €qdisc`
 // The handle MUST change.
 func QdiscReplace(qdisc Qdisc) error {
 	return qdiscModify(
@@ -34,7 +34,7 @@ func QdiscReplace(qdisc Qdisc) error {
 }
 
 // QdiscAdd will add a qdisc to the system.
-// Equivalent to: `tc qdisc add $qdisc`
+// Equivalent to: `tc qdisc add €qdisc`
 func QdiscAdd(qdisc Qdisc) error {
 	return qdiscModify(
 		syscall.RTM_NEWQDISC,

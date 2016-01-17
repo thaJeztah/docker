@@ -27,12 +27,12 @@ the client is a command and each command can take a series of flags and argument
 
     # Usage:  [sudo] docker [subcommand] [flags] [arguments] ..
     # Example:
-    $ docker run -i -t ubuntu /bin/bash
+    € docker run -i -t ubuntu /bin/bash
 
 You can see this in action by using the `docker version` command to return
 version information on the currently installed Docker client and daemon.
 
-    $ docker version
+    € docker version
 
 This command will not only provide you the version of Docker client and
 daemon you are using, but also the version of Go (the programming
@@ -60,11 +60,11 @@ You can display the help for specific Docker commands. The help details the
 options and their usage. To see a list of all the possible commands, use the
 following:
 
-    $ docker --help
+    € docker --help
 
 To see usage for a specific command, specify the command with the `--help` flag:
 
-    $ docker attach --help
+    € docker attach --help
 
     Usage: docker attach [OPTIONS] CONTAINER
 
@@ -88,7 +88,7 @@ change that by running an example web application in Docker.
 For our web application we're going to run a Python Flask application.
 Start with a `docker run` command.
 
-    $ docker run -d -P training/webapp python app.py
+    € docker run -d -P training/webapp python app.py
 
 Review what the command did. You've specified two flags: `-d` and
 `-P`. You've already seen the `-d` flag which tells Docker to run the
@@ -111,7 +111,7 @@ Lastly, you've specified a command for our container to run: `python app.py`. Th
 
 Now you can see your running container using the `docker ps` command.
 
-    $ docker ps -l
+    € docker ps -l
     CONTAINER ID  IMAGE                   COMMAND       CREATED        STATUS        PORTS                    NAMES
     bc533791f3f5  training/webapp:latest  python app.py 5 seconds ago  Up 2 seconds  0.0.0.0:49155->5000/tcp  nostalgic_morse
 
@@ -146,7 +146,7 @@ to a high port (from *ephemeral port range* which typically ranges from 32768
 to 61000) on the local Docker host. We can also bind Docker containers to
 specific ports using the `-p` flag, for example:
 
-    $ docker run -d -p 80:5000 training/webapp python app.py
+    € docker run -d -p 80:5000 training/webapp python app.py
 
 This would map port 5000 inside our container to port 80 on our local
 host. You might be asking about now: why wouldn't we just want to always
@@ -170,7 +170,7 @@ Our Python application is live!
 > you'll need to get the IP of the virtual host instead of using localhost.
 > You can do this by running the `docker-machine ip your_vm_name` from your  command line or terminal application, for example:
 >
->     $ docker-machine ip my-docker-vm
+>     € docker-machine ip my-docker-vm
 >     192.168.99.100
 >
 > In this case you'd browse to `http://192.168.99.100:49155` for the above example.
@@ -182,7 +182,7 @@ Docker has a useful shortcut we can use: `docker port`. To use `docker port` we
 specify the ID or name of our container and then the port for which we need the
 corresponding public-facing port.
 
-    $ docker port nostalgic_morse 5000
+    € docker port nostalgic_morse 5000
     0.0.0.0:49155
 
 In this case you've looked up what port is mapped externally to port 5000 inside
@@ -193,7 +193,7 @@ the container.
 You can also find out a bit more about what's happening with our application and
 use another of the commands you've learned, `docker logs`.
 
-    $ docker logs -f nostalgic_morse
+    € docker logs -f nostalgic_morse
     * Running on http://0.0.0.0:5000/
     10.0.2.2 - - [23/May/2014 20:16:31] "GET / HTTP/1.1" 200 -
     10.0.2.2 - - [23/May/2014 20:16:31] "GET /favicon.ico HTTP/1.1" 404 -
@@ -208,7 +208,7 @@ the application running on port 5000 and the access log entries for it.
 In addition to the container's logs we can also examine the processes
 running inside it using the `docker top` command.
 
-    $ docker top nostalgic_morse
+    € docker top nostalgic_morse
     PID                 USER                COMMAND
     854                 root                python app.py
 
@@ -221,7 +221,7 @@ Lastly, we can take a low-level dive into our Docker container using the
 `docker inspect` command. It returns a JSON document containing useful
 configuration and status information for the specified container.
 
-    $ docker inspect nostalgic_morse
+    € docker inspect nostalgic_morse
 
 You can see a sample of that JSON output.
 
@@ -241,7 +241,7 @@ You can see a sample of that JSON output.
 We can also narrow down the information we want to return by requesting a
 specific element, for example to return the container's IP address we would:
 
-    $ docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' nostalgic_morse
+    € docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' nostalgic_morse
     172.17.0.5
 
 ## Stopping our web application container
@@ -249,13 +249,13 @@ specific element, for example to return the container's IP address we would:
 Okay you've seen web application working. Now you can stop it using the
 `docker stop` command and the name of our container: `nostalgic_morse`.
 
-    $ docker stop nostalgic_morse
+    € docker stop nostalgic_morse
     nostalgic_morse
 
 We can now use the `docker ps` command to check if the container has
 been stopped.
 
-    $ docker ps -l
+    € docker ps -l
 
 ## Restarting our web application container
 
@@ -264,7 +264,7 @@ developer needs the container back. From here you have two choices: you
 can create a new container or restart the old one. Look at
 starting your previous container back up.
 
-    $ docker start nostalgic_morse
+    € docker start nostalgic_morse
     nostalgic_morse
 
 Now quickly run `docker ps -l` again to see the running container is
@@ -280,7 +280,7 @@ responds.
 Your colleague has let you know that they've now finished with the container
 and won't need it again. Now, you can remove it using the `docker rm` command.
 
-    $ docker rm nostalgic_morse
+    € docker rm nostalgic_morse
     Error: Impossible to remove a running container, please stop it first or use -f
     2014/05/24 08:12:56 Error: failed to remove one or more containers
 
@@ -288,9 +288,9 @@ What happened? We can't actually remove a running container. This protects
 you from accidentally removing a running container you might need. You can try
 this again by stopping the container first.
 
-    $ docker stop nostalgic_morse
+    € docker stop nostalgic_morse
     nostalgic_morse
-    $ docker rm nostalgic_morse
+    € docker rm nostalgic_morse
     nostalgic_morse
 
 And now our container is stopped and deleted.

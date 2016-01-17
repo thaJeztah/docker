@@ -32,7 +32,7 @@ container's resources at runtime.
 
 The basic `docker run` command takes this form:
 
-    $ docker run [OPTIONS] IMAGE[:TAG|@DIGEST] [COMMAND] [ARG...]
+    € docker run [OPTIONS] IMAGE[:TAG|@DIGEST] [COMMAND] [ARG...]
 
 The `docker run` command must specify an [*IMAGE*](glossary.md#image)
 to derive the container from. An image developer can define image
@@ -97,7 +97,7 @@ removed when it stops, this means you cannot use the `--rm` option with `-d` opt
 Do not pass a `service x start` command to a detached container. For example, this
 command attempts to start the `nginx` service.
 
-    $ docker run -d -p 80:80 my_image service nginx start
+    € docker run -d -p 80:80 my_image service nginx start
 
 This succeeds in starting the `nginx` service inside the container. However, it
 fails the detached container paradigm in that, the root process (`service nginx
@@ -105,7 +105,7 @@ start`) returns and the detached container stops as designed. As a result, the
 `nginx` service is started but could not be used. Instead, to start a process
 such as the `nginx` web server do the following:
 
-    $ docker run -d -p 80:80 my_image nginx -g 'daemon off;'
+    € docker run -d -p 80:80 my_image nginx -g 'daemon off;'
 
 To do input/output with a detached container use network connections or shared
 volumes. These are required because the container is no longer listening to the
@@ -132,14 +132,14 @@ streams]( https://github.com/docker/docker/blob/75a7f4d90cde0295bcfb7213004abce8
 You can specify to which of the three standard streams (`STDIN`, `STDOUT`,
 `STDERR`) you'd like to connect instead, as in:
 
-    $ docker run -a stdin -a stdout -i -t ubuntu /bin/bash
+    € docker run -a stdin -a stdout -i -t ubuntu /bin/bash
 
 For interactive processes (like a shell), you must use `-i -t` together in
 order to allocate a tty for the container process. `-i -t` is often written `-it`
 as you'll see in later examples.  Specifying `-t` is forbidden when the client
 standard output is redirected or piped, such as in:
 
-    $ echo test | docker run -i busybox cat
+    € echo test | docker run -i busybox cat
 
 >**Note**: A process running as PID 1 inside a container is treated
 >specially by Linux: it ignores any signal with the default action.
@@ -219,13 +219,13 @@ CMD ["htop"]
 Build the Dockerfile and tag the image as `myhtop`:
 
 ```bash
-$ docker build -t myhtop .
+€ docker build -t myhtop .
 ```
 
 Use the following command to run `htop` inside a container:
 
 ```
-$ docker run -it --rm --pid=host myhtop
+€ docker run -it --rm --pid=host myhtop
 ```
 
 ## UTS settings (--uts)
@@ -390,9 +390,9 @@ Example running a Redis container with Redis binding to `localhost` then
 running the `redis-cli` command and connecting to the Redis server over the
 `localhost` interface.
 
-    $ docker run -d --name redis example/redis --bind 127.0.0.1
-    $ # use the redis container's network stack to access localhost
-    $ docker run --rm -it --net container:redis example/redis-cli -h 127.0.0.1
+    € docker run -d --name redis example/redis --bind 127.0.0.1
+    € # use the redis container's network stack to access localhost
+    € docker run --rm -it --net container:redis example/redis-cli -h 127.0.0.1
 
 #### User-defined network
 
@@ -409,8 +409,8 @@ The following example creates a network using the built-in `bridge` network
 driver and running a container in the created network
 
 ```
-$ docker network create -d overlay my-net
-$ docker run --net=my-net -itd --name=container3 busybox
+€ docker network create -d overlay my-net
+€ docker run --net=my-net -itd --name=container3 busybox
 ```
 
 ### Managing /etc/hosts
@@ -419,7 +419,7 @@ Your container will have lines in `/etc/hosts` which define the hostname of the
 container itself as well as `localhost` and a few other common things. The
 `--add-host` flag can be used to add additional lines to `/etc/hosts`.
 
-    $ docker run -it --add-host db-static:86.75.30.9 ubuntu cat /etc/hosts
+    € docker run -it --add-host db-static:86.75.30.9 ubuntu cat /etc/hosts
     172.17.0.22     09d03f76bf2c
     fe00::0         ip6-localnet
     ff00::0         ip6-mcastprefix
@@ -516,12 +516,12 @@ will try forever to restart the container. The number of (attempted) restarts
 for a container can be obtained via [`docker inspect`](commandline/inspect.md). For example, to get the number of restarts
 for container "my-container";
 
-    $ docker inspect -f "{{ .RestartCount }}" my-container
+    € docker inspect -f "{{ .RestartCount }}" my-container
     # 2
 
 Or, to get the last time the container was (re)started;
 
-    $ docker inspect -f "{{ .State.StartedAt }}" my-container
+    € docker inspect -f "{{ .State.StartedAt }}" my-container
     # 2015-03-04T23:47:07.691840179Z
 
 
@@ -531,12 +531,12 @@ examples on using the [`--rm` (clean up)](#clean-up-rm) flag later in this page.
 
 ### Examples
 
-    $ docker run --restart=always redis
+    € docker run --restart=always redis
 
 This will run the `redis` container with a restart policy of **always**
 so that if the container exits, Docker will restart it.
 
-    $ docker run --restart=on-failure:10 redis
+    € docker run --restart=on-failure:10 redis
 
 This will run the `redis` container with a restart policy of **on-failure**
 and a maximum restart count of 10.  If the `redis` container exits with a
@@ -552,28 +552,28 @@ the exit codes follow the `chroot` standard, see below:
 
 **_125_** if the error is with Docker daemon **_itself_** 
 
-    $ docker run --foo busybox; echo $?
+    € docker run --foo busybox; echo €?
     # flag provided but not defined: --foo
       See 'docker run --help'.
       125
 
 **_126_** if the **_contained command_** cannot be invoked
 
-    $ docker run busybox /etc; echo $?
+    € docker run busybox /etc; echo €?
     # exec: "/etc": permission denied
       docker: Error response from daemon: Contained command could not be invoked
       126
 
 **_127_** if the **_contained command_** cannot be found
 
-    $ docker run busybox foo; echo $?
-    # exec: "foo": executable file not found in $PATH
+    € docker run busybox foo; echo €?
+    # exec: "foo": executable file not found in €PATH
       docker: Error response from daemon: Contained command not found or does not exist
       127
 
 **_Exit code_** of **_contained command_** otherwise
 
-    $ docker run busybox /bin/sh -c 'exit 3' 
+    € docker run busybox /bin/sh -c 'exit 3' 
     # 3
 
 ## Clean up (--rm)
@@ -606,23 +606,23 @@ the `--security-opt` flag. For example, you can specify the MCS/MLS level, a
 requirement for MLS systems. Specifying the level in the following command
 allows you to share the same content between containers.
 
-    $ docker run --security-opt label:level:s0:c100,c200 -it fedora bash
+    € docker run --security-opt label:level:s0:c100,c200 -it fedora bash
 
 An MLS example might be:
 
-    $ docker run --security-opt label:level:TopSecret -it rhel7 bash
+    € docker run --security-opt label:level:TopSecret -it rhel7 bash
 
 To disable the security labeling for this container versus running with the
 `--permissive` flag, use the following command:
 
-    $ docker run --security-opt label:disable -it fedora bash
+    € docker run --security-opt label:disable -it fedora bash
 
 If you want a tighter security policy on the processes within a container,
 you can specify an alternate type for the container. You could run a container
 that is only allowed to listen on Apache ports by executing the following
 command:
 
-    $ docker run --security-opt label:type:svirt_apache_t -it centos bash
+    € docker run --security-opt label:type:svirt_apache_t -it centos bash
 
 > **Note**: You would have to write policy defining a `svirt_apache_t` type.
 
@@ -711,25 +711,25 @@ We have four ways to set user memory usage:
 
 Examples:
 
-    $ docker run -it ubuntu:14.04 /bin/bash
+    € docker run -it ubuntu:14.04 /bin/bash
 
 We set nothing about memory, this means the processes in the container can use
 as much memory and swap memory as they need.
 
-    $ docker run -it -m 300M --memory-swap -1 ubuntu:14.04 /bin/bash
+    € docker run -it -m 300M --memory-swap -1 ubuntu:14.04 /bin/bash
 
 We set memory limit and disabled swap memory limit, this means the processes in
 the container can use 300M memory and as much swap memory as they need (if the
 host supports swap memory).
 
-    $ docker run -it -m 300M ubuntu:14.04 /bin/bash
+    € docker run -it -m 300M ubuntu:14.04 /bin/bash
 
 We set memory limit only, this means the processes in the container can use
 300M memory and 300M swap memory, by default, the total virtual memory size
 (--memory-swap) will be set as double of memory, in this case, memory + swap
 would be 2*300M, so processes can use 300M swap memory as well.
 
-    $ docker run -it -m 300M --memory-swap 1G ubuntu:14.04 /bin/bash
+    € docker run -it -m 300M --memory-swap 1G ubuntu:14.04 /bin/bash
 
 We set both memory and swap memory, so the processes in the container can use
 300M memory and 700M swap memory.
@@ -754,7 +754,7 @@ The following example limits the memory (`-m`) to 500M and sets the memory
 reservation to 200M.
 
 ```bash
-$ docker run -it -m 500M --memory-reservation 200M ubuntu:14.04 /bin/bash
+€ docker run -it -m 500M --memory-reservation 200M ubuntu:14.04 /bin/bash
 ```
 
 Under this configuration, when the container consumes memory more than 200M and
@@ -764,7 +764,7 @@ memory below 200M.
 The following example set memory reservation to 1G without a hard memory limit.
 
 ```bash
-$ docker run -it --memory-reservation 1G ubuntu:14.04 /bin/bash
+€ docker run -it --memory-reservation 1G ubuntu:14.04 /bin/bash
 ```
 
 The container can use as much memory as it needs. The memory reservation setting
@@ -781,11 +781,11 @@ memory.
 The following example limits the memory to 100M and disables the OOM killer for
 this container:
 
-    $ docker run -it -m 100M --oom-kill-disable ubuntu:14.04 /bin/bash
+    € docker run -it -m 100M --oom-kill-disable ubuntu:14.04 /bin/bash
 
 The following example, illustrates a dangerous way to use the flag:
 
-    $ docker run -it --oom-kill-disable ubuntu:14.04 /bin/bash
+    € docker run -it --oom-kill-disable ubuntu:14.04 /bin/bash
 
 The container has unlimited memory which can cause the host to run out memory
 and require killing system processes to free memory.
@@ -850,12 +850,12 @@ limit and "K" the kernel limit. There are three possible ways to set limits:
 
 Examples:
 
-    $ docker run -it -m 500M --kernel-memory 50M ubuntu:14.04 /bin/bash
+    € docker run -it -m 500M --kernel-memory 50M ubuntu:14.04 /bin/bash
 
 We set memory and kernel memory, so the processes in the container can use
 500M memory in total, in this 500M memory, it can be 50M kernel memory tops.
 
-    $ docker run -it --kernel-memory 50M ubuntu:14.04 /bin/bash
+    € docker run -it --kernel-memory 50M ubuntu:14.04 /bin/bash
 
 We set kernel memory without **-m**, so the processes in the container can
 use as much memory as they want, but they can only use 50M kernel memory.
@@ -870,7 +870,7 @@ between 0 and 100. A value of 0 turns off anonymous page swapping. A value of
 
 For example, you can set:
 
-    $ docker run -it --memory-swappiness=0 ubuntu:14.04 /bin/bash
+    € docker run -it --memory-swappiness=0 ubuntu:14.04 /bin/bash
 
 Setting the `--memory-swappiness` option is helpful when you want to retain the
 container's working set and to avoid swapping performance penalties.
@@ -919,7 +919,7 @@ And usually `--cpu-period` should work with `--cpu-quota`.
 
 Examples:
 
-    $ docker run -it --cpu-period=50000 --cpu-quota=25000 ubuntu:14.04 /bin/bash
+    € docker run -it --cpu-period=50000 --cpu-quota=25000 ubuntu:14.04 /bin/bash
 
 If there is 1 CPU, this means the container can get 50% CPU worth of run-time every 50ms.
 
@@ -931,11 +931,11 @@ We can set cpus in which to allow execution for containers.
 
 Examples:
 
-    $ docker run -it --cpuset-cpus="1,3" ubuntu:14.04 /bin/bash
+    € docker run -it --cpuset-cpus="1,3" ubuntu:14.04 /bin/bash
 
 This means processes in container can be executed on cpu 1 and cpu 3.
 
-    $ docker run -it --cpuset-cpus="0-2" ubuntu:14.04 /bin/bash
+    € docker run -it --cpuset-cpus="0-2" ubuntu:14.04 /bin/bash
 
 This means processes in container can be executed on cpu 0, cpu 1 and cpu 2.
 
@@ -944,12 +944,12 @@ on NUMA systems.
 
 Examples:
 
-    $ docker run -it --cpuset-mems="1,3" ubuntu:14.04 /bin/bash
+    € docker run -it --cpuset-mems="1,3" ubuntu:14.04 /bin/bash
 
 This example restricts the processes in the container to only use memory from
 memory nodes 1 and 3.
 
-    $ docker run -it --cpuset-mems="0-2" ubuntu:14.04 /bin/bash
+    € docker run -it --cpuset-mems="0-2" ubuntu:14.04 /bin/bash
 
 This example restricts the processes in the container to only use memory from
 memory nodes 0, 1 and 2.
@@ -977,12 +977,12 @@ The `--blkio-weight` flag can set the weighting to a value between 10 to 1000.
 For example, the commands below create two containers with different blkio
 weight:
 
-    $ docker run -it --name c1 --blkio-weight 300 ubuntu:14.04 /bin/bash
-    $ docker run -it --name c2 --blkio-weight 600 ubuntu:14.04 /bin/bash
+    € docker run -it --name c1 --blkio-weight 300 ubuntu:14.04 /bin/bash
+    € docker run -it --name c2 --blkio-weight 600 ubuntu:14.04 /bin/bash
 
 If you do block IO in the two containers at the same time, by, for example:
 
-    $ time dd if=/mnt/zerofile of=test.out bs=1M count=1024 oflag=direct
+    € time dd if=/mnt/zerofile of=test.out bs=1M count=1024 oflag=direct
 
 You'll find that the proportion of time is the same as the proportion of blkio
 weights of the two containers.
@@ -991,7 +991,7 @@ The `--blkio-weight-device="DEVICE_NAME:WEIGHT"` flag sets a specific device wei
 The `DEVICE_NAME:WEIGHT` is a string containing a colon-separated device name and weight.
 For example, to set `/dev/sda` device weight to `200`:
 
-    $ docker run -it \
+    € docker run -it \
         --blkio-weight-device "/dev/sda:200" \
         ubuntu
 
@@ -1001,7 +1001,7 @@ to override this default with a new value on a specific device.
 The following example uses a default weight of `300` and overrides this default 
 on `/dev/sda` setting that weight to `200`:
 
-    $ docker run -it \
+    € docker run -it \
         --blkio-weight 300 \
         --blkio-weight-device "/dev/sda:200" \
         ubuntu
@@ -1010,13 +1010,13 @@ The `--device-read-bps` flag limits the read rate (bytes per second) from a devi
 For example, this command creates a container and limits the read rate to `1mb`
 per second from `/dev/sda`:
 
-    $ docker run -it --device-read-bps /dev/sda:1mb ubuntu
+    € docker run -it --device-read-bps /dev/sda:1mb ubuntu
 
 The `--device-write-bps` flag limits the write rate (bytes per second)to a device.
 For example, this command creates a container and limits the write rate to `1mb`
 per second for `/dev/sda`: 
 
-    $ docker run -it --device-write-bps /dev/sda:1mb ubuntu
+    € docker run -it --device-write-bps /dev/sda:1mb ubuntu
 
 Both flags take limits in the `<device-path>:<limit>[unit]` format. Both read
 and write rates must be a positive integer. You can specify the rate in `kb`
@@ -1026,13 +1026,13 @@ The `--device-read-iops` flag limits read rate (IO per second) from a device.
 For example, this command creates a container and limits the read rate to
 `1000` IO per second from `/dev/sda`:
 
-    $ docker run -ti --device-read-iops /dev/sda:1000 ubuntu
+    € docker run -ti --device-read-iops /dev/sda:1000 ubuntu
 
 The `--device-write-iops` flag limits write rate (IO per second) to a device.
 For example, this command creates a container and limits the write rate to
 `1000` IO per second to `/dev/sda`:
 
-    $ docker run -ti --device-write-iops /dev/sda:1000 ubuntu
+    € docker run -ti --device-write-iops /dev/sda:1000 ubuntu
 
 Both flags take limits in the `<device-path>:<limit>` format. Both read and
 write rates must be a positive integer.
@@ -1044,7 +1044,7 @@ By default, the docker container process runs with the supplementary groups look
 up for the specified user. If one wants to add more to that list of groups, then
 one can use this flag:
 
-    $ docker run -it --rm --group-add audio  --group-add dbus --group-add 777 busybox id
+    € docker run -it --rm --group-add audio  --group-add dbus --group-add 777 busybox id
     uid=0(root) gid=0(root) groups=10(wheel),29(audio),81(dbus),777
 
 ## Runtime privilege and Linux capabilities
@@ -1071,23 +1071,23 @@ If you want to limit access to a specific device or devices you can use
 the `--device` flag. It allows you to specify one or more devices that
 will be accessible within the container.
 
-    $ docker run --device=/dev/snd:/dev/snd ...
+    € docker run --device=/dev/snd:/dev/snd ...
 
 By default, the container will be able to `read`, `write`, and `mknod` these devices.
 This can be overridden using a third `:rwm` set of options to each `--device` flag:
 
-    $ docker run --device=/dev/sda:/dev/xvdc --rm -it ubuntu fdisk  /dev/xvdc
+    € docker run --device=/dev/sda:/dev/xvdc --rm -it ubuntu fdisk  /dev/xvdc
 
     Command (m for help): q
-    $ docker run --device=/dev/sda:/dev/xvdc:r --rm -it ubuntu fdisk  /dev/xvdc
+    € docker run --device=/dev/sda:/dev/xvdc:r --rm -it ubuntu fdisk  /dev/xvdc
     You will not be able to write the partition table.
 
     Command (m for help): q
 
-    $ docker run --device=/dev/sda:/dev/xvdc:w --rm -it ubuntu fdisk  /dev/xvdc
+    € docker run --device=/dev/sda:/dev/xvdc:w --rm -it ubuntu fdisk  /dev/xvdc
         crash....
 
-    $ docker run --device=/dev/sda:/dev/xvdc:m --rm -it ubuntu fdisk  /dev/xvdc
+    € docker run --device=/dev/sda:/dev/xvdc:m --rm -it ubuntu fdisk  /dev/xvdc
     fdisk: unable to open /dev/xvdc: Operation not permitted
 
 In addition to `--privileged`, the operator can have fine grain control over the
@@ -1139,23 +1139,23 @@ Further reference information is available on the [capabilities(7) - Linux man p
 Both flags support the value `ALL`, so if the
 operator wants to have all capabilities but `MKNOD` they could use:
 
-    $ docker run --cap-add=ALL --cap-drop=MKNOD ...
+    € docker run --cap-add=ALL --cap-drop=MKNOD ...
 
 For interacting with the network stack, instead of using `--privileged` they
 should use `--cap-add=NET_ADMIN` to modify the network interfaces.
 
-    $ docker run -it --rm  ubuntu:14.04 ip link add dummy0 type dummy
+    € docker run -it --rm  ubuntu:14.04 ip link add dummy0 type dummy
     RTNETLINK answers: Operation not permitted
-    $ docker run -it --rm --cap-add=NET_ADMIN ubuntu:14.04 ip link add dummy0 type dummy
+    € docker run -it --rm --cap-add=NET_ADMIN ubuntu:14.04 ip link add dummy0 type dummy
 
 To mount a FUSE based filesystem, you need to combine both `--cap-add` and
 `--device`:
 
-    $ docker run --rm -it --cap-add SYS_ADMIN sshfs sshfs sven@10.10.10.20:/home/sven /mnt
+    € docker run --rm -it --cap-add SYS_ADMIN sshfs sshfs sven@10.10.10.20:/home/sven /mnt
     fuse: failed to open /dev/fuse: Operation not permitted
-    $ docker run --rm -it --device /dev/fuse sshfs sshfs sven@10.10.10.20:/home/sven /mnt
+    € docker run --rm -it --device /dev/fuse sshfs sshfs sven@10.10.10.20:/home/sven /mnt
     fusermount: mount failed: Operation not permitted
-    $ docker run --rm -it --cap-add SYS_ADMIN --device /dev/fuse sshfs
+    € docker run --rm -it --cap-add SYS_ADMIN --device /dev/fuse sshfs
     # sshfs sven@10.10.10.20:/home/sven /mnt
     The authenticity of host '10.10.10.20 (10.10.10.20)' can't be established.
     ECDSA key fingerprint is 25:34:85:75:25:b0:17:46:05:19:04:93:b5:dd:5f:c6.
@@ -1219,7 +1219,7 @@ Dockerfile instruction and how the operator can override that setting.
 Recall the optional `COMMAND` in the Docker
 commandline:
 
-    $ docker run [OPTIONS] IMAGE[:TAG|@DIGEST] [COMMAND] [ARG...]
+    € docker run [OPTIONS] IMAGE[:TAG|@DIGEST] [COMMAND] [ARG...]
 
 This command is optional because the person who created the `IMAGE` may
 have already provided a default `COMMAND` using the Dockerfile `CMD`
@@ -1246,12 +1246,12 @@ runtime by using a string to specify the new `ENTRYPOINT`. Here is an
 example of how to run a shell in a container that has been set up to
 automatically run something else (like `/usr/bin/redis-server`):
 
-    $ docker run -it --entrypoint /bin/bash example/redis
+    € docker run -it --entrypoint /bin/bash example/redis
 
 or two examples of how to pass more parameters to that ENTRYPOINT:
 
-    $ docker run -it --entrypoint /bin/bash example/redis -c ls -l
-    $ docker run -it --entrypoint /usr/bin/redis-cli example/redis --help
+    € docker run -it --entrypoint /bin/bash example/redis -c ls -l
+    € docker run -it --entrypoint /usr/bin/redis-cli example/redis --help
 
 ### EXPOSE (incoming ports)
 
@@ -1347,7 +1347,7 @@ Additionally, the operator can **set any environment variable** in the
 container by using one or more `-e` flags, even overriding those mentioned
 above, or already defined by the developer with a Dockerfile `ENV`:
 
-    $ docker run -e "deep=purple" --rm ubuntu /bin/bash -c export
+    € docker run -e "deep=purple" --rm ubuntu /bin/bash -c export
     declare -x HOME="/"
     declare -x HOSTNAME="85bc26a0e200"
     declare -x OLDPWD
@@ -1364,7 +1364,7 @@ Similarly the operator can set the **hostname** with `-h`.
 
     Underlying content from the "container-dir" is copied into tmpfs.
 
-    $ docker run -d --tmpfs /run:rw,noexec,nosuid,size=65536k my_image
+    € docker run -d --tmpfs /run:rw,noexec,nosuid,size=65536k my_image
 
 ### VOLUME (shared filesystems)
 

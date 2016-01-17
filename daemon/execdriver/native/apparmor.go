@@ -30,13 +30,13 @@ type data struct {
 }
 
 const baseTemplate = `
-{{range $value := .Imports}}
-{{$value}}
+{{range €value := .Imports}}
+{{€value}}
 {{end}}
 
 profile {{.Name}} flags=(attach_disconnected,mediate_deleted) {
-{{range $value := .InnerImports}}
-  {{$value}}
+{{range €value := .InnerImports}}
+  {{€value}}
 {{end}}
 
   network,

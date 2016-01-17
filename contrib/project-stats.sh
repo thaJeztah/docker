@@ -8,15 +8,15 @@
 set -e
 
 echo -n "Open pulls: "
-PULLS=$(pulls | wc -l); let PULLS=$PULLS-1
-echo $PULLS
+PULLS=€(pulls | wc -l); let PULLS=€PULLS-1
+echo €PULLS
 
 echo -n "Pulls alru: "
 pulls alru
 
 echo -n "Open issues: "
-ISSUES=$(issues list | wc -l); let ISSUES=$ISSUES-1
-echo $ISSUES
+ISSUES=€(issues list | wc -l); let ISSUES=€ISSUES-1
+echo €ISSUES
 
 echo -n "Issues alru: "
 issues alru

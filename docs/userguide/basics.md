@@ -13,7 +13,7 @@ parent = "mn_fun_docker"
 This quickstart assumes you have a working installation of Docker. To verify Docker is installed, use the following command:
 
     # Check that you have a working install
-    $ docker info
+    € docker info
 
 If you get `docker: command not found` or something like
 `/var/lib/docker/repositories: permission denied` you may have an
@@ -34,7 +34,7 @@ the [installation](../installation/index.md) instructions for your operating sys
 ## Download a pre-built image
 
     # Download an ubuntu image
-    $ docker pull ubuntu
+    € docker pull ubuntu
 
 This will find the `ubuntu` image by name on
 [*Docker Hub*](../userguide/dockerrepos.md#searching-for-images)
@@ -52,7 +52,7 @@ image cache.
 
 To run an interactive shell in the Ubuntu image:
 
-    $ docker run -i -t ubuntu /bin/bash       
+    € docker run -i -t ubuntu /bin/bash       
 
 The `-i` flag starts an interactive container. The `-t` flag creates a
 pseudo-TTY that attaches `stdin` and `stdout`.  
@@ -108,72 +108,72 @@ when no `-H` was passed in.
 
 Run Docker in daemon mode:
 
-    $ sudo <path to>/docker daemon -H 0.0.0.0:5555 &
+    € sudo <path to>/docker daemon -H 0.0.0.0:5555 &
 
 Download an `ubuntu` image:
 
-    $ docker -H :5555 pull ubuntu
+    € docker -H :5555 pull ubuntu
 
 You can use multiple `-H`, for example, if you want to listen on both
 TCP and a Unix socket
 
     # Run docker in daemon mode
-    $ sudo <path to>/docker daemon -H tcp://127.0.0.1:2375 -H unix:///var/run/docker.sock &
+    € sudo <path to>/docker daemon -H tcp://127.0.0.1:2375 -H unix:///var/run/docker.sock &
     # Download an ubuntu image, use default Unix socket
-    $ docker pull ubuntu
+    € docker pull ubuntu
     # OR use the TCP port
-    $ docker -H tcp://127.0.0.1:2375 pull ubuntu
+    € docker -H tcp://127.0.0.1:2375 pull ubuntu
 
 ## Starting a long-running worker process
 
     # Start a very useful long-running process
-    $ JOB=$(docker run -d ubuntu /bin/sh -c "while true; do echo Hello world; sleep 1; done")
+    € JOB=€(docker run -d ubuntu /bin/sh -c "while true; do echo Hello world; sleep 1; done")
 
     # Collect the output of the job so far
-    $ docker logs $JOB
+    € docker logs €JOB
 
     # Kill the job
-    $ docker kill $JOB
+    € docker kill €JOB
 
 ## Listing containers
 
-    $ docker ps # Lists only running containers
-    $ docker ps -a # Lists all containers
+    € docker ps # Lists only running containers
+    € docker ps -a # Lists all containers
 
 ## Controlling containers
 
     # Start a new container
-    $ JOB=$(docker run -d ubuntu /bin/sh -c "while true; do echo Hello world; sleep 1; done")
+    € JOB=€(docker run -d ubuntu /bin/sh -c "while true; do echo Hello world; sleep 1; done")
 
     # Stop the container
-    $ docker stop $JOB
+    € docker stop €JOB
 
     # Start the container
-    $ docker start $JOB
+    € docker start €JOB
 
     # Restart the container
-    $ docker restart $JOB
+    € docker restart €JOB
 
     # SIGKILL a container
-    $ docker kill $JOB
+    € docker kill €JOB
 
     # Remove a container
-    $ docker stop $JOB # Container must be stopped to remove it
-    $ docker rm $JOB
+    € docker stop €JOB # Container must be stopped to remove it
+    € docker rm €JOB
 
 ## Bind a service on a TCP port
 
     # Bind port 4444 of this container, and tell netcat to listen on it
-    $ JOB=$(docker run -d -p 4444 ubuntu:12.10 /bin/nc -l 4444)
+    € JOB=€(docker run -d -p 4444 ubuntu:12.10 /bin/nc -l 4444)
 
     # Which public port is NATed to my container?
-    $ PORT=$(docker port $JOB 4444 | awk -F: '{ print $2 }')
+    € PORT=€(docker port €JOB 4444 | awk -F: '{ print €2 }')
 
     # Connect to the public port
-    $ echo hello world | nc 127.0.0.1 $PORT
+    € echo hello world | nc 127.0.0.1 €PORT
 
     # Verify that the network connection worked
-    $ echo "Daemon received: $(docker logs $JOB)"
+    € echo "Daemon received: €(docker logs €JOB)"
 
 ## Committing (saving) a container state
 
@@ -185,10 +185,10 @@ the source image and the current state of the container's image. To list images
 you already have, use the `docker images` command.
 
     # Commit your container to a new named image
-    $ docker commit <container> <some_name>
+    € docker commit <container> <some_name>
 
     # List your images
-    $ docker images
+    € docker images
 
 You now have an image state from which you can create new instances.
 

@@ -58,7 +58,7 @@ a subdirectory inside the repository that will be used as a build context.
 For example, run this command to use a directory called `docker` in the branch
 `container`:
 
-      $ docker build https://github.com/docker/rootfs.git#container:docker
+      € docker build https://github.com/docker/rootfs.git#container:docker
 
 The following table represents all the valid suffixes with their build
 contexts:
@@ -110,7 +110,7 @@ build fails, a non-zero failure code will be returned.
 There should be informational output of the reason for failure output to
 `STDERR`:
 
-    $ docker build -t fail .
+    € docker build -t fail .
     Sending build context to Docker daemon 2.048 kB
     Sending build context to Docker daemon
     Step 1 : FROM busybox
@@ -118,7 +118,7 @@ There should be informational output of the reason for failure output to
     Step 2 : RUN exit 13
      ---> Running in e26670ec7a0a
     INFO[0000] The command [/bin/sh -c exit 13] returned a non-zero code: 13
-    $ echo $?
+    € echo €?
     1
 
 See also:
@@ -129,7 +129,7 @@ See also:
 
 ### Build with PATH
 
-    $ docker build .
+    € docker build .
     Uploading context 10240 bytes
     Step 1 : FROM busybox
     Pulling repository busybox
@@ -171,7 +171,7 @@ you must use `--rm=false`. This does not affect the build cache.
 
 ### Build with URL
 
-    $ docker build github.com/creack/docker-firefox
+    € docker build github.com/creack/docker-firefox
 
 This will clone the GitHub repository and use the cloned repository as context.
 The Dockerfile at the root of the repository is used as Dockerfile. Note that
@@ -180,21 +180,21 @@ schema.
 
 ### Build with -
 
-    $ docker build - < Dockerfile
+    € docker build - < Dockerfile
 
 This will read a Dockerfile from `STDIN` without context. Due to the lack of a
 context, no contents of any local directory will be sent to the Docker daemon.
 Since there is no context, a Dockerfile `ADD` only works if it refers to a
 remote URL.
 
-    $ docker build - < context.tar.gz
+    € docker build - < context.tar.gz
 
 This will build an image for a compressed context read from `STDIN`.  Supported
 formats are: bzip2, gzip and xz.
 
 ### Usage of .dockerignore
 
-    $ docker build .
+    € docker build .
     Uploading context 18.829 MB
     Uploading context
     Step 1 : FROM busybox
@@ -203,8 +203,8 @@ formats are: bzip2, gzip and xz.
      ---> Using cache
      ---> 99cc1ad10469
     Successfully built 99cc1ad10469
-    $ echo ".git" > .dockerignore
-    $ docker build .
+    € echo ".git" > .dockerignore
+    € docker build .
     Uploading context  6.76 MB
     Uploading context
     Step 1 : FROM busybox
@@ -221,7 +221,7 @@ uploaded context. The builder reference contains detailed information on
 
 ### Tag image (-t)
 
-    $ docker build -t vieux/apache:2.0 .
+    € docker build -t vieux/apache:2.0 .
 
 This will build like the previous example, but it will then tag the resulting
 image. The repository name will be `vieux/apache` and the tag will be `2.0`
@@ -232,25 +232,25 @@ version.
 For example, to tag an image both as `whenry/fedora-jboss:latest` and
 `whenry/fedora-jboss:v2.1`, use the following:
 
-    $ docker build -t whenry/fedora-jboss:latest -t whenry/fedora-jboss:v2.1 .
+    € docker build -t whenry/fedora-jboss:latest -t whenry/fedora-jboss:v2.1 .
 
 ### Specify Dockerfile (-f)
 
-    $ docker build -f Dockerfile.debug .
+    € docker build -f Dockerfile.debug .
 
 This will use a file called `Dockerfile.debug` for the build instructions
 instead of `Dockerfile`.
 
-    $ docker build -f dockerfiles/Dockerfile.debug -t myapp_debug .
-    $ docker build -f dockerfiles/Dockerfile.prod  -t myapp_prod .
+    € docker build -f dockerfiles/Dockerfile.debug -t myapp_debug .
+    € docker build -f dockerfiles/Dockerfile.prod  -t myapp_prod .
 
 The above commands will build the current build context (as specified by the
 `.`) twice, once using a debug version of a `Dockerfile` and once using a
 production version.
 
-    $ cd /home/me/myapp/some/dir/really/deep
-    $ docker build -f /home/me/myapp/dockerfiles/debug /home/me/myapp
-    $ docker build -f ../../../../dockerfiles/debug /home/me/myapp
+    € cd /home/me/myapp/some/dir/really/deep
+    € docker build -f /home/me/myapp/dockerfiles/debug /home/me/myapp
+    € docker build -f ../../../../dockerfiles/debug /home/me/myapp
 
 These two `docker build` commands do the exact same thing. They both use the
 contents of the `debug` file instead of looking for a `Dockerfile` and will use
@@ -290,7 +290,7 @@ A good example is `http_proxy` or source versions for pulling intermediate
 files. The `ARG` instruction lets Dockerfile authors define values that users
 can set at build-time using the  `--build-arg` flag:
 
-    $ docker build --build-arg HTTP_PROXY=http://10.20.30.2:1234 .
+    € docker build --build-arg HTTP_PROXY=http://10.20.30.2:1234 .
 
 This flag allows you to pass the build-time variables that are
 accessed like regular environment variables in the `RUN` instruction of the

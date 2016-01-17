@@ -115,20 +115,20 @@ time using multiple `-H` options:
 The Docker client will honor the `DOCKER_HOST` environment variable to set the
 `-H` flag for the client.
 
-    $ docker -H tcp://0.0.0.0:2375 ps
+    € docker -H tcp://0.0.0.0:2375 ps
     # or
-    $ export DOCKER_HOST="tcp://0.0.0.0:2375"
-    $ docker ps
+    € export DOCKER_HOST="tcp://0.0.0.0:2375"
+    € docker ps
     # both are equal
 
 Setting the `DOCKER_TLS_VERIFY` environment variable to any value other than
 the empty string is equivalent to setting the `--tlsverify` flag. The following
 are equivalent:
 
-    $ docker --tlsverify ps
+    € docker --tlsverify ps
     # or
-    $ export DOCKER_TLS_VERIFY=1
-    $ docker ps
+    € export DOCKER_TLS_VERIFY=1
+    € docker ps
 
 The Docker client will honor the `HTTP_PROXY`, `HTTPS_PROXY`, and `NO_PROXY`
 environment variables (or the lowercase versions thereof). `HTTPS_PROXY` takes
@@ -208,7 +208,7 @@ options for `zfs` start with `zfs`.
 
      Example use:
 
-        $ docker daemon \
+        € docker daemon \
               --storage-opt dm.thinpooldev=/dev/mapper/thin-pool
 
 *  `dm.basesize`
@@ -225,7 +225,7 @@ options for `zfs` start with `zfs`.
 
     Example use: 
 
-        $ docker daemon --storage-opt dm.basesize=50G
+        € docker daemon --storage-opt dm.basesize=50G
 
     This will increase the base device size to 50G. The Docker daemon will throw an 
     error if existing base device size is larger than 50G. A user can use 
@@ -235,13 +235,13 @@ options for `zfs` start with `zfs`.
     that may already be initialized and inherited by pulled images. Typically,
     a change to this value requires additional steps to take effect:
 
-        $ sudo service docker stop
-        $ sudo rm -rf /var/lib/docker
-        $ sudo service docker start
+        € sudo service docker stop
+        € sudo rm -rf /var/lib/docker
+        € sudo service docker start
 
     Example use:
 
-        $ docker daemon --storage-opt dm.basesize=20G
+        € docker daemon --storage-opt dm.basesize=20G
 
 *  `dm.loopdatasize`
 
@@ -256,7 +256,7 @@ options for `zfs` start with `zfs`.
 
     Example use:
 
-        $ docker daemon --storage-opt dm.loopdatasize=200G
+        € docker daemon --storage-opt dm.loopdatasize=200G
 
 *  `dm.loopmetadatasize`
 
@@ -271,7 +271,7 @@ options for `zfs` start with `zfs`.
 
     Example use:
 
-        $ docker daemon --storage-opt dm.loopmetadatasize=4G
+        € docker daemon --storage-opt dm.loopmetadatasize=4G
 
 *  `dm.fs`
 
@@ -280,7 +280,7 @@ options for `zfs` start with `zfs`.
 
     Example use:
 
-        $ docker daemon --storage-opt dm.fs=ext4
+        € docker daemon --storage-opt dm.fs=ext4
 
 *  `dm.mkfsarg`
 
@@ -288,7 +288,7 @@ options for `zfs` start with `zfs`.
 
     Example use:
 
-        $ docker daemon --storage-opt "dm.mkfsarg=-O ^has_journal"
+        € docker daemon --storage-opt "dm.mkfsarg=-O ^has_journal"
 
 *  `dm.mountopt`
 
@@ -296,7 +296,7 @@ options for `zfs` start with `zfs`.
 
     Example use:
 
-        $ docker daemon --storage-opt dm.mountopt=nodiscard
+        € docker daemon --storage-opt dm.mountopt=nodiscard
 
 *  `dm.datadev`
 
@@ -310,7 +310,7 @@ options for `zfs` start with `zfs`.
 
     Example use:
 
-        $ docker daemon \
+        € docker daemon \
               --storage-opt dm.datadev=/dev/sdb1 \
               --storage-opt dm.metadatadev=/dev/sdc1
 
@@ -326,11 +326,11 @@ options for `zfs` start with `zfs`.
     If setting up a new metadata pool it is required to be valid. This can be
     achieved by zeroing the first 4k to indicate empty metadata, like this:
 
-        $ dd if=/dev/zero of=$metadata_dev bs=4096 count=1
+        € dd if=/dev/zero of=€metadata_dev bs=4096 count=1
 
     Example use:
 
-        $ docker daemon \
+        € docker daemon \
               --storage-opt dm.datadev=/dev/sdb1 \
               --storage-opt dm.metadatadev=/dev/sdc1
 
@@ -341,7 +341,7 @@ options for `zfs` start with `zfs`.
 
     Example use:
 
-        $ docker daemon --storage-opt dm.blocksize=512K
+        € docker daemon --storage-opt dm.blocksize=512K
 
 *  `dm.blkdiscard`
 
@@ -355,7 +355,7 @@ options for `zfs` start with `zfs`.
 
     Example use:
 
-        $ docker daemon --storage-opt dm.blkdiscard=false
+        € docker daemon --storage-opt dm.blkdiscard=false
 
 *  `dm.override_udev_sync_check`
 
@@ -365,7 +365,7 @@ options for `zfs` start with `zfs`.
     To view the `udev` sync support of a Docker daemon that is using the
     `devicemapper` driver, run:
 
-        $ docker info
+        € docker info
         [...]
         Udev Sync Supported: true
         [...]
@@ -381,7 +381,7 @@ options for `zfs` start with `zfs`.
     To allow the `docker` daemon to start, regardless of `udev` sync not being
     supported, set `dm.override_udev_sync_check` to true:
 
-        $ docker daemon --storage-opt dm.override_udev_sync_check=true
+        € docker daemon --storage-opt dm.override_udev_sync_check=true
 
     When this value is `true`, the  `devicemapper` continues and simply warns
     you the errors are happening.
@@ -411,7 +411,7 @@ options for `zfs` start with `zfs`.
 
     Example use:
 
-        $ docker daemon --storage-opt dm.use_deferred_removal=true
+        € docker daemon --storage-opt dm.use_deferred_removal=true
 
 *  `dm.use_deferred_deletion`
 
@@ -425,7 +425,7 @@ options for `zfs` start with `zfs`.
     To avoid this failure, enable both deferred device deletion and deferred
     device removal on the daemon.
 
-        $ docker daemon \
+        € docker daemon \
               --storage-opt dm.use_deferred_deletion=true \
               --storage-opt dm.use_deferred_removal=true
 
@@ -447,7 +447,7 @@ Currently supported options of `zfs`:
 
     Example use:
 
-        $ docker daemon -s zfs --storage-opt zfs.fsname=zroot/docker
+        € docker daemon -s zfs --storage-opt zfs.fsname=zroot/docker
 
 ## Docker execdriver option
 
@@ -466,14 +466,14 @@ it is not available, the system uses `cgroupfs`. If you omit the
 `native.cgroupdriver` option,` cgroupfs` is used.
 This example sets the `cgroupdriver` to `systemd`:
 
-    $ sudo docker daemon --exec-opt native.cgroupdriver=systemd
+    € sudo docker daemon --exec-opt native.cgroupdriver=systemd
 
 Setting this option applies to all containers the daemon launches.
 
 Also Windows Container makes use of `--exec-opt` for special purpose. Docker user
 can specify default container isolation technology with this, for example:
 
-    $ docker daemon --exec-opt isolation=hyperv
+    € docker daemon --exec-opt isolation=hyperv
 
 Will make `hyperv` the default isolation technology on Windows, without specifying
 isolation value on daemon start, Windows isolation technology will default to `process`.
@@ -698,7 +698,7 @@ startup will fail with an error message.
 *Example: starting with default Docker user management:*
 
 ```
-     $ docker daemon --userns-remap=default
+     € docker daemon --userns-remap=default
 ```    
 When `default` is provided, Docker will create - or find the existing - user and group
 named `dockremap`. If the user is created, and the Linux distribution has
@@ -709,7 +709,7 @@ create the following range, based on an existing user named `user1` already owni
 the first 65536 range:
 
 ```
-     $ cat /etc/subuid
+     € cat /etc/subuid
      user1:100000:65536
      dockremap:165536:65536
 ```
@@ -871,7 +871,7 @@ This is a full example of the allowed configuration options in the file:
 
 Some options can be reconfigured when the daemon is running without requiring
 to restart the process. We use the `SIGHUP` signal in Linux to reload, and a global event
-in Windows with the key `Global\docker-daemon-config-$PID`. The options can
+in Windows with the key `Global\docker-daemon-config-€PID`. The options can
 be modified in the configuration file but still will check for conflicts with
 the provided flags. The daemon fails to reconfigure itself
 if there are conflicts, but it won't stop execution.

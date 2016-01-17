@@ -7,7 +7,7 @@ were it makes sense. It has been tested with SoftHSM.
 
 * Make it use a custom configuration file
 
-        export SOFTHSM_CONF=$PWD/softhsm.conf
+        export SOFTHSM_CONF=€PWD/softhsm.conf
 
 * Then use `softhsm` to init it
 

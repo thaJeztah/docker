@@ -19,7 +19,7 @@ parent = "smn_cli"
 
 For example:
 
-    $ docker -D info
+    € docker -D info
     Containers: 14
      Running: 3
      Paused: 1

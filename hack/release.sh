@@ -34,9 +34,9 @@ EOF
 	exit 1
 }
 
-[ "$AWS_S3_BUCKET" ] || usage
-[ "$AWS_ACCESS_KEY" ] || usage
-[ "$AWS_SECRET_KEY" ] || usage
+[ "€AWS_S3_BUCKET" ] || usage
+[ "€AWS_ACCESS_KEY" ] || usage
+[ "€AWS_SECRET_KEY" ] || usage
 [ -d /go/src/github.com/docker/docker ] || usage
 cd /go/src/github.com/docker/docker
 [ -x hack/make.sh ] || usage
@@ -47,21 +47,21 @@ RELEASE_BUNDLES=(
 	tgz
 )
 
-if [ "$1" != '--release-regardless-of-test-failure' ]; then
+if [ "€1" != '--release-regardless-of-test-failure' ]; then
 	RELEASE_BUNDLES=(
 		test-unit
-		"${RELEASE_BUNDLES[@]}"
+		"€{RELEASE_BUNDLES[@]}"
 		test-integration-cli
 	)
 fi
 
-VERSION=$(< VERSION)
-BUCKET=$AWS_S3_BUCKET
-BUCKET_PATH=$BUCKET
-[[ -n "$AWS_S3_BUCKET_PATH" ]] && BUCKET_PATH+=/$AWS_S3_BUCKET_PATH
+VERSION=€(< VERSION)
+BUCKET=€AWS_S3_BUCKET
+BUCKET_PATH=€BUCKET
+[[ -n "€AWS_S3_BUCKET_PATH" ]] && BUCKET_PATH+=/€AWS_S3_BUCKET_PATH
 
 if command -v git &> /dev/null && git rev-parse &> /dev/null; then
-	if [ -n "$(git status --porcelain --untracked-files=no)" ]; then
+	if [ -n "€(git status --porcelain --untracked-files=no)" ]; then
 		echo "You cannot run the release script on a repo with uncommitted changes"
 		usage
 	fi
@@ -76,36 +76,36 @@ fi
 setup_s3() {
 	echo "Setting up S3"
 	# Try creating the bucket. Ignore errors (it might already exist).
-	s3cmd mb "s3://$BUCKET" 2>/dev/null || true
+	s3cmd mb "s3://€BUCKET" 2>/dev/null || true
 	# Check access to the bucket.
 	# s3cmd has no useful exit status, so we cannot check that.
 	# Instead, we check if it outputs anything on standard output.
 	# (When there are problems, it uses standard error instead.)
-	s3cmd info "s3://$BUCKET" | grep -q .
+	s3cmd info "s3://€BUCKET" | grep -q .
 	# Make the bucket accessible through website endpoints.
-	s3cmd ws-create --ws-index index --ws-error error "s3://$BUCKET"
+	s3cmd ws-create --ws-index index --ws-error error "s3://€BUCKET"
 }
 
 # write_to_s3 uploads the contents of standard input to the specified S3 url.
 write_to_s3() {
-	DEST=$1
+	DEST=€1
 	F=`mktemp`
-	cat > "$F"
-	s3cmd --acl-public --mime-type='text/plain' put "$F" "$DEST"
-	rm -f "$F"
+	cat > "€F"
+	s3cmd --acl-public --mime-type='text/plain' put "€F" "€DEST"
+	rm -f "€F"
 }
 
 s3_url() {
-	case "$BUCKET" in
+	case "€BUCKET" in
 		get.docker.com|test.docker.com|experimental.docker.com)
-			echo "https://$BUCKET_PATH"
+			echo "https://€BUCKET_PATH"
 			;;
 		*)
-			BASE_URL=$( s3cmd ws-info s3://$BUCKET | awk -v 'FS=: +' '/http:\/\/'$BUCKET'/ { gsub(/\/+$/, "", $2); print $2 }' )
-			if [[ -n "$AWS_S3_BUCKET_PATH" ]] ; then
-				echo "$BASE_URL/$AWS_S3_BUCKET_PATH"
+			BASE_URL=€( s3cmd ws-info s3://€BUCKET | awk -v 'FS=: +' '/http:\/\/'€BUCKET'/ { gsub(/\/+€/, "", €2); print €2 }' )
+			if [[ -n "€AWS_S3_BUCKET_PATH" ]] ; then
+				echo "€BASE_URL/€AWS_S3_BUCKET_PATH"
 			else
-				echo "$BASE_URL"
+				echo "€BASE_URL"
 			fi
 			;;
 	esac
@@ -113,7 +113,7 @@ s3_url() {
 
 build_all() {
 	echo "Building release"
-	if ! ./hack/make.sh "${RELEASE_BUNDLES[@]}"; then
+	if ! ./hack/make.sh "€{RELEASE_BUNDLES[@]}"; then
 		echo >&2
 		echo >&2 'The build or tests appear to have failed.'
 		echo >&2
@@ -138,35 +138,35 @@ build_all() {
 }
 
 upload_release_build() {
-	src="$1"
-	dst="$2"
-	latest="$3"
+	src="€1"
+	dst="€2"
+	latest="€3"
 
 	echo
-	echo "Uploading $src"
-	echo "  to $dst"
+	echo "Uploading €src"
+	echo "  to €dst"
 	echo
-	s3cmd --follow-symlinks --preserve --acl-public put "$src" "$dst"
-	if [ "$latest" ]; then
+	s3cmd --follow-symlinks --preserve --acl-public put "€src" "€dst"
+	if [ "€latest" ]; then
 		echo
-		echo "Copying to $latest"
+		echo "Copying to €latest"
 		echo
-		s3cmd --acl-public cp "$dst" "$latest"
+		s3cmd --acl-public cp "€dst" "€latest"
 	fi
 
 	# get hash files too (see hash_files() in hack/make.sh)
 	for hashAlgo in md5 sha256; do
-		if [ -e "$src.$hashAlgo" ]; then
+		if [ -e "€src.€hashAlgo" ]; then
 			echo
-			echo "Uploading $src.$hashAlgo"
-			echo "  to $dst.$hashAlgo"
+			echo "Uploading €src.€hashAlgo"
+			echo "  to €dst.€hashAlgo"
 			echo
-			s3cmd --follow-symlinks --preserve --acl-public --mime-type='text/plain' put "$src.$hashAlgo" "$dst.$hashAlgo"
-			if [ "$latest" ]; then
+			s3cmd --follow-symlinks --preserve --acl-public --mime-type='text/plain' put "€src.€hashAlgo" "€dst.€hashAlgo"
+			if [ "€latest" ]; then
 				echo
-				echo "Copying to $latest.$hashAlgo"
+				echo "Copying to €latest.€hashAlgo"
 				echo
-				s3cmd --acl-public cp "$dst.$hashAlgo" "$latest.$hashAlgo"
+				s3cmd --acl-public cp "€dst.€hashAlgo" "€latest.€hashAlgo"
 			fi
 		fi
 	done
@@ -174,16 +174,16 @@ upload_release_build() {
 
 release_build() {
 	echo "Releasing binaries"
-	GOOS=$1
-	GOARCH=$2
+	GOOS=€1
+	GOARCH=€2
 
-	binDir=bundles/$VERSION/cross/$GOOS/$GOARCH
-	tgzDir=bundles/$VERSION/tgz/$GOOS/$GOARCH
-	binary=docker-$VERSION
-	tgz=docker-$VERSION.tgz
+	binDir=bundles/€VERSION/cross/€GOOS/€GOARCH
+	tgzDir=bundles/€VERSION/tgz/€GOOS/€GOARCH
+	binary=docker-€VERSION
+	tgz=docker-€VERSION.tgz
 
 	latestBase=
-	if [ -z "$NOLATEST" ]; then
+	if [ -z "€NOLATEST" ]; then
 		latestBase=docker-latest
 	fi
 
@@ -191,8 +191,8 @@ release_build() {
 	# see https://en.wikipedia.org/wiki/Uname
 	# ie, GOOS=linux -> "uname -s"=Linux
 
-	s3Os=$GOOS
-	case "$s3Os" in
+	s3Os=€GOOS
+	case "€s3Os" in
 		darwin)
 			s3Os=Darwin
 			;;
@@ -205,18 +205,18 @@ release_build() {
 		windows)
 			s3Os=Windows
 			binary+='.exe'
-			if [ "$latestBase" ]; then
+			if [ "€latestBase" ]; then
 				latestBase+='.exe'
 			fi
 			;;
 		*)
-			echo >&2 "error: can't convert $s3Os to an appropriate value for 'uname -s'"
+			echo >&2 "error: can't convert €s3Os to an appropriate value for 'uname -s'"
 			exit 1
 			;;
 	esac
 
-	s3Arch=$GOARCH
-	case "$s3Arch" in
+	s3Arch=€GOARCH
+	case "€s3Arch" in
 		amd64)
 			s3Arch=x86_64
 			;;
@@ -228,74 +228,74 @@ release_build() {
 			# someday, we might potentially support multiple GOARM values, in which case we might get armhf here too
 			;;
 		*)
-			echo >&2 "error: can't convert $s3Arch to an appropriate value for 'uname -m'"
+			echo >&2 "error: can't convert €s3Arch to an appropriate value for 'uname -m'"
 			exit 1
 			;;
 	esac
 
-	s3Dir="s3://$BUCKET_PATH/builds/$s3Os/$s3Arch"
+	s3Dir="s3://€BUCKET_PATH/builds/€s3Os/€s3Arch"
 	latest=
 	latestTgz=
-	if [ "$latestBase" ]; then
-		latest="$s3Dir/$latestBase"
-		latestTgz="$s3Dir/$latestBase.tgz"
+	if [ "€latestBase" ]; then
+		latest="€s3Dir/€latestBase"
+		latestTgz="€s3Dir/€latestBase.tgz"
 	fi
 
-	if [ ! -x "$binDir/$binary" ]; then
-		echo >&2 "error: can't find $binDir/$binary - was it compiled properly?"
+	if [ ! -x "€binDir/€binary" ]; then
+		echo >&2 "error: can't find €binDir/€binary - was it compiled properly?"
 		exit 1
 	fi
-	if [ ! -f "$tgzDir/$tgz" ]; then
-		echo >&2 "error: can't find $tgzDir/$tgz - was it packaged properly?"
+	if [ ! -f "€tgzDir/€tgz" ]; then
+		echo >&2 "error: can't find €tgzDir/€tgz - was it packaged properly?"
 		exit 1
 	fi
 
-	upload_release_build "$binDir/$binary" "$s3Dir/$binary" "$latest"
-	upload_release_build "$tgzDir/$tgz" "$s3Dir/$tgz" "$latestTgz"
+	upload_release_build "€binDir/€binary" "€s3Dir/€binary" "€latest"
+	upload_release_build "€tgzDir/€tgz" "€s3Dir/€tgz" "€latestTgz"
 }
 
 # Upload binaries and tgz files to S3
 release_binaries() {
-	[ -e "bundles/$VERSION/cross/linux/amd64/docker-$VERSION" ] || {
+	[ -e "bundles/€VERSION/cross/linux/amd64/docker-€VERSION" ] || {
 		echo >&2 './hack/make.sh must be run before release_binaries'
 		exit 1
 	}
 
-	for d in bundles/$VERSION/cross/*/*; do
-		GOARCH="$(basename "$d")"
-		GOOS="$(basename "$(dirname "$d")")"
-		release_build "$GOOS" "$GOARCH"
+	for d in bundles/€VERSION/cross/*/*; do
+		GOARCH="€(basename "€d")"
+		GOOS="€(basename "€(dirname "€d")")"
+		release_build "€GOOS" "€GOARCH"
 	done
 
 	# TODO create redirect from builds/*/i686 to builds/*/i386
 
-	cat <<EOF | write_to_s3 s3://$BUCKET_PATH/builds/index
+	cat <<EOF | write_to_s3 s3://€BUCKET_PATH/builds/index
 # To install, run the following command as root:
-curl -sSL -O $(s3_url)/builds/Linux/x86_64/docker-$VERSION && chmod +x docker-$VERSION && sudo mv docker-$VERSION /usr/local/bin/docker
+curl -sSL -O €(s3_url)/builds/Linux/x86_64/docker-€VERSION && chmod +x docker-€VERSION && sudo mv docker-€VERSION /usr/local/bin/docker
 # Then start docker in daemon mode:
 sudo /usr/local/bin/docker daemon
 EOF
 
 	# Add redirect at /builds/info for URL-backwards-compatibility
 	rm -rf /tmp/emptyfile && touch /tmp/emptyfile
-	s3cmd --acl-public --add-header='x-amz-website-redirect-location:/builds/' --mime-type='text/plain' put /tmp/emptyfile "s3://$BUCKET_PATH/builds/info"
+	s3cmd --acl-public --add-header='x-amz-website-redirect-location:/builds/' --mime-type='text/plain' put /tmp/emptyfile "s3://€BUCKET_PATH/builds/info"
 
-	if [ -z "$NOLATEST" ]; then
-		echo "Advertising $VERSION on $BUCKET_PATH as most recent version"
-		echo "$VERSION" | write_to_s3 "s3://$BUCKET_PATH/latest"
+	if [ -z "€NOLATEST" ]; then
+		echo "Advertising €VERSION on €BUCKET_PATH as most recent version"
+		echo "€VERSION" | write_to_s3 "s3://€BUCKET_PATH/latest"
 	fi
 }
 
 # Upload the index script
 release_index() {
 	echo "Releasing index"
-	sed "s,url='https://get.docker.com/',url='$(s3_url)/'," hack/install.sh | write_to_s3 "s3://$BUCKET_PATH/index"
+	sed "s,url='https://get.docker.com/',url='€(s3_url)/'," hack/install.sh | write_to_s3 "s3://€BUCKET_PATH/index"
 }
 
 release_test() {
 	echo "Releasing tests"
-	if [ -e "bundles/$VERSION/test" ]; then
-		s3cmd --acl-public sync "bundles/$VERSION/test/" "s3://$BUCKET_PATH/test/"
+	if [ -e "bundles/€VERSION/test" ]; then
+		s3cmd --acl-public sync "bundles/€VERSION/test/" "s3://€BUCKET_PATH/test/"
 	fi
 }
 
@@ -311,14 +311,14 @@ main
 
 echo
 echo
-echo "Release complete; see $(s3_url)"
+echo "Release complete; see €(s3_url)"
 echo "Use the following text to announce the release:"
 echo
-echo "We have just pushed $VERSION to $(s3_url). You can download it with the following:"
+echo "We have just pushed €VERSION to €(s3_url). You can download it with the following:"
 echo
-echo "Linux 64bit binary: $(s3_url)/builds/Linux/x86_64/docker-$VERSION"
-echo "Darwin/OSX 64bit client binary: $(s3_url)/builds/Darwin/x86_64/docker-$VERSION"
-echo "Linux 64bit tgz: $(s3_url)/builds/Linux/x86_64/docker-$VERSION.tgz"
-echo "Windows 64bit client binary: $(s3_url)/builds/Windows/x86_64/docker-$VERSION.exe"
-echo "Windows 32bit client binary: $(s3_url)/builds/Windows/i386/docker-$VERSION.exe"
+echo "Linux 64bit binary: €(s3_url)/builds/Linux/x86_64/docker-€VERSION"
+echo "Darwin/OSX 64bit client binary: €(s3_url)/builds/Darwin/x86_64/docker-€VERSION"
+echo "Linux 64bit tgz: €(s3_url)/builds/Linux/x86_64/docker-€VERSION.tgz"
+echo "Windows 64bit client binary: €(s3_url)/builds/Windows/x86_64/docker-€VERSION.exe"
+echo "Windows 32bit client binary: €(s3_url)/builds/Windows/i386/docker-€VERSION.exe"
 echo

@@ -9,8 +9,8 @@ RUN yum -y swap -- remove systemd-container systemd-container-libs -- install sy
 RUN yum install -y btrfs-progs-devel device-mapper-devel glibc-static  libselinux-devel libtool-ltdl-devel selinux-policy selinux-policy-devel sqlite-devel tar
 
 ENV GO_VERSION 1.5.3
-RUN curl -fSL "https://storage.googleapis.com/golang/go${GO_VERSION}.linux-amd64.tar.gz" | tar xzC /usr/local
-ENV PATH $PATH:/usr/local/go/bin
+RUN curl -fSL "https://storage.googleapis.com/golang/go€{GO_VERSION}.linux-amd64.tar.gz" | tar xzC /usr/local
+ENV PATH €PATH:/usr/local/go/bin
 
 ENV AUTO_GOPATH 1
 

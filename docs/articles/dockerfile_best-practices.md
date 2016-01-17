@@ -273,7 +273,7 @@ the recipient container back to the source (ie, `MYSQL_PORT_3306_TCP`).
 
 In order to make new software easier to run, you can use `ENV` to update the
 `PATH` environment variable for the software your container installs. For
-example, `ENV PATH /usr/local/nginx/bin:$PATH` will ensure that `CMD [“nginx”]`
+example, `ENV PATH /usr/local/nginx/bin:€PATH` will ensure that `CMD [“nginx”]`
 just works.
 
 The `ENV` instruction is also useful for providing required environment
@@ -285,8 +285,8 @@ version bumps are easier to maintain, as seen in the following example:
 
     ENV PG_MAJOR 9.3
     ENV PG_VERSION 9.3.4
-    RUN curl -SL http://example.com/postgres-$PG_VERSION.tar.xz | tar -xJC /usr/src/postgress && …
-    ENV PATH /usr/local/postgres-$PG_MAJOR/bin:$PATH
+    RUN curl -SL http://example.com/postgres-€PG_VERSION.tar.xz | tar -xJC /usr/src/postgress && …
+    ENV PATH /usr/local/postgres-€PG_MAJOR/bin:€PATH
 
 Similar to having constant variables in a program (as opposed to hard-coding
 values), this approach lets you change a single `ENV` instruction to
@@ -353,11 +353,11 @@ Let's start with an example of an image for the command line tool `s3cmd`:
 
 Now the image can be run like this to show the command's help:
 
-    $ docker run s3cmd
+    € docker run s3cmd
 
 Or using the right parameters to execute a command:
 
-    $ docker run s3cmd ls s3://mybucket
+    € docker run s3cmd ls s3://mybucket
 
 This is useful because the image name can double as a reference to the binary as
 shown in the command above.
@@ -373,17 +373,17 @@ uses the following script as its `ENTRYPOINT`:
 #!/bin/bash
 set -e
 
-if [ "$1" = 'postgres' ]; then
-    chown -R postgres "$PGDATA"
+if [ "€1" = 'postgres' ]; then
+    chown -R postgres "€PGDATA"
 
-    if [ -z "$(ls -A "$PGDATA")" ]; then
+    if [ -z "€(ls -A "€PGDATA")" ]; then
         gosu postgres initdb
     fi
 
-    exec gosu postgres "$@"
+    exec gosu postgres "€@"
 fi
 
-exec "$@"
+exec "€@"
 ```
 
 > **Note**:
@@ -404,15 +404,15 @@ This script allows the user to interact with Postgres in several ways.
 
 It can simply start Postgres:
 
-    $ docker run postgres
+    € docker run postgres
 
 Or, it can be used to run Postgres and pass parameters to the server:
 
-    $ docker run postgres postgres --help
+    € docker run postgres postgres --help
 
 Lastly, it could also be used to start a totally different tool, such as Bash:
 
-    $ docker run --rm -it postgres bash
+    € docker run --rm -it postgres bash
 
 ### VOLUME
 

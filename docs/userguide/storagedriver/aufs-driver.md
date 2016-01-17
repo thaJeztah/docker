@@ -64,7 +64,7 @@ layers are built.
 You can only use the AUFS storage driver on Linux systems with AUFS installed. Use the following command to determine if your system supports AUFS.
 
 ```bash
-$ grep aufs /proc/filesystems
+€ grep aufs /proc/filesystems
 nodev   aufs
 ```
 
@@ -73,7 +73,7 @@ system supports AUFS, you can must instruct the Docker daemon to use it. You do
 this from the command line with the `docker daemon` command:
 
 ```bash
-$ sudo docker daemon --storage-driver=aufs &
+€ sudo docker daemon --storage-driver=aufs &
 ```
 
 Alternatively, you can edit the Docker config file and add the
@@ -87,7 +87,7 @@ DOCKER_OPTS="--storage-driver=aufs"
 Once your daemon is running, verify the storage driver with the `docker info` command.
 
 ```bash
-$ sudo docker info
+€ sudo docker info
 Containers: 1
 Images: 4
 Storage Driver: aufs
@@ -124,7 +124,7 @@ shows the three image layers below it. They are listed in the order they are
 stacked.
 
 ```bash
-$ cat /var/lib/docker/aufs/layers/91e54dfb11794fad694460162bf0cb0a4fa710cfa3f60979c177d920813e267c
+€ cat /var/lib/docker/aufs/layers/91e54dfb11794fad694460162bf0cb0a4fa710cfa3f60979c177d920813e267c
 
 d74508fb6632491cea586a1fd7d748dfc5274cd6fdfedee309ecdcbc2bf5cb82
 
@@ -162,7 +162,7 @@ writable layer is stored in the following file
 container with ID `b41a6e5a508d` has 4 image layers below it:
 
 ```bash
-$ cat /var/lib/docker/aufs/layers/b41a6e5a508dfa02607199dfe51ed9345a675c977f2cafe8ef3e4b0b5773404e-init
+€ cat /var/lib/docker/aufs/layers/b41a6e5a508dfa02607199dfe51ed9345a675c977f2cafe8ef3e4b0b5773404e-init
 91e54dfb11794fad694460162bf0cb0a4fa710cfa3f60979c177d920813e267c
 d74508fb6632491cea586a1fd7d748dfc5274cd6fdfedee309ecdcbc2bf5cb82
 c22013c8472965aa5b62559f2b540cd440716ef149756e7b958a1b2aba421e87

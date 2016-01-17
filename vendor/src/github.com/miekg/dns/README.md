@@ -52,7 +52,7 @@ Send pull request if you want to be listed here.
 # Features
 
 * UDP/TCP queries, IPv4 and IPv6;
-* RFC 1035 zone file parsing ($INCLUDE, $ORIGIN, $TTL and $GENERATE (for all record types) are supported;
+* RFC 1035 zone file parsing (€INCLUDE, €ORIGIN, €TTL and €GENERATE (for all record types) are supported;
 * Fast:
     * Reply speed around ~ 80K qps (faster hardware results in more qps);
     * Parsing RRs ~ 100K RR/s, that's 5M records in about 50 seconds;

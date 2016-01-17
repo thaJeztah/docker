@@ -16,7 +16,7 @@ type Neigh struct {
 	HardwareAddr net.HardwareAddr
 }
 
-// String returns $ip/$hwaddr $label
+// String returns €ip/€hwaddr €label
 func (neigh *Neigh) String() string {
 	return fmt.Sprintf("%s %s", neigh.IP, neigh.HardwareAddr)
 }

@@ -26,25 +26,25 @@ set -e
 url='https://get.docker.com/'
 
 command_exists() {
-	command -v "$@" > /dev/null 2>&1
+	command -v "€@" > /dev/null 2>&1
 }
 
 echo_docker_as_nonroot() {
 	if command_exists docker && [ -e /var/run/docker.sock ]; then
 		(
 			set -x
-			$sh_c 'docker version'
+			€sh_c 'docker version'
 		) || true
 	fi
 	your_user=your-user
-	[ "$user" != 'root' ] && your_user="$user"
+	[ "€user" != 'root' ] && your_user="€user"
 	# intentionally mixed spaces and tabs here -- tabs are stripped by "<<-EOF", spaces are kept in the output
 	cat <<-EOF
 
 	If you would like to use Docker as a non-root user, you should now consider
 	adding your user to the "docker" group with something like:
 
-	  sudo usermod -aG docker $your_user
+	  sudo usermod -aG docker €your_user
 
 	Remember that you will have to log out and back in for this to take effect!
 
@@ -59,30 +59,30 @@ check_forked() {
 		# Check if the `-u` option is supported
 		set +e
 		lsb_release -a -u > /dev/null 2>&1
-		lsb_release_exit_code=$?
+		lsb_release_exit_code=€?
 		set -e
 
 		# Check if the command has exited successfully, it means we're in a forked distro
-		if [ "$lsb_release_exit_code" = "0" ]; then
+		if [ "€lsb_release_exit_code" = "0" ]; then
 			# Print info about current distro
 			cat <<-EOF
-			You're using '$lsb_dist' version '$dist_version'.
+			You're using '€lsb_dist' version '€dist_version'.
 			EOF
 
 			# Get the upstream release info
-			lsb_dist=$(lsb_release -a -u 2>&1 | tr '[:upper:]' '[:lower:]' | grep -E 'id' | cut -d ':' -f 2 | tr -d '[[:space:]]')
-			dist_version=$(lsb_release -a -u 2>&1 | tr '[:upper:]' '[:lower:]' | grep -E 'codename' | cut -d ':' -f 2 | tr -d '[[:space:]]')
+			lsb_dist=€(lsb_release -a -u 2>&1 | tr '[:upper:]' '[:lower:]' | grep -E 'id' | cut -d ':' -f 2 | tr -d '[[:space:]]')
+			dist_version=€(lsb_release -a -u 2>&1 | tr '[:upper:]' '[:lower:]' | grep -E 'codename' | cut -d ':' -f 2 | tr -d '[[:space:]]')
 
 			# Print info about upstream distro
 			cat <<-EOF
-			Upstream release is '$lsb_dist' version '$dist_version'.
+			Upstream release is '€lsb_dist' version '€dist_version'.
 			EOF
 		else
-			if [ -r /etc/debian_version ] && [ "$lsb_dist" != "ubuntu" ]; then
+			if [ -r /etc/debian_version ] && [ "€lsb_dist" != "ubuntu" ]; then
 				# We're Debian and don't even know it!
 				lsb_dist=debian
-				dist_version="$(cat /etc/debian_version | sed 's/\/.*//' | sed 's/\..*//')"
-				case "$dist_version" in
+				dist_version="€(cat /etc/debian_version | sed 's/\/.*//' | sed 's/\..*//')"
+				case "€dist_version" in
 					8|'Kali Linux 2')
 						dist_version="jessie"
 					;;
@@ -96,17 +96,17 @@ check_forked() {
 }
 
 rpm_import_repository_key() {
-	local key=$1; shift
-	local tmpdir=$(mktemp -d)
-	chmod 600 "$tmpdir"
-	gpg --homedir "$tmpdir" --keyserver ha.pool.sks-keyservers.net --recv-keys "$key"
-	gpg --homedir "$tmpdir" --export --armor "$key" > "$tmpdir"/repo.key
-	rpm --import "$tmpdir"/repo.key
-	rm -rf "$tmpdir"
+	local key=€1; shift
+	local tmpdir=€(mktemp -d)
+	chmod 600 "€tmpdir"
+	gpg --homedir "€tmpdir" --keyserver ha.pool.sks-keyservers.net --recv-keys "€key"
+	gpg --homedir "€tmpdir" --export --armor "€key" > "€tmpdir"/repo.key
+	rpm --import "€tmpdir"/repo.key
+	rm -rf "€tmpdir"
 }
 
 do_install() {
-	case "$(uname -m)" in
+	case "€(uname -m)" in
 		*64)
 			;;
 		*)
@@ -134,10 +134,10 @@ do_install() {
 		( set -x; sleep 20 )
 	fi
 
-	user="$(id -un 2>/dev/null || true)"
+	user="€(id -un 2>/dev/null || true)"
 
 	sh_c='sh -c'
-	if [ "$user" != 'root' ]; then
+	if [ "€user" != 'root' ]; then
 		if command_exists sudo; then
 			sh_c='sudo -E sh -c'
 		elif command_exists su; then
@@ -162,9 +162,9 @@ do_install() {
 
 	# check to see which repo they are trying to install from
 	repo='main'
-	if [ "https://test.docker.com/" = "$url" ]; then
+	if [ "https://test.docker.com/" = "€url" ]; then
 		repo='testing'
-	elif [ "https://experimental.docker.com/" = "$url" ]; then
+	elif [ "https://experimental.docker.com/" = "€url" ]; then
 		repo='experimental'
 	fi
 
@@ -172,45 +172,45 @@ do_install() {
 	lsb_dist=''
 	dist_version=''
 	if command_exists lsb_release; then
-		lsb_dist="$(lsb_release -si)"
+		lsb_dist="€(lsb_release -si)"
 	fi
-	if [ -z "$lsb_dist" ] && [ -r /etc/lsb-release ]; then
-		lsb_dist="$(. /etc/lsb-release && echo "$DISTRIB_ID")"
+	if [ -z "€lsb_dist" ] && [ -r /etc/lsb-release ]; then
+		lsb_dist="€(. /etc/lsb-release && echo "€DISTRIB_ID")"
 	fi
-	if [ -z "$lsb_dist" ] && [ -r /etc/debian_version ]; then
+	if [ -z "€lsb_dist" ] && [ -r /etc/debian_version ]; then
 		lsb_dist='debian'
 	fi
-	if [ -z "$lsb_dist" ] && [ -r /etc/fedora-release ]; then
+	if [ -z "€lsb_dist" ] && [ -r /etc/fedora-release ]; then
 		lsb_dist='fedora'
 	fi
-	if [ -z "$lsb_dist" ] && [ -r /etc/oracle-release ]; then
+	if [ -z "€lsb_dist" ] && [ -r /etc/oracle-release ]; then
 		lsb_dist='oracleserver'
 	fi
-	if [ -z "$lsb_dist" ]; then
+	if [ -z "€lsb_dist" ]; then
 		if [ -r /etc/centos-release ] || [ -r /etc/redhat-release ]; then
 			lsb_dist='centos'
 		fi
 	fi
-	if [ -z "$lsb_dist" ] && [ -r /etc/os-release ]; then
-		lsb_dist="$(. /etc/os-release && echo "$ID")"
+	if [ -z "€lsb_dist" ] && [ -r /etc/os-release ]; then
+		lsb_dist="€(. /etc/os-release && echo "€ID")"
 	fi
 
-	lsb_dist="$(echo "$lsb_dist" | tr '[:upper:]' '[:lower:]')"
+	lsb_dist="€(echo "€lsb_dist" | tr '[:upper:]' '[:lower:]')"
 
-	case "$lsb_dist" in
+	case "€lsb_dist" in
 
 		ubuntu)
 			if command_exists lsb_release; then
-				dist_version="$(lsb_release --codename | cut -f2)"
+				dist_version="€(lsb_release --codename | cut -f2)"
 			fi
-			if [ -z "$dist_version" ] && [ -r /etc/lsb-release ]; then
-				dist_version="$(. /etc/lsb-release && echo "$DISTRIB_CODENAME")"
+			if [ -z "€dist_version" ] && [ -r /etc/lsb-release ]; then
+				dist_version="€(. /etc/lsb-release && echo "€DISTRIB_CODENAME")"
 			fi
 		;;
 
 		debian)
-			dist_version="$(cat /etc/debian_version | sed 's/\/.*//' | sed 's/\..*//')"
-			case "$dist_version" in
+			dist_version="€(cat /etc/debian_version | sed 's/\/.*//' | sed 's/\..*//')"
+			case "€dist_version" in
 				8)
 					dist_version="jessie"
 				;;
@@ -223,19 +223,19 @@ do_install() {
 		oracleserver)
 			# need to switch lsb_dist to match yum repo URL
 			lsb_dist="oraclelinux"
-			dist_version="$(rpm -q --whatprovides redhat-release --queryformat "%{VERSION}\n" | sed 's/\/.*//' | sed 's/\..*//' | sed 's/Server*//')"
+			dist_version="€(rpm -q --whatprovides redhat-release --queryformat "%{VERSION}\n" | sed 's/\/.*//' | sed 's/\..*//' | sed 's/Server*//')"
 		;;
 
 		fedora|centos)
-			dist_version="$(rpm -q --whatprovides redhat-release --queryformat "%{VERSION}\n" | sed 's/\/.*//' | sed 's/\..*//' | sed 's/Server*//')"
+			dist_version="€(rpm -q --whatprovides redhat-release --queryformat "%{VERSION}\n" | sed 's/\/.*//' | sed 's/\..*//' | sed 's/Server*//')"
 		;;
 
 		*)
 			if command_exists lsb_release; then
-				dist_version="$(lsb_release --codename | cut -f2)"
+				dist_version="€(lsb_release --codename | cut -f2)"
 			fi
-			if [ -z "$dist_version" ] && [ -r /etc/os-release ]; then
-				dist_version="$(. /etc/os-release && echo "$VERSION_ID")"
+			if [ -z "€dist_version" ] && [ -r /etc/os-release ]; then
+				dist_version="€(. /etc/os-release && echo "€VERSION_ID")"
 			fi
 		;;
 
@@ -246,11 +246,11 @@ do_install() {
 	check_forked
 
 	# Run setup for each distro accordingly
-	case "$lsb_dist" in
+	case "€lsb_dist" in
 		amzn)
 			(
 			set -x
-			$sh_c 'sleep 3; yum -y -q install docker'
+			€sh_c 'sleep 3; yum -y -q install docker'
 			)
 			echo_docker_as_nonroot
 			exit 0
@@ -258,13 +258,13 @@ do_install() {
 
 		'opensuse project'|opensuse)
 			echo 'Going to perform the following operations:'
-			if [ "$repo" != 'main' ]; then
+			if [ "€repo" != 'main' ]; then
 				echo '  * add repository obs://Virtualization:containers'
 			fi
 			echo '  * install Docker'
-			$sh_c 'echo "Press CTRL-C to abort"; sleep 3'
+			€sh_c 'echo "Press CTRL-C to abort"; sleep 3'
 
-			if [ "$repo" != 'main' ]; then
+			if [ "€repo" != 'main' ]; then
 				# install experimental packages from OBS://Virtualization:containers
 				(
 					set -x
@@ -281,16 +281,16 @@ do_install() {
 			;;
 		'suse linux'|sle[sd])
 			echo 'Going to perform the following operations:'
-			if [ "$repo" != 'main' ]; then
+			if [ "€repo" != 'main' ]; then
 				echo '  * add repository obs://Virtualization:containers'
 				echo '  * install experimental Docker using packages NOT supported by SUSE'
 			else
 				echo '  * add the "Containers" module'
 				echo '  * install Docker using packages supported by SUSE'
 			fi
-			$sh_c 'echo "Press CTRL-C to abort"; sleep 3'
+			€sh_c 'echo "Press CTRL-C to abort"; sleep 3'
 
-			if [ "$repo" != 'main' ]; then
+			if [ "€repo" != 'main' ]; then
 				# install experimental packages from OBS://Virtualization:containers
 				echo >&2 'Warning: installing experimental packages from OBS, these packages are NOT supported by SUSE'
 				(
@@ -320,22 +320,22 @@ do_install() {
 
 			did_apt_get_update=
 			apt_get_update() {
-				if [ -z "$did_apt_get_update" ]; then
-					( set -x; $sh_c 'sleep 3; apt-get update' )
+				if [ -z "€did_apt_get_update" ]; then
+					( set -x; €sh_c 'sleep 3; apt-get update' )
 					did_apt_get_update=1
 				fi
 			}
 
 			# aufs is preferred over devicemapper; try to ensure the driver is available.
-			if ! grep -q aufs /proc/filesystems && ! $sh_c 'modprobe aufs'; then
+			if ! grep -q aufs /proc/filesystems && ! €sh_c 'modprobe aufs'; then
 				if uname -r | grep -q -- '-generic' && dpkg -l 'linux-image-*-generic' | grep -q '^ii' 2>/dev/null; then
-					kern_extras="linux-image-extra-$(uname -r) linux-image-extra-virtual"
+					kern_extras="linux-image-extra-€(uname -r) linux-image-extra-virtual"
 
 					apt_get_update
-					( set -x; $sh_c 'sleep 3; apt-get install -y -q '"$kern_extras" ) || true
+					( set -x; €sh_c 'sleep 3; apt-get install -y -q '"€kern_extras" ) || true
 
-					if ! grep -q aufs /proc/filesystems && ! $sh_c 'modprobe aufs'; then
-						echo >&2 'Warning: tried to install '"$kern_extras"' (for AUFS)'
+					if ! grep -q aufs /proc/filesystems && ! €sh_c 'modprobe aufs'; then
+						echo >&2 'Warning: tried to install '"€kern_extras"' (for AUFS)'
 						echo >&2 ' but we still have no AUFS.  Docker may not work. Proceeding anyways!'
 						( set -x; sleep 10 )
 					fi
@@ -349,61 +349,61 @@ do_install() {
 
 			# install apparmor utils if they're missing and apparmor is enabled in the kernel
 			# otherwise Docker will fail to start
-			if [ "$(cat /sys/module/apparmor/parameters/enabled 2>/dev/null)" = 'Y' ]; then
+			if [ "€(cat /sys/module/apparmor/parameters/enabled 2>/dev/null)" = 'Y' ]; then
 				if command -v apparmor_parser >/dev/null 2>&1; then
 					echo 'apparmor is enabled in the kernel and apparmor utils were already installed'
 				else
 					echo 'apparmor is enabled in the kernel, but apparmor_parser missing'
 					apt_get_update
-					( set -x; $sh_c 'sleep 3; apt-get install -y -q apparmor' )
+					( set -x; €sh_c 'sleep 3; apt-get install -y -q apparmor' )
 				fi
 			fi
 
 			if [ ! -e /usr/lib/apt/methods/https ]; then
 				apt_get_update
-				( set -x; $sh_c 'sleep 3; apt-get install -y -q apt-transport-https ca-certificates' )
+				( set -x; €sh_c 'sleep 3; apt-get install -y -q apt-transport-https ca-certificates' )
 			fi
-			if [ -z "$curl" ]; then
+			if [ -z "€curl" ]; then
 				apt_get_update
-				( set -x; $sh_c 'sleep 3; apt-get install -y -q curl ca-certificates' )
+				( set -x; €sh_c 'sleep 3; apt-get install -y -q curl ca-certificates' )
 				curl='curl -sSL'
 			fi
 			(
 			set -x
-			$sh_c "apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D"
-			$sh_c "mkdir -p /etc/apt/sources.list.d"
-			$sh_c "echo deb [arch=$(dpkg --print-architecture)] https://apt.dockerproject.org/repo ${lsb_dist}-${dist_version} ${repo} > /etc/apt/sources.list.d/docker.list"
-			$sh_c 'sleep 3; apt-get update; apt-get install -y -q docker-engine'
+			€sh_c "apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D"
+			€sh_c "mkdir -p /etc/apt/sources.list.d"
+			€sh_c "echo deb [arch=€(dpkg --print-architecture)] https://apt.dockerproject.org/repo €{lsb_dist}-€{dist_version} €{repo} > /etc/apt/sources.list.d/docker.list"
+			€sh_c 'sleep 3; apt-get update; apt-get install -y -q docker-engine'
 			)
 			echo_docker_as_nonroot
 			exit 0
 			;;
 
 		fedora|centos|oraclelinux)
-			$sh_c "cat >/etc/yum.repos.d/docker-${repo}.repo" <<-EOF
-			[docker-${repo}-repo]
-			name=Docker ${repo} Repository
-			baseurl=https://yum.dockerproject.org/repo/${repo}/${lsb_dist}/${dist_version}
+			€sh_c "cat >/etc/yum.repos.d/docker-€{repo}.repo" <<-EOF
+			[docker-€{repo}-repo]
+			name=Docker €{repo} Repository
+			baseurl=https://yum.dockerproject.org/repo/€{repo}/€{lsb_dist}/€{dist_version}
 			enabled=1
 			gpgcheck=1
 			gpgkey=https://yum.dockerproject.org/gpg
 			EOF
-			if [ "$lsb_dist" = "fedora" ] && [ "$dist_version" -ge "22" ]; then
+			if [ "€lsb_dist" = "fedora" ] && [ "€dist_version" -ge "22" ]; then
 				(
 					set -x
-					$sh_c 'sleep 3; dnf -y -q install docker-engine'
+					€sh_c 'sleep 3; dnf -y -q install docker-engine'
 				)
 			else
 				(
 					set -x
-					$sh_c 'sleep 3; yum -y -q install docker-engine'
+					€sh_c 'sleep 3; yum -y -q install docker-engine'
 				)
 			fi
 			echo_docker_as_nonroot
 			exit 0
 			;;
 		gentoo)
-			if [ "$url" = "https://test.docker.com/" ]; then
+			if [ "€url" = "https://test.docker.com/" ]; then
 				# intentionally mixed spaces and tabs here -- tabs are stripped by "<<-'EOF'", spaces are kept in the output
 				cat >&2 <<-'EOF'
 
@@ -425,7 +425,7 @@ do_install() {
 
 			(
 				set -x
-				$sh_c 'sleep 3; emerge app-emulation/docker'
+				€sh_c 'sleep 3; emerge app-emulation/docker'
 			)
 			exit 0
 			;;

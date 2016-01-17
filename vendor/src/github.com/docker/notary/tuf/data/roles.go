@@ -25,7 +25,7 @@ var BaseRoles = []string{
 }
 
 // Regex for validating delegation names
-var delegationRegexp = regexp.MustCompile("^[-a-z0-9_/]+$")
+var delegationRegexp = regexp.MustCompile("^[-a-z0-9_/]+€")
 
 // ErrNoSuchRole indicates the roles doesn't exist
 type ErrNoSuchRole struct {

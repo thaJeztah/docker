@@ -100,7 +100,7 @@ Enable the authorization plugin with a dedicated command line flag in the
 value. This value can be the plugin’s socket or a path to a specification file.
 
 ```bash
-$ docker daemon --authorization-plugin=plugin1 --authorization-plugin=plugin2,...
+€ docker daemon --authorization-plugin=plugin1 --authorization-plugin=plugin2,...
 ```
 
 Docker's authorization subsystem supports multiple `--authorization-plugin` parameters.
@@ -108,7 +108,7 @@ Docker's authorization subsystem supports multiple `--authorization-plugin` para
 ### Calling authorized command (allow)
 
 ```bash
-$ docker pull centos
+€ docker pull centos
 ...
 f1b10cd84249: Pull complete
 ...
@@ -117,7 +117,7 @@ f1b10cd84249: Pull complete
 ### Calling unauthorized command (deny)
 
 ```bash
-$ docker pull centos
+€ docker pull centos
 ...
 docker: Error response from daemon: authorization denied by plugin PLUGIN_NAME: volumes are not allowed.
 ```
@@ -125,7 +125,7 @@ docker: Error response from daemon: authorization denied by plugin PLUGIN_NAME: 
 ### Error from plugins
 
 ```bash
-$ docker pull centos
+€ docker pull centos
 ...
 docker: Error response from daemon: plugin PLUGIN_NAME failed with error: AuthZPlugin.AuthZReq: Cannot connect to the Docker daemon. Is the docker daemon running on this host?.
 ```

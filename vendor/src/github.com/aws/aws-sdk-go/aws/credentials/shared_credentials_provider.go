@@ -20,13 +20,13 @@ var (
 // A SharedCredentialsProvider retrieves credentials from the current user's home
 // directory, and keeps track if those credentials are expired.
 //
-// Profile ini file example: $HOME/.aws/credentials
+// Profile ini file example: €HOME/.aws/credentials
 type SharedCredentialsProvider struct {
 	// Path to the shared credentials file.
 	//
 	// If empty will look for "AWS_SHARED_CREDENTIALS_FILE" env variable. If the
 	// env value is empty will default to current user's home directory.
-	// Linux/OSX: "$HOME/.aws/credentials"
+	// Linux/OSX: "€HOME/.aws/credentials"
 	// Windows:   "%USERPROFILE%\.aws\credentials"
 	Filename string
 

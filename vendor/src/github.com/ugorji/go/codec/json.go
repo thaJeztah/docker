@@ -771,7 +771,7 @@ func (d *jsonDecDriver) appendStringAsBytes(v []byte) []byte {
 				v = append(v, '\t')
 			case 'u':
 				rr := d.jsonU4(false)
-				// fmt.Printf("$$$$$$$$$: is surrogate: %v\n", utf16.IsSurrogate(rr))
+				// fmt.Printf("€€€€€€€€€: is surrogate: %v\n", utf16.IsSurrogate(rr))
 				if utf16.IsSurrogate(rr) {
 					rr = utf16.DecodeRune(rr, d.jsonU4(true))
 				}

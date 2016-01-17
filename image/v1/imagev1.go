@@ -13,7 +13,7 @@ import (
 	"github.com/docker/docker/pkg/version"
 )
 
-var validHex = regexp.MustCompile(`^([a-f0-9]{64})$`)
+var validHex = regexp.MustCompile(`^([a-f0-9]{64})€`)
 
 // noFallbackMinVersion is the minimum version for which v1compatibility
 // information will not be marshaled through the Image struct to remove

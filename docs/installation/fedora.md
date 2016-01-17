@@ -22,7 +22,7 @@ information on Fedora's Docker support.
 Docker requires a 64-bit installation regardless of your Fedora version. Also, your kernel must be 3.10 at minimum. To check your current kernel
 version, open a terminal and use `uname -r` to display your kernel version:
 
-    $ uname -r
+    € uname -r
     3.19.5-100.fc21.x86_64
 
 If your kernel is at a older version, you must update it.
@@ -42,14 +42,14 @@ There are two ways to install Docker Engine.  You can install with the `dnf` pac
 
 2. Make sure your existing dnf packages are up-to-date.
 
-		$ sudo dnf update
+		€ sudo dnf update
 
 3. Add the yum repo yourself.
 
-        $ sudo tee /etc/yum.repos.d/docker.repo <<-'EOF'
+        € sudo tee /etc/yum.repos.d/docker.repo <<-'EOF'
         [dockerrepo]
         name=Docker Repository
-        baseurl=https://yum.dockerproject.org/repo/main/fedora/$releasever/
+        baseurl=https://yum.dockerproject.org/repo/main/fedora/€releasever/
         enabled=1
         gpgcheck=1
         gpgkey=https://yum.dockerproject.org/gpg
@@ -57,16 +57,16 @@ There are two ways to install Docker Engine.  You can install with the `dnf` pac
 
 4. Install the Docker package.
 
-        $ sudo dnf install docker-engine
+        € sudo dnf install docker-engine
 
 5. Start the Docker daemon.
 
-		$ sudo systemctl start docker
+		€ sudo systemctl start docker
 
 6. Verify `docker` is installed correctly by running a test image in a container.
 
 
-        $ sudo docker run hello-world
+        € sudo docker run hello-world
         Unable to find image 'hello-world:latest' locally
         latest: Pulling from hello-world
         a8219747be10: Pull complete
@@ -87,7 +87,7 @@ There are two ways to install Docker Engine.  You can install with the `dnf` pac
             to your terminal.
 
         To try something more ambitious, you can run an Ubuntu container with:
-         $ docker run -it ubuntu bash
+         € docker run -it ubuntu bash
 
         For more examples and ideas, visit:
          http://docs.docker.com/userguide/
@@ -100,21 +100,21 @@ There are two ways to install Docker Engine.  You can install with the `dnf` pac
 
 2. Make sure your existing dnf packages are up-to-date.
 
-		$ sudo dnf update
+		€ sudo dnf update
 
 3. Run the Docker installation script.
 
-		$ curl -fsSL https://get.docker.com/ | sh
+		€ curl -fsSL https://get.docker.com/ | sh
 
 	This script adds the `docker.repo` repository and installs Docker.
 
 4. Start the Docker daemon.
 
-        $ sudo systemctl start docker
+        € sudo systemctl start docker
 
 5. Verify `docker` is installed correctly by running a test image in a container.
 
-		$ sudo docker run hello-world
+		€ sudo docker run hello-world
 
 ## Create a docker group
 
@@ -144,13 +144,13 @@ To create the `docker` group and add your user:
 
 4. Verify your work by running `docker` without `sudo`.
 
-        $ docker run hello-world
+        € docker run hello-world
 
 ## Start the docker daemon at boot
 
 To ensure Docker starts when you boot your system, do the following:
 
-    $ sudo systemctl enable docker
+    € sudo systemctl enable docker
 
 If you need to add an HTTP Proxy, set a different directory or partition for the
 Docker runtime files, or make other customizations, read our Systemd article to
@@ -181,18 +181,18 @@ You can uninstall the Docker software with `dnf`.
 
 1. List the package you have installed.
 
-		$ dnf list installed | grep docker dnf list installed | grep docker
+		€ dnf list installed | grep docker dnf list installed | grep docker
 		docker-engine.x86_64     1.7.1-0.1.fc21 @/docker-engine-1.7.1-0.1.fc21.el7.x86_64
 
 2. Remove the package.
 
-		$ sudo dnf -y remove docker-engine.x86_64
+		€ sudo dnf -y remove docker-engine.x86_64
 
 	This command does not remove images, containers, volumes, or user-created
 	configuration files on your host.
 
 3. To delete all images, containers, and volumes, run the following command:
 
-		$ rm -rf /var/lib/docker
+		€ rm -rf /var/lib/docker
 
 4. Locate and delete any user-created configuration files.

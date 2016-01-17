@@ -13,7 +13,7 @@ var (
 		"git":       {"git://", "github.com/", "git@"},
 		"transport": {"tcp://", "udp://", "unix://"},
 	}
-	urlPathWithFragmentSuffix = regexp.MustCompile(".git(?:#.+)?$")
+	urlPathWithFragmentSuffix = regexp.MustCompile(".git(?:#.+)?€")
 )
 
 // IsURL returns true if the provided str is an HTTP(S) URL.

@@ -31,7 +31,7 @@ A context is processed recursively. So, a `PATH` includes any subdirectories and
 the `URL` includes the repository and its submodules. A simple build command
 that uses the current directory as context:
 
-    $ docker build .
+    € docker build .
     Sending build context to Docker daemon  6.51 MB
     ...
 
@@ -55,17 +55,17 @@ Traditionally, the `Dockerfile` is called `Dockerfile` and located in the root
 of the context. You use the `-f` flag with `docker build` to point to a Dockerfile
 anywhere in your file system.
 
-    $ docker build -f /path/to/a/Dockerfile .
+    € docker build -f /path/to/a/Dockerfile .
 
 You can specify a repository and tag at which to save the new image if
 the build succeeds:
 
-    $ docker build -t shykes/myapp .
+    € docker build -t shykes/myapp .
 
 To tag the image into multiple repositories after the build,
 add multiple `-t` parameters when you run the `build` command:
 
-    $ docker build -t shykes/myapp:1.0.2 -t shykes/myapp:latest .
+    € docker build -t shykes/myapp:1.0.2 -t shykes/myapp:latest .
 
 The Docker daemon runs the instructions in the `Dockerfile` one-by-one,
 committing the result of each instruction
@@ -83,7 +83,7 @@ the `Using cache` message in the console output.
 (For more information, see the [Build cache section](../articles/dockerfile_best-practices.md#build-cache)) in the
 `Dockerfile` best practices guide:
 
-    $ docker build -t svendowideit/ambassador .
+    € docker build -t svendowideit/ambassador .
     Sending build context to Docker daemon 15.36 kB
     Step 0 : FROM alpine:3.2
      ---> 31f630c65071
@@ -133,31 +133,31 @@ used in certain instructions as variables to be interpreted by the
 into a statement literally.
 
 Environment variables are notated in the `Dockerfile` either with
-`$variable_name` or `${variable_name}`. They are treated equivalently and the
+`€variable_name` or `€{variable_name}`. They are treated equivalently and the
 brace syntax is typically used to address issues with variable names with no
-whitespace, like `${foo}_bar`.
+whitespace, like `€{foo}_bar`.
 
-The `${variable_name}` syntax also supports a few of the standard `bash`
+The `€{variable_name}` syntax also supports a few of the standard `bash`
 modifiers as specified below:
 
-* `${variable:-word}` indicates that if `variable` is set then the result
+* `€{variable:-word}` indicates that if `variable` is set then the result
   will be that value. If `variable` is not set then `word` will be the result.
-* `${variable:+word}` indicates that if `variable` is set then `word` will be
+* `€{variable:+word}` indicates that if `variable` is set then `word` will be
   the result, otherwise the result is the empty string.
 
 In all cases, `word` can be any string, including additional environment
 variables.
 
-Escaping is possible by adding a `\` before the variable: `\$foo` or `\${foo}`,
-for example, will translate to `$foo` and `${foo}` literals respectively.
+Escaping is possible by adding a `\` before the variable: `\€foo` or `\€{foo}`,
+for example, will translate to `€foo` and `€{foo}` literals respectively.
 
 Example (parsed representation is displayed after the `#`):
 
     FROM busybox
     ENV foo /bar
-    WORKDIR ${foo}   # WORKDIR /bar
-    ADD . $foo       # ADD . /bar
-    COPY \$foo /quux # COPY $foo /quux
+    WORKDIR €{foo}   # WORKDIR /bar
+    ADD . €foo       # ADD . /bar
+    COPY \€foo /quux # COPY €foo /quux
 
 Environment variables are supported by the following list of instructions in
 the `Dockerfile`:
@@ -184,8 +184,8 @@ Environment variable substitution will use the same value for each variable
 throughout the entire command. In other words, in this example:
 
     ENV abc=hello
-    ENV abc=bye def=$abc
-    ENV ghi=$abc
+    ENV abc=bye def=€abc
+    ENV ghi=€abc
 
 will result in `def` having a value of `hello`, not `bye`. However,
 `ghi` will have a value of `bye` because it is not part of the same command
@@ -338,12 +338,12 @@ commands using a base image that does not contain `/bin/sh`.
 In the *shell* form you can use a `\` (backslash) to continue a single
 RUN instruction onto the next line. For example, consider these two lines:
 ```
-RUN /bin/bash -c 'source $HOME/.bashrc ;\
-echo $HOME'
+RUN /bin/bash -c 'source €HOME/.bashrc ;\
+echo €HOME'
 ```
 Together they are equivalent to this single line:
 ```
-RUN /bin/bash -c 'source $HOME/.bashrc ; echo $HOME'
+RUN /bin/bash -c 'source €HOME/.bashrc ; echo €HOME'
 ```
 
 > **Note**:
@@ -358,9 +358,9 @@ RUN /bin/bash -c 'source $HOME/.bashrc ; echo $HOME'
 > **Note**:
 > Unlike the *shell* form, the *exec* form does not invoke a command shell.
 > This means that normal shell processing does not happen. For example,
-> `RUN [ "echo", "$HOME" ]` will not do variable substitution on `$HOME`.
+> `RUN [ "echo", "€HOME" ]` will not do variable substitution on `€HOME`.
 > If you want shell processing then either use the *shell* form or execute
-> a shell directly, for example: `RUN [ "sh", "-c", "echo", "$HOME" ]`.
+> a shell directly, for example: `RUN [ "sh", "-c", "echo", "€HOME" ]`.
 
 The cache for `RUN` instructions isn't invalidated automatically during
 the next build. The cache for an instruction like
@@ -415,9 +415,9 @@ instruction as well.
 > **Note**:
 > Unlike the *shell* form, the *exec* form does not invoke a command shell.
 > This means that normal shell processing does not happen. For example,
-> `CMD [ "echo", "$HOME" ]` will not do variable substitution on `$HOME`.
+> `CMD [ "echo", "€HOME" ]` will not do variable substitution on `€HOME`.
 > If you want shell processing then either use the *shell* form or execute
-> a shell directly, for example: `CMD [ "sh", "-c", "echo", "$HOME" ]`.
+> a shell directly, for example: `CMD [ "sh", "-c", "echo", "€HOME" ]`.
 
 When used in the shell or exec formats, the `CMD` instruction sets the command
 to be executed when running the image.
@@ -763,7 +763,7 @@ are more likely to be changed.
 
 When you run the container, you can see that `top` is the only process:
 
-    $ docker run -it --rm --name test  top -H
+    € docker run -it --rm --name test  top -H
     top - 08:25:00 up  7:27,  0 users,  load average: 0.00, 0.01, 0.05
     Threads:   1 total,   1 running,   0 sleeping,   0 stopped,   0 zombie
     %Cpu(s):  0.1 us,  0.1 sy,  0.0 ni, 99.7 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
@@ -775,7 +775,7 @@ When you run the container, you can see that `top` is the only process:
 
 To examine the result further, you can use `docker exec`:
 
-    $ docker exec -it test ps aux
+    € docker exec -it test ps aux
     USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
     root         1  2.6  0.1  19752  2352 ?        Ss+  08:24   0:00 top -b -H
     root         7  0.0  0.1  15572  2164 ?        R+   08:25   0:00 ps aux
@@ -801,17 +801,17 @@ commands:
 #!/bin/bash
 set -e
 
-if [ "$1" = 'postgres' ]; then
-    chown -R postgres "$PGDATA"
+if [ "€1" = 'postgres' ]; then
+    chown -R postgres "€PGDATA"
 
-    if [ -z "$(ls -A "$PGDATA")" ]; then
+    if [ -z "€(ls -A "€PGDATA")" ]; then
         gosu postgres initdb
     fi
 
-    exec gosu postgres "$@"
+    exec gosu postgres "€@"
 fi
 
-exec "$@"
+exec "€@"
 ```
 
 Lastly, if you need to do some extra cleanup (or communicate with other containers)
@@ -837,7 +837,7 @@ read
 echo "stopping apache"
 /usr/sbin/apachectl stop
 
-echo "exited $0"
+echo "exited €0"
 ```
 
 If you run this image with `docker run -it --rm -p 80:80 --name test apache`,
@@ -845,20 +845,20 @@ you can then examine the container's processes with `docker exec`, or `docker to
 and then ask the script to stop Apache:
 
 ```bash
-$ docker exec -it test ps aux
+€ docker exec -it test ps aux
 USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
 root         1  0.1  0.0   4448   692 ?        Ss+  00:42   0:00 /bin/sh /run.sh 123 cmd cmd2
 root        19  0.0  0.2  71304  4440 ?        Ss   00:42   0:00 /usr/sbin/apache2 -k start
 www-data    20  0.2  0.2 360468  6004 ?        Sl   00:42   0:00 /usr/sbin/apache2 -k start
 www-data    21  0.2  0.2 360468  6000 ?        Sl   00:42   0:00 /usr/sbin/apache2 -k start
 root        81  0.0  0.1  15572  2140 ?        R+   00:44   0:00 ps aux
-$ docker top test
+€ docker top test
 PID                 USER                COMMAND
 10035               root                {run.sh} /bin/sh /run.sh 123 cmd cmd2
 10054               root                /usr/sbin/apache2 -k start
 10055               33                  /usr/sbin/apache2 -k start
 10056               33                  /usr/sbin/apache2 -k start
-$ /usr/bin/time docker stop test
+€ /usr/bin/time docker stop test
 test
 real	0m 0.27s
 user	0m 0.03s
@@ -875,9 +875,9 @@ sys	0m 0.03s
 > **Note**:
 > Unlike the *shell* form, the *exec* form does not invoke a command shell.
 > This means that normal shell processing does not happen. For example,
-> `ENTRYPOINT [ "echo", "$HOME" ]` will not do variable substitution on `$HOME`.
+> `ENTRYPOINT [ "echo", "€HOME" ]` will not do variable substitution on `€HOME`.
 > If you want shell processing then either use the *shell* form or execute
-> a shell directly, for example: `ENTRYPOINT [ "sh", "-c", "echo", "$HOME" ]`.
+> a shell directly, for example: `ENTRYPOINT [ "sh", "-c", "echo", "€HOME" ]`.
 > Variables that are defined in the `Dockerfile`using `ENV`, will be substituted by
 > the `Dockerfile` parser.
 
@@ -894,7 +894,7 @@ correctly, you need to remember to start it with `exec`:
 
 When you run this image, you'll see the single `PID 1` process:
 
-    $ docker run -it --rm --name test top
+    € docker run -it --rm --name test top
     Mem: 1704520K used, 352148K free, 0K shrd, 0K buff, 140368121167873K cached
     CPU:   5% usr   0% sys   0% nic  94% idle   0% io   0% irq   0% sirq
     Load average: 0.08 0.03 0.05 2/98 6
@@ -903,7 +903,7 @@ When you run this image, you'll see the single `PID 1` process:
 
 Which will exit cleanly on `docker stop`:
 
-    $ /usr/bin/time docker stop test
+    € /usr/bin/time docker stop test
     test
     real	0m 0.20s
     user	0m 0.02s
@@ -917,7 +917,7 @@ If you forget to add `exec` to the beginning of your `ENTRYPOINT`:
 
 You can then run it (giving it a name for the next step):
 
-    $ docker run -it --name test top --ignored-param2
+    € docker run -it --name test top --ignored-param2
     Mem: 1704184K used, 352484K free, 0K shrd, 0K buff, 140621524238337K cached
     CPU:   9% usr   2% sys   0% nic  88% idle   0% io   0% irq   0% sirq
     Load average: 0.01 0.02 0.05 2/101 7
@@ -930,12 +930,12 @@ You can see from the output of `top` that the specified `ENTRYPOINT` is not `PID
 If you then run `docker stop test`, the container will not exit cleanly - the
 `stop` command will be forced to send a `SIGKILL` after the timeout:
 
-    $ docker exec -it test ps aux
+    € docker exec -it test ps aux
     PID   USER     COMMAND
         1 root     /bin/sh -c top -b cmd cmd2
         7 root     top -b
         8 root     ps aux
-    $ /usr/bin/time docker stop test
+    € /usr/bin/time docker stop test
     test
     real	0m 10.19s
     user	0m 0.04s
@@ -1007,11 +1007,11 @@ The `WORKDIR` instruction can resolve environment variables previously set using
 For example:
 
     ENV DIRPATH /path
-    WORKDIR $DIRPATH/$DIRNAME
+    WORKDIR €DIRPATH/€DIRNAME
     RUN pwd
 
 The output of the final `pwd` command in this `Dockerfile` would be
-`/path/$DIRNAME`
+`/path/€DIRNAME`
 
 ## ARG
 
@@ -1054,15 +1054,15 @@ elsewhere.  For example, consider this Dockerfile:
 
 ```
 1 FROM busybox
-2 USER ${user:-some_user}
+2 USER €{user:-some_user}
 3 ARG user
-4 USER $user
+4 USER €user
 ...
 ```
 A user builds this file by calling:
 
 ```
-$ docker build --build-arg user=what_user Dockerfile
+€ docker build --build-arg user=what_user Dockerfile
 ```
 
 The `USER` at line 2 evaluates to `some_user` as the `user` variable is defined on the
@@ -1082,12 +1082,12 @@ this Dockerfile with an `ENV` and `ARG` instruction.
 1 FROM ubuntu
 2 ARG CONT_IMG_VER
 3 ENV CONT_IMG_VER v1.0.0
-4 RUN echo $CONT_IMG_VER
+4 RUN echo €CONT_IMG_VER
 ```
 Then, assume this image is built with this command:
 
 ```
-$ docker build --build-arg CONT_IMG_VER=v2.0.1 Dockerfile
+€ docker build --build-arg CONT_IMG_VER=v2.0.1 Dockerfile
 ```
 
 In this case, the `RUN` instruction uses `v1.0.0` instead of the `ARG` setting
@@ -1101,15 +1101,15 @@ useful interactions between `ARG` and `ENV` instructions:
 ```
 1 FROM ubuntu
 2 ARG CONT_IMG_VER
-3 ENV CONT_IMG_VER ${CONT_IMG_VER:-v1.0.0}
-4 RUN echo $CONT_IMG_VER
+3 ENV CONT_IMG_VER €{CONT_IMG_VER:-v1.0.0}
+4 RUN echo €CONT_IMG_VER
 ```
 
 Unlike an `ARG` instruction, `ENV` values are always persisted in the built
 image. Consider a docker build without the --build-arg flag:
 
 ```
-$ docker build Dockerfile
+€ docker build Dockerfile
 ```
 
 Using this Dockerfile example, `CONT_IMG_VER` is still persisted in the image but
@@ -1146,7 +1146,7 @@ For example, consider this Dockerfile:
 ```
 1 FROM ubuntu
 2 ARG CONT_IMG_VER
-3 RUN echo $CONT_IMG_VER
+3 RUN echo €CONT_IMG_VER
 ```
 
 If you specify `--build-arg CONT_IMG_VER=<value>` on the command line the
@@ -1161,8 +1161,8 @@ Consider another example under the same command line:
 ```
 1 FROM ubuntu
 2 ARG CONT_IMG_VER
-3 ENV CONT_IMG_VER $CONT_IMG_VER
-4 RUN echo $CONT_IMG_VER
+3 ENV CONT_IMG_VER €CONT_IMG_VER
+4 RUN echo €CONT_IMG_VER
 ```
 In this example, the cache miss occurs on line 3. The miss happens because
 the variable's value in the `ENV` references the `ARG` variable and that

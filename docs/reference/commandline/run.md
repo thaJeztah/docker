@@ -112,11 +112,11 @@ For information on connecting a container to a network, see the ["*Docker networ
 
 ### Assign name and allocate psuedo-TTY (--name, -it)
 
-    $ docker run --name test -it debian
+    € docker run --name test -it debian
     root@d6c0fe130dba:/# exit 13
-    $ echo $?
+    € echo €?
     13
-    $ docker ps -a | grep test
+    € docker ps -a | grep test
     d6c0fe130dba        debian:7            "/bin/bash"         26 seconds ago      Exited (13) 17 seconds ago                         test
 
 This example runs a container named `test` using the `debian:latest`
@@ -128,7 +128,7 @@ In the example, the `bash` shell is quit by entering
 
 ### Capture container ID (--cidfile)
 
-    $ docker run --cidfile /tmp/docker_test.cid ubuntu echo "test"
+    € docker run --cidfile /tmp/docker_test.cid ubuntu echo "test"
 
 This will create a container and print `test` to the console. The `cidfile`
 flag makes Docker attempt to create a new file and write the container ID to it.
@@ -137,7 +137,7 @@ file when `docker run` exits.
 
 ### Full container capabilities (--privileged)
 
-    $ docker run -t -i --rm ubuntu bash
+    € docker run -t -i --rm ubuntu bash
     root@bc338942ef20:/# mount -t tmpfs none /mnt
     mount: permission denied
 
@@ -145,7 +145,7 @@ This will *not* work, because by default, most potentially dangerous kernel
 capabilities are dropped; including `cap_sys_admin` (which is required to mount
 filesystems). However, the `--privileged` flag will allow it to run:
 
-    $ docker run --privileged ubuntu bash
+    € docker run --privileged ubuntu bash
     root@50e3f57e16e6:/# mount -t tmpfs none /mnt
     root@50e3f57e16e6:/# df -h
     Filesystem      Size  Used Avail Use% Mounted on
@@ -158,14 +158,14 @@ flag exists to allow special use-cases, like running Docker within Docker.
 
 ### Set working directory (-w)
 
-    $ docker  run -w /path/to/dir/ -i -t  ubuntu pwd
+    € docker  run -w /path/to/dir/ -i -t  ubuntu pwd
 
 The `-w` lets the command being executed inside directory given, here
 `/path/to/dir/`. If the path does not exists it is created inside the container.
 
 ### mount tmpfs (--tmpfs)
 
-    $ docker run -d --tmpfs /run:rw,noexec,nosuid,size=65536k my_image
+    € docker run -d --tmpfs /run:rw,noexec,nosuid,size=65536k my_image
 
     The --tmpfs flag mounts a tmpfs into the container with the rw,noexec,nosuid,size=65536k options.
 
@@ -173,7 +173,7 @@ The `-w` lets the command being executed inside directory given, here
 
 ### Mount volume (-v, --read-only)
 
-    $ docker  run  -v `pwd`:`pwd` -w `pwd` -i -t  ubuntu pwd
+    € docker  run  -v `pwd`:`pwd` -w `pwd` -i -t  ubuntu pwd
 
 The `-v` flag mounts the current working directory into the container. The `-w`
 lets the command being executed inside the current working directory, by
@@ -181,21 +181,21 @@ changing into the directory to the value returned by `pwd`. So this
 combination executes the command using the container, but inside the
 current working directory.
 
-    $ docker run -v /doesnt/exist:/foo -w /foo -i -t ubuntu bash
+    € docker run -v /doesnt/exist:/foo -w /foo -i -t ubuntu bash
 
 When the host directory of a bind-mounted volume doesn't exist, Docker
 will automatically create this directory on the host for you. In the
 example above, Docker will create the `/doesnt/exist`
 folder before starting your container.
 
-    $ docker run --read-only -v /icanwrite busybox touch /icanwrite here
+    € docker run --read-only -v /icanwrite busybox touch /icanwrite here
 
 Volumes can be used in combination with `--read-only` to control where
 a container writes files. The `--read-only` flag mounts the container's root
 filesystem as read only prohibiting writes to locations other than the
 specified volumes for the container.
 
-    $ docker run -t -i -v /var/run/docker.sock:/var/run/docker.sock -v ./static-docker:/usr/bin/docker busybox sh
+    € docker run -t -i -v /var/run/docker.sock:/var/run/docker.sock -v ./static-docker:/usr/bin/docker busybox sh
 
 By bind-mounting the docker unix socket and statically linked docker
 binary (such as that provided by [https://get.docker.com](
@@ -204,26 +204,26 @@ manipulate the host's Docker daemon.
 
 ### Publish or expose port (-p, --expose)
 
-    $ docker run -p 127.0.0.1:80:8080 ubuntu bash
+    € docker run -p 127.0.0.1:80:8080 ubuntu bash
 
 This binds port `8080` of the container to port `80` on `127.0.0.1` of the host
 machine. The [Docker User
 Guide](../../userguide/networking/default_network/dockerlinks.md)
 explains in detail how to manipulate ports in Docker.
 
-    $ docker run --expose 80 ubuntu bash
+    € docker run --expose 80 ubuntu bash
 
 This exposes port `80` of the container without publishing the port to the host
 system's interfaces.
 
 ### Set environment variables (-e, --env, --env-file)
 
-    $ docker run -e MYVAR1 --env MYVAR2=foo --env-file ./env.list ubuntu bash
+    € docker run -e MYVAR1 --env MYVAR2=foo --env-file ./env.list ubuntu bash
 
 This sets environmental variables in the container. For illustration all three
 flags are shown here. Where `-e`, `--env` take an environment variable and
 value, or if no `=` is provided, then that variable's current value is passed
-through (i.e. `$MYVAR1` from the host is set to `$MYVAR1` in the container).
+through (i.e. `€MYVAR1` from the host is set to `€MYVAR1` in the container).
 When no `=` is provided and that variable is not defined in the client's
 environment then that variable will be removed from the container's list of
 environment variables.
@@ -233,9 +233,9 @@ Regardless of the order of these three flags, the `--env-file` are processed
 first, and then `-e`, `--env` flags. This way, the `-e` or `--env` will
 override variables as needed.
 
-    $ cat ./env.list
+    € cat ./env.list
     TEST_FOO=BAR
-    $ docker run --env TEST_FOO="This is a test" --env-file ./env.list busybox env | grep TEST_FOO
+    € docker run --env TEST_FOO="This is a test" --env-file ./env.list busybox env | grep TEST_FOO
     TEST_FOO=This is a test
 
 The `--env-file` flag takes a filename as an argument and expects each line
@@ -244,7 +244,7 @@ lines need only be prefixed with `#`
 
 An example of a file passed with `--env-file`
 
-    $ cat ./env.list
+    € cat ./env.list
     TEST_FOO=BAR
 
     # this is a comment
@@ -258,7 +258,7 @@ An example of a file passed with `--env-file`
 
     # pass through this variable from the caller
     TEST_PASSTHROUGH
-    $ TEST_PASSTHROUGH=howdy docker run --env-file ./env.list busybox env
+    € TEST_PASSTHROUGH=howdy docker run --env-file ./env.list busybox env
     PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
     HOSTNAME=5198e0745561
     TEST_FOO=BAR
@@ -272,7 +272,7 @@ An example of a file passed with `--env-file`
     123qwe=bar
     org.spring.config=something
 
-    $ docker run --env-file ./env.list busybox env
+    € docker run --env-file ./env.list busybox env
     PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
     HOSTNAME=5198e0745561
     TEST_FOO=BAR
@@ -290,7 +290,7 @@ An example of a file passed with `--env-file`
 
 A label is a `key=value` pair that applies metadata to a container. To label a container with two labels:
 
-    $ docker run -l my-label --label com.example.foo=bar ubuntu bash
+    € docker run -l my-label --label com.example.foo=bar ubuntu bash
 
 The `my-label` key doesn't specify a value so the label defaults to an empty
 string(`""`). To add multiple labels, repeat the label flag (`-l` or `--label`).
@@ -303,7 +303,7 @@ Use the `--label-file` flag to load multiple labels from a file. Delimit each
 label in the file with an EOL mark. The example below loads labels from a
 labels file in the current directory:
 
-    $ docker run --label-file ./labels ubuntu bash
+    € docker run --label-file ./labels ubuntu bash
 
 The label-file format is similar to the format for loading environment
 variables. (Unlike environment variables, labels are not visible to processes
@@ -328,14 +328,14 @@ When you start a container use the `--net` flag to connect it to a network.
 This adds the `busybox` container to the `mynet` network.
 
 ```bash
-$ docker run -itd --net=my-multihost-network busybox
+€ docker run -itd --net=my-multihost-network busybox
 ```
 
 You can also choose the IP addresses for the container with `--ip` and `--ip6`
 flags when you start the container on a user-defined network.
 
 ```bash
-$ docker run -itd --net=my-multihost-network --ip=10.10.9.75 busybox
+€ docker run -itd --net=my-multihost-network --ip=10.10.9.75 busybox
 ```
 
 If you want to add a running container to a network use the `docker network connect` subcommand.
@@ -355,7 +355,7 @@ disconnect` command.
 
 ### Mount volumes from container (--volumes-from)
 
-    $ docker run --volumes-from 777f7dc92da7 --volumes-from ba8c0c54f0f2:ro -i -t ubuntu pwd
+    € docker run --volumes-from 777f7dc92da7 --volumes-from ba8c0c54f0f2:ro -i -t ubuntu pwd
 
 The `--volumes-from` flag mounts all the defined volumes from the referenced
 containers. Containers can be specified by repetitions of the `--volumes-from`
@@ -383,18 +383,18 @@ The `-a` flag tells `docker run` to bind to the container's `STDIN`, `STDOUT`
 or `STDERR`. This makes it possible to manipulate the output and input as
 needed.
 
-    $ echo "test" | docker run -i -a stdin ubuntu cat -
+    € echo "test" | docker run -i -a stdin ubuntu cat -
 
 This pipes data into a container and prints the container's ID by attaching
 only to the container's `STDIN`.
 
-    $ docker run -a stderr ubuntu echo test
+    € docker run -a stderr ubuntu echo test
 
 This isn't going to print anything unless there's an error because we've
 only attached to the `STDERR` of the container. The container's logs
 still store what's been written to `STDERR` and `STDOUT`.
 
-    $ cat somefile | docker run -i -a stdin mybuilder dobuild
+    € cat somefile | docker run -i -a stdin mybuilder dobuild
 
 This is how piping a file into a container could be done for a build.
 The container's ID will be printed after the build is done and the build
@@ -404,7 +404,7 @@ retrieve the container's ID once the container has finished running.
 
 ### Add host device to container (--device)
 
-    $ docker run --device=/dev/sdc:/dev/xvdc --device=/dev/sdd --device=/dev/zero:/dev/nulo -i -t ubuntu ls -l /dev/{xvdc,sdd,nulo}
+    € docker run --device=/dev/sdc:/dev/xvdc --device=/dev/sdd --device=/dev/zero:/dev/nulo -i -t ubuntu ls -l /dev/{xvdc,sdd,nulo}
     brw-rw---- 1 root disk 8, 2 Feb  9 16:05 /dev/xvdc
     brw-rw---- 1 root disk 8, 3 Feb  9 16:05 /dev/sdd
     crw-rw-rw- 1 root root 1, 5 Feb  9 16:05 /dev/nulo
@@ -419,19 +419,19 @@ This can be overridden using a third `:rwm` set of options to each `--device`
 flag:
 
 
-    $ docker run --device=/dev/sda:/dev/xvdc --rm -it ubuntu fdisk  /dev/xvdc
+    € docker run --device=/dev/sda:/dev/xvdc --rm -it ubuntu fdisk  /dev/xvdc
 
     Command (m for help): q
-    $ docker run --device=/dev/sda:/dev/xvdc:ro --rm -it ubuntu fdisk  /dev/xvdc
+    € docker run --device=/dev/sda:/dev/xvdc:ro --rm -it ubuntu fdisk  /dev/xvdc
     You will not be able to write the partition table.
 
     Command (m for help): q
 
-    $ docker run --device=/dev/sda:/dev/xvdc --rm -it ubuntu fdisk  /dev/xvdc
+    € docker run --device=/dev/sda:/dev/xvdc --rm -it ubuntu fdisk  /dev/xvdc
 
     Command (m for help): q
 
-    $ docker run --device=/dev/sda:/dev/xvdc:m --rm -it ubuntu fdisk  /dev/xvdc
+    € docker run --device=/dev/sda:/dev/xvdc:m --rm -it ubuntu fdisk  /dev/xvdc
     fdisk: unable to open /dev/xvdc: Operation not permitted
 
 > **Note:**
@@ -492,7 +492,7 @@ Docker supports the following restart policies:
   </tbody>
 </table>
 
-    $ docker run --restart=always redis
+    € docker run --restart=always redis
 
 This will run the `redis` container with a restart policy of **always**
 so that if the container exits, Docker will restart it.
@@ -507,8 +507,8 @@ You can add other hosts into a container's `/etc/hosts` file by using one or
 more `--add-host` flags. This example adds a static address for a host named
 `docker`:
 
-    $ docker run --add-host=docker:10.180.0.1 --rm -it debian
-    $$ ping docker
+    € docker run --add-host=docker:10.180.0.1 --rm -it debian
+    €€ ping docker
     PING docker (10.180.0.1): 48 data bytes
     56 bytes from 10.180.0.1: icmp_seq=0 ttl=254 time=7.600 ms
     56 bytes from 10.180.0.1: icmp_seq=1 ttl=254 time=30.705 ms
@@ -525,8 +525,8 @@ The flags you pass to `ip addr show` depend on whether you are
 using IPv4 or IPv6 networking in your containers. Use the following
 flags for IPv4 address retrieval for a network device named `eth0`:
 
-    $ HOSTIP=`ip -4 addr show scope global dev eth0 | grep inet | awk '{print \$2}' | cut -d / -f 1`
-    $ docker run  --add-host=docker:${HOSTIP} --rm -it debian
+    € HOSTIP=`ip -4 addr show scope global dev eth0 | grep inet | awk '{print \€2}' | cut -d / -f 1`
+    € docker run  --add-host=docker:€{HOSTIP} --rm -it debian
 
 For IPv6 use the `-6` flag instead of the `-4` flag. For other network
 devices, replace `eth0` with the correct device name (for example `docker0`
@@ -539,7 +539,7 @@ available in the default container, you can set these using the `--ulimit` flag.
 `--ulimit` is specified with a soft and hard limit as such:
 `<type>=<soft limit>[:<hard limit>]`, for example:
 
-    $ docker run --ulimit nofile=1024:1024 --rm debian ulimit -n
+    € docker run --ulimit nofile=1024:1024 --rm debian ulimit -n
     1024
 
 > **Note:**
@@ -547,7 +547,7 @@ available in the default container, you can set these using the `--ulimit` flag.
 > for both values. If no `ulimits` are set, they will be inherited from
 > the default `ulimits` set on the daemon.  `as` option is disabled now.
 > In other words, the following script is not supported:
-> `$ docker run -it --ulimit as=1024 fedora /bin/bash`
+> `€ docker run -it --ulimit as=1024 fedora /bin/bash`
 
 The values are sent to the appropriate `syscall` as they are set.
 Docker doesn't perform any byte conversion. Take this into account when setting the values.
@@ -581,8 +581,8 @@ technology. On Linux, the only supported is the `default` option which uses
 Linux namespaces. These two commands are equivalent on Linux:
 
 ```
-$ docker run -d busybox top
-$ docker run -d --isolation default busybox top
+€ docker run -d busybox top
+€ docker run -d --isolation default busybox top
 ```
 
 On Microsoft Windows, can take any of these values:
@@ -597,13 +597,13 @@ On Microsoft Windows, can take any of these values:
 In practice, when running on Microsoft Windows without a `daemon` option set,  these two commands are equivalent:
 
 ```
-$ docker run -d --isolation default busybox top
-$ docker run -d --isolation process busybox top
+€ docker run -d --isolation default busybox top
+€ docker run -d --isolation process busybox top
 ```
 
 If you have set the `--exec-opt isolation=hyperv` option on the Docker `daemon`, any of these commands also result in `hyperv` isolation:
 
 ```
-$ docker run -d --isolation default busybox top
-$ docker run -d --isolation hyperv busybox top
+€ docker run -d --isolation default busybox top
+€ docker run -d --isolation hyperv busybox top
 ```

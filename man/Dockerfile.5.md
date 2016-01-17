@@ -360,15 +360,15 @@ A Dockerfile is similar to a Makefile.
 
   ```
   1 FROM busybox
-  2 USER ${user:-some_user}
+  2 USER €{user:-some_user}
   3 ARG user
-  4 USER $user
+  4 USER €user
   ...
   ```
   A user builds this file by calling:
 
   ```
-  $ docker build --build-arg user=what_user Dockerfile
+  € docker build --build-arg user=what_user Dockerfile
   ```
 
   The `USER` at line 2 evaluates to `some_user` as the `user` variable is defined on the
@@ -388,12 +388,12 @@ A Dockerfile is similar to a Makefile.
   1 FROM ubuntu
   2 ARG CONT_IMG_VER
   3 ENV CONT_IMG_VER v1.0.0
-  4 RUN echo $CONT_IMG_VER
+  4 RUN echo €CONT_IMG_VER
   ```
   Then, assume this image is built with this command:
 
   ```
-  $ docker build --build-arg CONT_IMG_VER=v2.0.1 Dockerfile
+  € docker build --build-arg CONT_IMG_VER=v2.0.1 Dockerfile
   ```
 
   In this case, the `RUN` instruction uses `v1.0.0` instead of the `ARG` setting
@@ -407,15 +407,15 @@ A Dockerfile is similar to a Makefile.
   ```
   1 FROM ubuntu
   2 ARG CONT_IMG_VER
-  3 ENV CONT_IMG_VER ${CONT_IMG_VER:-v1.0.0}
-  4 RUN echo $CONT_IMG_VER
+  3 ENV CONT_IMG_VER €{CONT_IMG_VER:-v1.0.0}
+  4 RUN echo €CONT_IMG_VER
   ```
 
   Unlike an `ARG` instruction, `ENV` values are always persisted in the built
   image. Consider a docker build without the --build-arg flag:
 
   ```
-  $ docker build Dockerfile
+  € docker build Dockerfile
   ```
 
   Using this Dockerfile example, `CONT_IMG_VER` is still persisted in the image but

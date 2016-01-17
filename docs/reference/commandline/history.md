@@ -21,7 +21,7 @@ parent = "smn_cli"
 
 To see how the `docker:latest` image was built:
 
-    $ docker history docker
+    € docker history docker
     IMAGE               CREATED             CREATED BY                                      SIZE                COMMENT
     3e23a5875458        8 days ago          /bin/sh -c #(nop) ENV LC_ALL=C.UTF-8            0 B
     8578938dd170        8 days ago          /bin/sh -c dpkg-reconfigure locales &&    loc   1.245 MB
@@ -32,7 +32,7 @@ To see how the `docker:latest` image was built:
 
 To see how the `docker:apache` image was added to a container's base image:
 
-    $ docker history docker:scm
+    € docker history docker:scm
     IMAGE               CREATED             CREATED BY                                      SIZE                COMMENT
     2ac9d1098bf1        3 months ago        /bin/bash                                       241.4 MB            Added Apache to Fedora base image
     88b42ffd1f7c        5 months ago        /bin/sh -c #(nop) ADD file:1fd8d7f9f6557cafc7   373.7 MB

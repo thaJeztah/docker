@@ -146,7 +146,7 @@ func (s *DockerRegistrySuite) TestRunByDigest(c *check.C) {
 	imageReference := fmt.Sprintf("%s@%s", repoName, pushDigest)
 
 	containerName := "runByDigest"
-	out, _ := dockerCmd(c, "run", "--name", containerName, imageReference, "sh", "-c", "echo found=$digest")
+	out, _ := dockerCmd(c, "run", "--name", containerName, imageReference, "sh", "-c", "echo found=€digest")
 
 	foundRegex := regexp.MustCompile("found=([^\n]+)")
 	matches := foundRegex.FindStringSubmatch(out)
@@ -258,7 +258,7 @@ func (s *DockerRegistrySuite) TestListImagesWithDigests(c *check.C) {
 	// list images
 	out, _ := dockerCmd(c, "images", "--digests")
 
-	// make sure repo shown, tag=<none>, digest = $digest1
+	// make sure repo shown, tag=<none>, digest = €digest1
 	re1 := regexp.MustCompile(`\s*` + repoName + `\s*<none>\s*` + digest1.String() + `\s`)
 	c.Assert(re1.MatchString(out), checker.True, check.Commentf("expected %q: %s", re1.String(), out))
 	// setup image2
@@ -277,10 +277,10 @@ func (s *DockerRegistrySuite) TestListImagesWithDigests(c *check.C) {
 	// list images
 	out, _ = dockerCmd(c, "images", "--digests")
 
-	// make sure repo shown, tag=<none>, digest = $digest1
+	// make sure repo shown, tag=<none>, digest = €digest1
 	c.Assert(re1.MatchString(out), checker.True, check.Commentf("expected %q: %s", re1.String(), out))
 
-	// make sure repo shown, tag=<none>, digest = $digest2
+	// make sure repo shown, tag=<none>, digest = €digest2
 	re2 := regexp.MustCompile(`\s*` + repoName + `\s*<none>\s*` + digest2.String() + `\s`)
 	c.Assert(re2.MatchString(out), checker.True, check.Commentf("expected %q: %s", re2.String(), out))
 

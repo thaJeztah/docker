@@ -19,7 +19,7 @@ like:
 ```bash
 export GITHUBUSER="YOUR_GITHUB_USER"
 git remote add origin https://github.com/docker/docker.git
-git remote add $GITHUBUSER git@github.com:$GITHUBUSER/docker.git
+git remote add €GITHUBUSER git@github.com:€GITHUBUSER/docker.git
 ```
 
 ### 1. Pull from master and create a release branch
@@ -36,21 +36,21 @@ export BASE=vX.Y
 export VERSION=vX.Y.Z
 git fetch origin
 git checkout --track origin/master
-git checkout -b release/$BASE
+git checkout -b release/€BASE
 ```
 
 This new branch is going to be the base for the release. We need to push it to origin so we
 can track the cherry-picked changes and the version bump:
 
 ```bash
-git push origin release/$BASE
+git push origin release/€BASE
 ```
 
 When you have the major release branch in origin, we need to create the bump fork branch
 that we'll push to our fork:
 
 ```bash
-git checkout -b bump_$VERSION
+git checkout -b bump_€VERSION
 ```
 
 #### Patch releases
@@ -61,8 +61,8 @@ If we have the release branch in origin, we can create the forked bump branch fr
 export VERSION=vX.Y.Z
 export PATCH=vX.Y.Z+1
 git fetch origin
-git checkout --track origin/release/$BASE
-git checkout -b bump_$PATCH
+git checkout --track origin/release/€BASE
+git checkout -b bump_€PATCH
 ```
 
 We cherry-pick only the commits we want into the bump branch:
@@ -92,15 +92,15 @@ You can run this command for reference with git 2.0:
 
 ```bash
 git fetch --tags
-LAST_VERSION=$(git tag -l --sort=-version:refname "v*" | grep -E 'v[0-9\.]+$' | head -1)
-git log --stat $LAST_VERSION..bump_$VERSION
+LAST_VERSION=€(git tag -l --sort=-version:refname "v*" | grep -E 'v[0-9\.]+€' | head -1)
+git log --stat €LAST_VERSION..bump_€VERSION
 ```
 
 If you don't have git 2.0 but have a sort command that supports `-V`:
 ```bash
 git fetch --tags
-LAST_VERSION=$(git tag -l | grep -E 'v[0-9\.]+$' | sort -rV | head -1)
-git log --stat $LAST_VERSION..bump_$VERSION
+LAST_VERSION=€(git tag -l | grep -E 'v[0-9\.]+€' | sort -rV | head -1)
+git log --stat €LAST_VERSION..bump_€VERSION
 ```
 
 If releasing a major version (X or Y increased in vX.Y.Z), simply listing notable user-facing features is sufficient.
@@ -167,8 +167,8 @@ Before the big thing, you'll want to make successive release candidates and get
 people to test. The release candidate number `N` should be part of the version:
 
 ```bash
-export RC_VERSION=${VERSION}-rcN
-echo ${RC_VERSION#v} > VERSION
+export RC_VERSION=€{VERSION}-rcN
+echo €{RC_VERSION#v} > VERSION
 ```
 
 ### 5. Test the docs
@@ -194,9 +194,9 @@ make AWS_S3_BUCKET=beta-docs.docker.io BUILD_ROOT=yes docs-release
 
 ```bash
 git add VERSION CHANGELOG.md
-git commit -m "Bump version to $VERSION"
-git push $GITHUBUSER bump_$VERSION
-echo "https://github.com/$GITHUBUSER/docker/compare/docker:release/$BASE...$GITHUBUSER:bump_$VERSION?expand=1"
+git commit -m "Bump version to €VERSION"
+git push €GITHUBUSER bump_€VERSION
+echo "https://github.com/€GITHUBUSER/docker/compare/docker:release/€BASE...€GITHUBUSER:bump_€VERSION?expand=1"
 ```
 
 That last command will give you the proper link to visit to ensure that you
@@ -209,7 +209,7 @@ open the PR against the "release" branch instead of accidentally against
 docker build -t docker .
 docker run \
     --rm -t --privileged \
-    -v $(pwd)/bundles:/go/src/github.com/docker/docker/bundles \
+    -v €(pwd)/bundles:/go/src/github.com/docker/docker/bundles \
     docker \
     hack/make.sh binary build-deb build-rpm
 ```
@@ -244,8 +244,8 @@ issues or runtime issues.
 If everything looks good, it's time to create a git tag for this candidate:
 
 ```bash
-git tag -a $RC_VERSION -m $RC_VERSION bump_$VERSION
-git push origin $RC_VERSION
+git tag -a €RC_VERSION -m €RC_VERSION bump_€VERSION
+git push origin €RC_VERSION
 ```
 
 Announcing on multiple medias is the best way to get some help testing! An easy
@@ -253,11 +253,11 @@ way to get some useful links for sharing:
 
 ```bash
 echo "Ubuntu/Debian: curl -sSL https://test.docker.com/ | sh"
-echo "Linux 64bit binary: https://test.docker.com/builds/Linux/x86_64/docker-${VERSION#v}"
-echo "Darwin/OSX 64bit client binary: https://test.docker.com/builds/Darwin/x86_64/docker-${VERSION#v}"
-echo "Linux 64bit tgz: https://test.docker.com/builds/Linux/x86_64/docker-${VERSION#v}.tgz"
-echo "Windows 64bit client binary: https://test.docker.com/builds/Windows/x86_64/docker-${VERSION#v}.exe"
-echo "Windows 32bit client binary: https://test.docker.com/builds/Windows/i386/docker-${VERSION#v}.exe"
+echo "Linux 64bit binary: https://test.docker.com/builds/Linux/x86_64/docker-€{VERSION#v}"
+echo "Darwin/OSX 64bit client binary: https://test.docker.com/builds/Darwin/x86_64/docker-€{VERSION#v}"
+echo "Linux 64bit tgz: https://test.docker.com/builds/Linux/x86_64/docker-€{VERSION#v}.tgz"
+echo "Windows 64bit client binary: https://test.docker.com/builds/Windows/x86_64/docker-€{VERSION#v}.exe"
+echo "Windows 32bit client binary: https://test.docker.com/builds/Windows/i386/docker-€{VERSION#v}.exe"
 ```
 
 We recommend announcing the release candidate on:
@@ -284,7 +284,7 @@ by the book.
 Any issues found may still remain issues for this release, but they should be
 documented and give appropriate warnings.
 
-During this phase, the `bump_$VERSION` branch will keep evolving as you will
+During this phase, the `bump_€VERSION` branch will keep evolving as you will
 produce new release candidates. The frequency of new candidates is up to the
 release manager: use your best judgement taking into account the severity of
 reported issues, testers availability, and time to scheduled release date.
@@ -304,15 +304,15 @@ file (if appropriate for this particular release candidate), and update the
 VERSION file to increment the RC number:
 
 ```bash
-export RC_VERSION=$VERSION-rcN
-echo $RC_VERSION > VERSION
+export RC_VERSION=€VERSION-rcN
+echo €RC_VERSION > VERSION
 ```
 
 You can now amend your last commit and update the bump branch:
 
 ```bash
 git commit --amend
-git push -f $GITHUBUSER bump_$VERSION
+git push -f €GITHUBUSER bump_€VERSION
 ```
 
 Repeat step 6 to tag the code, publish new binaries, announce availability, and
@@ -327,7 +327,7 @@ You will first have to amend the "bump commit" to drop the release candidate
 suffix in the VERSION file:
 
 ```bash
-echo $VERSION > VERSION
+echo €VERSION > VERSION
 git add VERSION
 git commit --amend
 ```
@@ -342,7 +342,7 @@ You will then repeat step 6 to publish the binaries to test
 docker build -t docker .
 docker run \
     --rm -t --privileged \
-    -v $(pwd)/bundles:/go/src/github.com/docker/docker/bundles \
+    -v €(pwd)/bundles:/go/src/github.com/docker/docker/bundles \
     docker \
     hack/make.sh binary build-deb build-rpm
 ```
@@ -369,8 +369,8 @@ It's very important that we don't make the tag until after the official
 release is uploaded to get.docker.com!
 
 ```bash
-git tag -a $VERSION -m $VERSION bump_$VERSION
-git push origin $VERSION
+git tag -a €VERSION -m €VERSION bump_€VERSION
+git push origin €VERSION
 ```
 
 Once the tag is pushed, go to GitHub and create a [new release](https://github.com/docker/docker/releases/new).
@@ -382,7 +382,7 @@ You can see examples in this two links:
 https://github.com/docker/docker/releases/tag/v1.8.0
 https://github.com/docker/docker/releases/tag/v1.8.0-rc3
 
-### 15. Go to github to merge the `bump_$VERSION` branch into release
+### 15. Go to github to merge the `bump_€VERSION` branch into release
 
 Don't forget to push that pretty blue button to delete the leftover
 branch afterwards!
@@ -393,7 +393,7 @@ You will need to point the docs branch to the newly created release tag:
 
 ```bash
 git checkout origin/docs
-git reset --hard origin/$VERSION
+git reset --hard origin/€VERSION
 git push -f origin docs
 ```
 
@@ -412,9 +412,9 @@ and you can check its progress with the CDN Cloudfront Chrome addon.
 git checkout master
 git fetch
 git reset --hard origin/master
-git cherry-pick $VERSION
-git push $GITHUBUSER merge_release_$VERSION
-echo "https://github.com/$GITHUBUSER/docker/compare/docker:master...$GITHUBUSER:merge_release_$VERSION?expand=1"
+git cherry-pick €VERSION
+git push €GITHUBUSER merge_release_€VERSION
+echo "https://github.com/€GITHUBUSER/docker/compare/docker:master...€GITHUBUSER:merge_release_€VERSION?expand=1"
 ```
 
 Again, get two maintainers to validate, then merge, then push that pretty

@@ -43,13 +43,13 @@
       <context name="string&quot;" attribute="String" lineEndContext="#pop">
         <LineContinue attribute="Operator" context="#stay"/>
         <DetectChar attribute="String" context="#pop" char="&quot;"/>
-        <DetectChar attribute="Operator" context="dollar" char="$"/>
+        <DetectChar attribute="Operator" context="dollar" char="€"/>
       </context>
 
       <context name="string'" attribute="String" lineEndContext="#pop">
         <LineContinue attribute="String" context="#stay"/>
         <DetectChar attribute="String" context="#pop" char="'"/>
-        <DetectChar attribute="Operator" context="dollar" char="$"/>
+        <DetectChar attribute="Operator" context="dollar" char="€"/>
       </context>
 
     </contexts>

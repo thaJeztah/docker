@@ -25,7 +25,7 @@ Running an application inside a container takes a single command: `docker run`.
 
 Let's try it now.
 
-    $ docker run ubuntu /bin/echo 'Hello world'
+    € docker run ubuntu /bin/echo 'Hello world'
     Hello world
 
 And you just launched your first container!
@@ -63,7 +63,7 @@ only run as long as the command you specify is active. Here, as soon as
 Let's try the `docker run` command again, this time specifying a new
 command to run in our container.
 
-    $ docker run -t -i ubuntu /bin/bash
+    € docker run -t -i ubuntu /bin/bash
     root@af8bae53bdd3:/#
 
 Here we've again specified the `docker run` command and launched an
@@ -108,7 +108,7 @@ like most of the applications we're probably going to run with Docker.
 
 Again we can do this with the `docker run` command:
 
-    $ docker run -d ubuntu /bin/sh -c "while true; do echo hello world; sleep 1; done"
+    € docker run -d ubuntu /bin/sh -c "while true; do echo hello world; sleep 1; done"
     1e5535038e285177d5214659a068137486f96ee5c2e85a4ac52dc83f2ebe4147
 
 Wait, what? Where's our "hello world" output? Let's look at what we've run here.
@@ -145,7 +145,7 @@ do that with the `docker ps` command. The `docker ps` command queries
 the Docker daemon for information about all the containers it knows
 about.
 
-    $ docker ps
+    € docker ps
     CONTAINER ID  IMAGE         COMMAND               CREATED        STATUS       PORTS NAMES
     1e5535038e28  ubuntu  /bin/sh -c 'while tr  2 minutes ago  Up 1 minute        insane_babbage
 
@@ -165,7 +165,7 @@ Okay, so we now know it's running. But is it doing what we asked it to do? To
 see this we're going to look inside the container using the `docker logs`
 command. Let's use the container name Docker assigned.
 
-    $ docker logs insane_babbage
+    € docker logs insane_babbage
     hello world
     hello world
     hello world
@@ -181,7 +181,7 @@ Now we've established we can create our own containers let's tidy up
 after ourselves and stop our detached container. To do this we use the
 `docker stop` command.
 
-    $ docker stop insane_babbage
+    € docker stop insane_babbage
     insane_babbage
 
 The `docker stop` command tells Docker to politely stop the running
@@ -190,7 +190,7 @@ has just stopped.
 
 Let's check it worked with the `docker ps` command.
 
-    $ docker ps
+    € docker ps
     CONTAINER ID  IMAGE         COMMAND               CREATED        STATUS       PORTS NAMES
 
 Excellent. Our container has been stopped.

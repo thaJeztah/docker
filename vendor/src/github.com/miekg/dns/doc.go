@@ -28,7 +28,7 @@ Or when the default TTL (3600) and class (IN) suit you:
 
 Or even:
 
-     mx, err := dns.NewRR("$ORIGIN nl.\nmiek 1H IN MX 10 mx.miek")
+     mx, err := dns.NewRR("€ORIGIN nl.\nmiek 1H IN MX 10 mx.miek")
 
 In the DNS messages are exchanged, these messages contain resource
 records (sets).  Use pattern for creating a message:

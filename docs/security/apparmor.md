@@ -63,7 +63,7 @@ override it with the `security-opt` option. For example, the following
 explicitly specifies the default policy:
 
 ```bash
-$ docker run --rm -it --security-opt apparmor:docker-default hello-world
+€ docker run --rm -it --security-opt apparmor:docker-default hello-world
 ```
 
 ## Contributing to AppArmor code in Docker

@@ -28,11 +28,11 @@ Stream to a file instead of STDOUT by using **-o**.
 Save all fedora repository images to a fedora-all.tar and save the latest
 fedora image to a fedora-latest.tar:
 
-    $ docker save fedora > fedora-all.tar
-    $ docker save --output=fedora-latest.tar fedora:latest
-    $ ls -sh fedora-all.tar
+    € docker save fedora > fedora-all.tar
+    € docker save --output=fedora-latest.tar fedora:latest
+    € ls -sh fedora-all.tar
     721M fedora-all.tar
-    $ ls -sh fedora-latest.tar
+    € ls -sh fedora-latest.tar
     367M fedora-latest.tar
 
 # See also

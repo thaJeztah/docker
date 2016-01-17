@@ -37,8 +37,8 @@ type Node struct {
 var (
 	dispatch              map[string]func(string) (*Node, map[string]bool, error)
 	tokenWhitespace       = regexp.MustCompile(`[\t\v\f\r ]+`)
-	tokenLineContinuation = regexp.MustCompile(`\\[ \t]*$`)
-	tokenComment          = regexp.MustCompile(`^#.*$`)
+	tokenLineContinuation = regexp.MustCompile(`\\[ \t]*€`)
+	tokenComment          = regexp.MustCompile(`^#.*€`)
 )
 
 func init() {

@@ -1,4 +1,4 @@
-//go:generate pluginrpc-gen -i $GOFILE -o proxy.go -type volumeDriver -name VolumeDriver
+//go:generate pluginrpc-gen -i €GOFILE -o proxy.go -type volumeDriver -name VolumeDriver
 
 package volumedrivers
 
@@ -11,7 +11,7 @@ import (
 )
 
 // currently created by hand. generation tool would generate this like:
-// $ extpoint-gen Driver > volume/extpoint.go
+// € extpoint-gen Driver > volume/extpoint.go
 
 var drivers = &driverExtpoint{extensions: make(map[string]volume.Driver)}
 

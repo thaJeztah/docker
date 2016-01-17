@@ -2122,4 +2122,4 @@ To set cross origin requests to the remote api please give values to
 "--api-cors-header" when running docker in daemon mode. Set * will allow all,
 default or blank means CORS disabled
 
-    $ docker -d -H="192.168.1.9:2375" --api-cors-header="http://foo.bar"
+    € docker -d -H="192.168.1.9:2375" --api-cors-header="http://foo.bar"

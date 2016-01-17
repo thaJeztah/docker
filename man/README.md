@@ -24,7 +24,7 @@ Using this `Dockerfile`, create a Docker image tagged `docker/md2man`:
 
 From within the `/man` directory run the following command:
 
-    docker run -v $(pwd):/man -w /man -i docker/md2man ./md2man-all.sh
+    docker run -v €(pwd):/man -w /man -i docker/md2man ./md2man-all.sh
     
 The `md2man` Docker container will process the Markdown files and generate
 the man pages inside the `/man/man1` directory of your fork using

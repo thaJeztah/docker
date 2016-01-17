@@ -16,8 +16,8 @@ interface(`docker_domtrans',`
 		type docker_t, docker_exec_t;
 	')
 
-	corecmd_search_bin($1)
-	domtrans_pattern($1, docker_exec_t, docker_t)
+	corecmd_search_bin(€1)
+	domtrans_pattern(€1, docker_exec_t, docker_t)
 ')
 
 ########################################
@@ -35,8 +35,8 @@ interface(`docker_exec',`
 		type docker_exec_t;
 	')
 
-	corecmd_search_bin($1)
-	can_exec($1, docker_exec_t)
+	corecmd_search_bin(€1)
+	can_exec(€1, docker_exec_t)
 ')
 
 ########################################
@@ -54,8 +54,8 @@ interface(`docker_search_lib',`
 		type docker_var_lib_t;
 	')
 
-	allow $1 docker_var_lib_t:dir search_dir_perms;
-	files_search_var_lib($1)
+	allow €1 docker_var_lib_t:dir search_dir_perms;
+	files_search_var_lib(€1)
 ')
 
 ########################################
@@ -73,8 +73,8 @@ interface(`docker_exec_lib',`
 		type docker_var_lib_t;
 	')
 
-	allow $1 docker_var_lib_t:dir search_dir_perms;
-	can_exec($1, docker_var_lib_t)
+	allow €1 docker_var_lib_t:dir search_dir_perms;
+	can_exec(€1, docker_var_lib_t)
 ')
 
 ########################################
@@ -92,8 +92,8 @@ interface(`docker_read_lib_files',`
 		type docker_var_lib_t;
 	')
 
-	files_search_var_lib($1)
-	read_files_pattern($1, docker_var_lib_t, docker_var_lib_t)
+	files_search_var_lib(€1)
+	read_files_pattern(€1, docker_var_lib_t, docker_var_lib_t)
 ')
 
 ########################################
@@ -111,8 +111,8 @@ interface(`docker_read_share_files',`
 		type docker_share_t;
 	')
 
-	files_search_var_lib($1)
-	read_files_pattern($1, docker_share_t, docker_share_t)
+	files_search_var_lib(€1)
+	read_files_pattern(€1, docker_share_t, docker_share_t)
 ')
 
 ########################################
@@ -130,9 +130,9 @@ interface(`docker_manage_lib_files',`
 		type docker_var_lib_t;
 	')
 
-	files_search_var_lib($1)
-	manage_files_pattern($1, docker_var_lib_t, docker_var_lib_t)
-	manage_lnk_files_pattern($1, docker_var_lib_t, docker_var_lib_t)
+	files_search_var_lib(€1)
+	manage_files_pattern(€1, docker_var_lib_t, docker_var_lib_t)
+	manage_lnk_files_pattern(€1, docker_var_lib_t, docker_var_lib_t)
 ')
 
 ########################################
@@ -150,8 +150,8 @@ interface(`docker_manage_lib_dirs',`
 		type docker_var_lib_t;
 	')
 
-	files_search_var_lib($1)
-	manage_dirs_pattern($1, docker_var_lib_t, docker_var_lib_t)
+	files_search_var_lib(€1)
+	manage_dirs_pattern(€1, docker_var_lib_t, docker_var_lib_t)
 ')
 
 ########################################
@@ -186,7 +186,7 @@ interface(`docker_lib_filetrans',`
 		type docker_var_lib_t;
 	')
 
-	filetrans_pattern($1, docker_var_lib_t, $2, $3, $4)
+	filetrans_pattern(€1, docker_var_lib_t, €2, €3, €4)
 ')
 
 ########################################
@@ -204,8 +204,8 @@ interface(`docker_read_pid_files',`
 		type docker_var_run_t;
 	')
 
-	files_search_pids($1)
-	read_files_pattern($1, docker_var_run_t, docker_var_run_t)
+	files_search_pids(€1)
+	read_files_pattern(€1, docker_var_run_t, docker_var_run_t)
 ')
 
 ########################################
@@ -224,13 +224,13 @@ interface(`docker_systemctl',`
 		type docker_unit_file_t;
 	')
 
-	systemd_exec_systemctl($1)
-	init_reload_services($1)
-        systemd_read_fifo_file_passwd_run($1)
-	allow $1 docker_unit_file_t:file read_file_perms;
-	allow $1 docker_unit_file_t:service manage_service_perms;
+	systemd_exec_systemctl(€1)
+	init_reload_services(€1)
+        systemd_read_fifo_file_passwd_run(€1)
+	allow €1 docker_unit_file_t:file read_file_perms;
+	allow €1 docker_unit_file_t:service manage_service_perms;
 
-	ps_process_pattern($1, docker_t)
+	ps_process_pattern(€1, docker_t)
 ')
 
 ########################################
@@ -248,7 +248,7 @@ interface(`docker_rw_sem',`
 		type docker_t;
 	')
 
-	allow $1 docker_t:sem rw_sem_perms;
+	allow €1 docker_t:sem rw_sem_perms;
 ')
 
 #######################################
@@ -266,7 +266,7 @@ interface(`docker_use_ptys',`
         type docker_devpts_t;
     ')
 
-    allow $1 docker_devpts_t:chr_file rw_term_perms;
+    allow €1 docker_devpts_t:chr_file rw_term_perms;
 ')
 
 #######################################
@@ -289,16 +289,16 @@ interface(`docker_filetrans_named_content',`
         type docker_home_t;
     ')
 
-    files_pid_filetrans($1, docker_var_run_t, file, "docker.pid")
-    files_pid_filetrans($1, docker_var_run_t, sock_file, "docker.sock")
-    files_pid_filetrans($1, docker_var_run_t, dir, "docker-client")
-    files_var_lib_filetrans($1, docker_var_lib_t, dir, "docker")
-    filetrans_pattern($1, docker_var_lib_t, docker_share_t, file, "config.env")
-    filetrans_pattern($1, docker_var_lib_t, docker_share_t, file, "hosts")
-    filetrans_pattern($1, docker_var_lib_t, docker_share_t, file, "hostname")
-    filetrans_pattern($1, docker_var_lib_t, docker_share_t, file, "resolv.conf")
-    filetrans_pattern($1, docker_var_lib_t, docker_share_t, dir, "init")
-    userdom_admin_home_dir_filetrans($1, docker_home_t, dir, ".docker")
+    files_pid_filetrans(€1, docker_var_run_t, file, "docker.pid")
+    files_pid_filetrans(€1, docker_var_run_t, sock_file, "docker.sock")
+    files_pid_filetrans(€1, docker_var_run_t, dir, "docker-client")
+    files_var_lib_filetrans(€1, docker_var_lib_t, dir, "docker")
+    filetrans_pattern(€1, docker_var_lib_t, docker_share_t, file, "config.env")
+    filetrans_pattern(€1, docker_var_lib_t, docker_share_t, file, "hosts")
+    filetrans_pattern(€1, docker_var_lib_t, docker_share_t, file, "hostname")
+    filetrans_pattern(€1, docker_var_lib_t, docker_share_t, file, "resolv.conf")
+    filetrans_pattern(€1, docker_var_lib_t, docker_share_t, dir, "init")
+    userdom_admin_home_dir_filetrans(€1, docker_home_t, dir, ".docker")
 ')
 
 ########################################
@@ -316,8 +316,8 @@ interface(`docker_stream_connect',`
 		type docker_t, docker_var_run_t;
 	')
 
-	files_search_pids($1)
-	stream_connect_pattern($1, docker_var_run_t, docker_var_run_t, docker_t)
+	files_search_pids(€1)
+	stream_connect_pattern(€1, docker_var_run_t, docker_var_run_t, docker_t)
 ')
 
 ########################################
@@ -335,9 +335,9 @@ interface(`docker_spc_stream_connect',`
 		type spc_t, spc_var_run_t;
 	')
 
-	files_search_pids($1)
-	files_write_all_pid_sockets($1)
-	allow $1 spc_t:unix_stream_socket connectto;
+	files_search_pids(€1)
+	files_write_all_pid_sockets(€1)
+	allow €1 spc_t:unix_stream_socket connectto;
 ')
 
 
@@ -362,30 +362,30 @@ interface(`docker_admin',`
 		type docker_config_t;
 	')
 
-	allow $1 docker_t:process { ptrace signal_perms };
-	ps_process_pattern($1, docker_t)
+	allow €1 docker_t:process { ptrace signal_perms };
+	ps_process_pattern(€1, docker_t)
 
-	admin_pattern($1, docker_config_t)
+	admin_pattern(€1, docker_config_t)
 
-	files_search_var_lib($1)
-	admin_pattern($1, docker_var_lib_t)
+	files_search_var_lib(€1)
+	admin_pattern(€1, docker_var_lib_t)
 
-	files_search_pids($1)
-	admin_pattern($1, docker_var_run_t)
+	files_search_pids(€1)
+	admin_pattern(€1, docker_var_run_t)
 
-	files_search_locks($1)
-	admin_pattern($1, docker_lock_t)
+	files_search_locks(€1)
+	admin_pattern(€1, docker_lock_t)
 
-	logging_search_logs($1)
-	admin_pattern($1, docker_log_t)
+	logging_search_logs(€1)
+	admin_pattern(€1, docker_log_t)
 
-	docker_systemctl($1)
-	admin_pattern($1, docker_unit_file_t)
-	allow $1 docker_unit_file_t:service all_service_perms;
+	docker_systemctl(€1)
+	admin_pattern(€1, docker_unit_file_t)
+	allow €1 docker_unit_file_t:service all_service_perms;
 
 	optional_policy(`
-		systemd_passwd_agent_exec($1)
-		systemd_read_fifo_file_passwd_run($1)
+		systemd_passwd_agent_exec(€1)
+		systemd_read_fifo_file_passwd_run(€1)
 	')
 ')
 
@@ -420,42 +420,42 @@ interface(`fs_dontaudit_remount_tmpfs',`
 		type tmpfs_t;
 	')
 
-	dontaudit $1 tmpfs_t:filesystem remount;
+	dontaudit €1 tmpfs_t:filesystem remount;
 ')
 interface(`dev_dontaudit_list_all_dev_nodes',`
 	gen_require(`
 		type device_t;
 	')
 
-	dontaudit $1 device_t:dir list_dir_perms;
+	dontaudit €1 device_t:dir list_dir_perms;
 ')
 interface(`kernel_unlabeled_entry_type',`
 	gen_require(`
 		type unlabeled_t;
 	')
 
-	domain_entry_file($1, unlabeled_t)
+	domain_entry_file(€1, unlabeled_t)
 ')
 interface(`kernel_unlabeled_domtrans',`
 	gen_require(`
 		type unlabeled_t;
 	')
 
-	read_lnk_files_pattern($1, unlabeled_t, unlabeled_t)
-	domain_transition_pattern($1, unlabeled_t, $2)
-	type_transition $1 unlabeled_t:process $2;
+	read_lnk_files_pattern(€1, unlabeled_t, unlabeled_t)
+	domain_transition_pattern(€1, unlabeled_t, €2)
+	type_transition €1 unlabeled_t:process €2;
 ')
 interface(`files_write_all_pid_sockets',`
 	gen_require(`
 		attribute pidfile;
 	')
 
-	allow $1 pidfile:sock_file write_sock_file_perms;
+	allow €1 pidfile:sock_file write_sock_file_perms;
 ')
 interface(`dev_dontaudit_mounton_sysfs',`
 	gen_require(`
 		type sysfs_t;
 	')
 
-	dontaudit $1 sysfs_t:dir mounton;
+	dontaudit €1 sysfs_t:dir mounton;
 ')

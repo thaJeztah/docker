@@ -19,7 +19,7 @@ import (
 func (s *DockerSuite) TestLogsContainerSmallerThanPage(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	testLen := 32767
-	out, _ := dockerCmd(c, "run", "-d", "busybox", "sh", "-c", fmt.Sprintf("for i in $(seq 1 %d); do echo -n =; done; echo", testLen))
+	out, _ := dockerCmd(c, "run", "-d", "busybox", "sh", "-c", fmt.Sprintf("for i in €(seq 1 %d); do echo -n =; done; echo", testLen))
 
 	id := strings.TrimSpace(out)
 	dockerCmd(c, "wait", id)
@@ -33,7 +33,7 @@ func (s *DockerSuite) TestLogsContainerSmallerThanPage(c *check.C) {
 func (s *DockerSuite) TestLogsContainerBiggerThanPage(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	testLen := 32768
-	out, _ := dockerCmd(c, "run", "-d", "busybox", "sh", "-c", fmt.Sprintf("for i in $(seq 1 %d); do echo -n =; done; echo", testLen))
+	out, _ := dockerCmd(c, "run", "-d", "busybox", "sh", "-c", fmt.Sprintf("for i in €(seq 1 %d); do echo -n =; done; echo", testLen))
 
 	id := strings.TrimSpace(out)
 	dockerCmd(c, "wait", id)
@@ -47,7 +47,7 @@ func (s *DockerSuite) TestLogsContainerBiggerThanPage(c *check.C) {
 func (s *DockerSuite) TestLogsContainerMuchBiggerThanPage(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	testLen := 33000
-	out, _ := dockerCmd(c, "run", "-d", "busybox", "sh", "-c", fmt.Sprintf("for i in $(seq 1 %d); do echo -n =; done; echo", testLen))
+	out, _ := dockerCmd(c, "run", "-d", "busybox", "sh", "-c", fmt.Sprintf("for i in €(seq 1 %d); do echo -n =; done; echo", testLen))
 
 	id := strings.TrimSpace(out)
 	dockerCmd(c, "wait", id)
@@ -60,7 +60,7 @@ func (s *DockerSuite) TestLogsContainerMuchBiggerThanPage(c *check.C) {
 func (s *DockerSuite) TestLogsTimestamps(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	testLen := 100
-	out, _ := dockerCmd(c, "run", "-d", "busybox", "sh", "-c", fmt.Sprintf("for i in $(seq 1 %d); do echo =; done;", testLen))
+	out, _ := dockerCmd(c, "run", "-d", "busybox", "sh", "-c", fmt.Sprintf("for i in €(seq 1 %d); do echo =; done;", testLen))
 
 	id := strings.TrimSpace(out)
 	dockerCmd(c, "wait", id)
@@ -118,7 +118,7 @@ func (s *DockerSuite) TestLogsStderrInStdout(c *check.C) {
 func (s *DockerSuite) TestLogsTail(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	testLen := 100
-	out, _ := dockerCmd(c, "run", "-d", "busybox", "sh", "-c", fmt.Sprintf("for i in $(seq 1 %d); do echo =; done;", testLen))
+	out, _ := dockerCmd(c, "run", "-d", "busybox", "sh", "-c", fmt.Sprintf("for i in €(seq 1 %d); do echo =; done;", testLen))
 
 	id := strings.TrimSpace(out)
 	dockerCmd(c, "wait", id)
@@ -169,7 +169,7 @@ func (s *DockerSuite) TestLogsFollowStopped(c *check.C) {
 func (s *DockerSuite) TestLogsSince(c *check.C) {
 	testRequires(c, DaemonIsLinux)
 	name := "testlogssince"
-	dockerCmd(c, "run", "--name="+name, "busybox", "/bin/sh", "-c", "for i in $(seq 1 3); do sleep 2; echo log$i; done")
+	dockerCmd(c, "run", "--name="+name, "busybox", "/bin/sh", "-c", "for i in €(seq 1 3); do sleep 2; echo log€i; done")
 	out, _ := dockerCmd(c, "logs", "-t", name)
 
 	log2Line := strings.Split(strings.Split(out, "\n")[1], " ")
@@ -204,7 +204,7 @@ func (s *DockerSuite) TestLogsSince(c *check.C) {
 
 func (s *DockerSuite) TestLogsSinceFutureFollow(c *check.C) {
 	testRequires(c, DaemonIsLinux)
-	out, _ := dockerCmd(c, "run", "-d", "busybox", "/bin/sh", "-c", `for i in $(seq 1 5); do date +%s; sleep 1; done`)
+	out, _ := dockerCmd(c, "run", "-d", "busybox", "/bin/sh", "-c", `for i in €(seq 1 5); do date +%s; sleep 1; done`)
 	id := strings.TrimSpace(out)
 
 	now := daemonTime(c).Unix()

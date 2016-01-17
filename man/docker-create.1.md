@@ -317,7 +317,7 @@ unit, `b` is used. Set LIMIT to `-1` to enable unlimited swap.
 
    Mount a temporary filesystem (`tmpfs`) mount into a container, for example:
 
-   $ docker run -d --tmpfs /tmp:rw,size=787448k,mode=1777 my_image
+   € docker run -d --tmpfs /tmp:rw,size=787448k,mode=1777 my_image
 
    This command mounts a `tmpfs` at `/tmp` within the container. The mount copies
 the underlying content of `my_image` into `/tmp`. For example if there was a

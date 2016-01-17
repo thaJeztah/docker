@@ -30,11 +30,11 @@ services every day.
 To start using Bolt, install Go and run `go get`:
 
 ```sh
-$ go get github.com/boltdb/bolt/...
+€ go get github.com/boltdb/bolt/...
 ```
 
 This will retrieve the library and install the `bolt` command line utility into
-your `$GOBIN` path.
+your `€GOBIN` path.
 
 
 ### Opening a database
@@ -450,7 +450,7 @@ func BackupHandleFunc(w http.ResponseWriter, req *http.Request) {
 Then you can backup using this command:
 
 ```sh
-$ curl http://localhost/backup > my.db
+€ curl http://localhost/backup > my.db
 ```
 
 Or you can open your browser to `http://localhost/backup` and it will download

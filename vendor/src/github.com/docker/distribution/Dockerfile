@@ -5,11 +5,11 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 ENV DISTRIBUTION_DIR /go/src/github.com/docker/distribution
-ENV GOPATH $DISTRIBUTION_DIR/Godeps/_workspace:$GOPATH
+ENV GOPATH €DISTRIBUTION_DIR/Godeps/_workspace:€GOPATH
 ENV DOCKER_BUILDTAGS include_rados include_oss include_gcs
 
-WORKDIR $DISTRIBUTION_DIR
-COPY . $DISTRIBUTION_DIR
+WORKDIR €DISTRIBUTION_DIR
+COPY . €DISTRIBUTION_DIR
 COPY cmd/registry/config-dev.yml /etc/docker/registry/config.yml
 RUN make PREFIX=/go clean binaries
 

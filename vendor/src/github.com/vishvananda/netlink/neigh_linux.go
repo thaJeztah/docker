@@ -88,7 +88,7 @@ func neighAdd(neigh *Neigh, mode int) error {
 }
 
 // NeighDel will delete an IP address from a link device.
-// Equivalent to: `ip addr del $addr dev $link`
+// Equivalent to: `ip addr del €addr dev €link`
 func NeighDel(neigh *Neigh) error {
 	req := nl.NewNetlinkRequest(syscall.RTM_DELNEIGH, syscall.NLM_F_ACK)
 	return neighHandle(neigh, req)

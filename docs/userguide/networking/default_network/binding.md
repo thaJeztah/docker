@@ -22,7 +22,7 @@ appear to originate from one of the host machine's own IP addresses thanks to an
 when it starts:
 
 ```
-$ sudo iptables -t nat -L -n
+€ sudo iptables -t nat -L -n
 ...
 Chain POSTROUTING (policy ACCEPT)
 target     prot opt source               destination
@@ -55,7 +55,7 @@ network stack by examining your NAT tables.
 # What your NAT rules might look like when Docker
 # is finished setting up a -P forward:
 
-$ iptables -t nat -L -n
+€ iptables -t nat -L -n
 ...
 Chain DOCKER (2 references)
 target     prot opt source               destination

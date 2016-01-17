@@ -38,7 +38,7 @@ and frequently panic under certain conditions.
 To check your current kernel version, open a terminal and use `uname -r` to
 display your kernel version:
 
-    $ uname -r
+    € uname -r
     3.11.0-15-generic
 
 >**Note**: If you previously installed Docker using `APT`, make sure you update
@@ -55,12 +55,12 @@ packages from the new repository:
 
 3. Update package information, ensure that APT works with the `https` method, and that CA certificates are installed.
 
-         $ apt-get update
-         $ apt-get install apt-transport-https ca-certificates
+         € apt-get update
+         € apt-get install apt-transport-https ca-certificates
 
 4. Add the new `GPG` key.
 
-        $ sudo apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
+        € sudo apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
 
 5. Open the `/etc/apt/sources.list.d/docker.list` file in your favorite editor.
 
@@ -93,15 +93,15 @@ packages from the new repository:
 
 9. Update the `APT` package index.
 
-        $ apt-get update
+        € apt-get update
 
 10. Purge the old repo if it exists.
 
-        $ apt-get purge lxc-docker
+        € apt-get purge lxc-docker
 
 11. Verify that `APT` is pulling from the right repository.
 
-        $ apt-cache policy docker-engine
+        € apt-cache policy docker-engine
 
     From now on when you run `apt-get upgrade`, `APT` pulls from the new repository.
 
@@ -121,11 +121,11 @@ To install the `linux-image-extra` package for your kernel version:
 
 2. Update your package manager.
 
-        $ sudo apt-get update
+        € sudo apt-get update
 
 3. Install the recommended package.
 
-        $ sudo apt-get install linux-image-extra-$(uname -r)
+        € sudo apt-get install linux-image-extra-€(uname -r)
 
 4. Go ahead and install Docker.
 
@@ -165,17 +165,17 @@ To upgrade your kernel and install the additional packages, do the following:
 
 2. Update your package manager.
 
-        $ sudo apt-get update
+        € sudo apt-get update
 
 3. Install both the required and optional packages.
 
-        $ sudo apt-get install linux-image-generic-lts-trusty
+        € sudo apt-get install linux-image-generic-lts-trusty
 
     Depending on your environment, you may install more as described in the preceding table.
 
 4. Reboot your host.
 
-        $ sudo reboot
+        € sudo reboot
 
 5. After your system reboots, go ahead and install Docker.
 
@@ -190,19 +190,19 @@ install Docker using the following:
 
 2. Update your `APT` package index.
 
-        $ sudo apt-get update
+        € sudo apt-get update
 
 3. Install Docker.
 
-        $ sudo apt-get install docker-engine
+        € sudo apt-get install docker-engine
 
 4. Start the `docker` daemon.
 
-        $ sudo service docker start
+        € sudo service docker start
 
 5. Verify `docker` is installed correctly.
 
-        $ sudo docker run hello-world
+        € sudo docker run hello-world
 
     This command downloads a test image and runs it in a container. When the
     container runs, it prints an informational message. Then, it exits.
@@ -240,7 +240,7 @@ To create the `docker` group and add your user:
 
 3. Create the `docker` group and add your user.
 
-        $ sudo usermod -aG docker ubuntu
+        € sudo usermod -aG docker ubuntu
 
 3. Log out and log back in.
 
@@ -248,7 +248,7 @@ To create the `docker` group and add your user:
 
 4. Verify your work by running `docker` without `sudo`.
 
-        $ docker run hello-world
+        € docker run hello-world
 
 	If this fails with a message similar to this:
 
@@ -285,7 +285,7 @@ Bootloader), do the following:
 
 5. Update GRUB.
 
-        $ sudo update-grub
+        € sudo update-grub
 
 6. Reboot your system.
 
@@ -310,11 +310,11 @@ To configure UFW and allow incoming connections on the Docker port:
 
 2. Verify that UFW is installed and enabled.
 
-        $ sudo ufw status
+        € sudo ufw status
 
 3. Open the `/etc/default/ufw` file for editing.
 
-        $ sudo nano /etc/default/ufw
+        € sudo nano /etc/default/ufw
 
 4. Set the `DEFAULT_FORWARD_POLICY` policy to:
 
@@ -324,11 +324,11 @@ To configure UFW and allow incoming connections on the Docker port:
 
 6. Reload UFW to use the new setting.
 
-        $ sudo ufw reload
+        € sudo ufw reload
 
 7. Allow incoming connections on the Docker port.
 
-        $ sudo ufw allow 2375/tcp
+        € sudo ufw allow 2375/tcp
 
 ### Configure a DNS server for use by Docker
 
@@ -362,7 +362,7 @@ To specify a DNS server for use by Docker:
 
 2. Open the `/etc/default/docker` file for editing.
 
-        $ sudo nano /etc/default/docker
+        € sudo nano /etc/default/docker
 
 3. Add a setting for Docker.
 
@@ -380,7 +380,7 @@ To specify a DNS server for use by Docker:
 
 5. Restart the Docker daemon.
 
-        $ sudo restart docker
+        € sudo restart docker
 
 
 &nbsp;
@@ -391,7 +391,7 @@ NetworkManager (this might slow your network).
 
 1. Open the `/etc/NetworkManager/NetworkManager.conf` file for editing.
 
-        $ sudo nano /etc/NetworkManager/NetworkManager.conf
+        € sudo nano /etc/NetworkManager/NetworkManager.conf
 
 2. Comment out the `dns=dsnmasq` line:
 
@@ -401,8 +401,8 @@ NetworkManager (this might slow your network).
 
 4. Restart both the NetworkManager and Docker.
 
-        $ sudo restart network-manager
-        $ sudo restart docker
+        € sudo restart network-manager
+        € sudo restart docker
 
 ### Configure Docker to start on boot
 
@@ -411,7 +411,7 @@ for versions `14.10` and below.
 
 For `15.04` and up, to configure the `docker` daemon to start on boot, run
 
-    $ sudo systemctl enable docker
+    € sudo systemctl enable docker
 
 For `14.10` and below the above installation method automatically configures `upstart`
 to start the docker daemon on boot
@@ -420,22 +420,22 @@ to start the docker daemon on boot
 
 To install the latest version of Docker with `apt-get`:
 
-    $ apt-get upgrade docker-engine
+    € apt-get upgrade docker-engine
 
 ## Uninstallation
 
 To uninstall the Docker package:
 
-    $ sudo apt-get purge docker-engine
+    € sudo apt-get purge docker-engine
 
 To uninstall the Docker package and dependencies that are no longer needed:
 
-    $ sudo apt-get autoremove --purge docker-engine
+    € sudo apt-get autoremove --purge docker-engine
 
 The above commands will not remove images, containers, volumes, or user created
 configuration files on your host. If you wish to delete all images, containers,
 and volumes run the following command:
 
-    $ rm -rf /var/lib/docker
+    € rm -rf /var/lib/docker
 
 You must delete the user created configuration files manually.

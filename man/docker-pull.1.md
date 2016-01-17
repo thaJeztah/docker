@@ -33,7 +33,7 @@ registry located at `registry-1.docker.io` by default.
 Note that if the  image is previously downloaded then the status would be
 `Status: Image is up to date for fedora`.
 
-    $ docker pull --all-tags fedora
+    € docker pull --all-tags fedora
     Pulling repository fedora
     ad57ef8d78d7: Download complete
     105182bb5e8b: Download complete
@@ -42,7 +42,7 @@ Note that if the  image is previously downloaded then the status would be
 
     Status: Downloaded newer image for fedora
 
-    $ docker images
+    € docker images
     REPOSITORY   TAG         IMAGE ID        CREATED      VIRTUAL SIZE
     fedora       rawhide     ad57ef8d78d7    5 days ago   359.3 MB
     fedora       20          105182bb5e8b    5 days ago   372.7 MB
@@ -51,7 +51,7 @@ Note that if the  image is previously downloaded then the status would be
 
 ## Pull a repository with the -a|--all-tags option set to false (this is the default).
 
-    $ docker pull debian
+    € docker pull debian
     Using default tag: latest
     latest: Pulling from library/debian
     2c49f83e0b13: Pull complete 
@@ -59,7 +59,7 @@ Note that if the  image is previously downloaded then the status would be
 
     Status: Downloaded newer image for debian:latest
     
-    $ docker images
+    € docker images
     REPOSITORY   TAG         IMAGE ID        CREATED      VIRTUAL SIZE
     debian       latest     4a5e6db8c069     5 days ago   125.1 MB
          
@@ -68,7 +68,7 @@ Note that if the  image is previously downloaded then the status would be
 Note that if the  image is previously downloaded then the status would be
 `Status: Image is up to date for registry.hub.docker.com/fedora:20`
 
-    $ docker pull registry.hub.docker.com/fedora:20
+    € docker pull registry.hub.docker.com/fedora:20
     Pulling repository fedora
     3f2fed40e4b0: Download complete 
     511136ea3c5a: Download complete 
@@ -76,7 +76,7 @@ Note that if the  image is previously downloaded then the status would be
 
     Status: Downloaded newer image for registry.hub.docker.com/fedora:20
 
-    $ docker images
+    € docker images
     REPOSITORY   TAG         IMAGE ID        CREATED      VIRTUAL SIZE
     fedora       20          3f2fed40e4b0    4 days ago   372.7 MB
 

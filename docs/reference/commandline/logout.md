@@ -19,4 +19,4 @@ parent = "smn_cli"
 
 For example:
 
-    $ docker logout localhost:8080
+    € docker logout localhost:8080

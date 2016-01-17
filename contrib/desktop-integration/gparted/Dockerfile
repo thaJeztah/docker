@@ -14,7 +14,7 @@
 #
 #   docker run -v /tmp/.X11-unix:/tmp/.X11-unix \
 #     --device=/dev/sda:/dev/sda \
-#     -e DISPLAY=unix$DISPLAY gparted
+#     -e DISPLAY=unix€DISPLAY gparted
 #
 
 # Base docker image

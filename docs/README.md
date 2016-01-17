@@ -67,7 +67,7 @@ own.
 	run a container running the Docker documentation website. To build the
 	documentation site, enter `make docs` in the `docs` directory of your `docker/docker` fork:
 
-		$ make docs
+		€ make docs
 		.... (lots of output) ....
 		docker run --rm -it  -e AWS_S3_BUCKET -p 8000:8000 "docker-docs:master" mkdocs serve
 		Running at: http://0.0.0.0:8000/
@@ -141,7 +141,7 @@ and then publish the final release.
 
 4. Call the `make` from the `docker` directory.
 
-    	$ make AWS_S3_BUCKET=dowideit-docs docs-release
+    	€ make AWS_S3_BUCKET=dowideit-docs docs-release
 
 	This publishes _only_ to the `http://bucket-url/v1.2/` version of the
 	documentation.
@@ -149,7 +149,7 @@ and then publish the final release.
 5.  If you're publishing the current release's documentation, you need to also
 update the root docs pages by running
 
-     	$ make AWS_S3_BUCKET=dowideit-docs BUILD_ROOT=yes docs-release
+     	€ make AWS_S3_BUCKET=dowideit-docs BUILD_ROOT=yes docs-release
 
 ### Errors publishing using a Docker Machine VM
 
@@ -178,13 +178,13 @@ For example, to update the current release's docs, do the following:
 
 1. Go to your `docker/docker` fork and get the latest from master.
 
-    	$ git fetch upstream
+    	€ git fetch upstream
 
 2. Checkout a new branch based on `upstream/docs`.
 
 	You should give your new branch a descriptive name.
 
-		$ git checkout -b post-1.2.0-docs-update-1 upstream/docs
+		€ git checkout -b post-1.2.0-docs-update-1 upstream/docs
 
 3. In a browser window, open [https://github.com/docker/docker/commits/master].
 
@@ -198,13 +198,13 @@ For example, to update the current release's docs, do the following:
 
 6. Cherry-pick the commit.
 
-	 	$ git cherry-pick -x fe845c4
+	 	€ git cherry-pick -x fe845c4
 
 7. Repeat until you have cherry-picked everything you want to merge.
 
 8. Push your changes to your fork.
 
-    	$ git push origin post-1.2.0-docs-update-1
+    	€ git push origin post-1.2.0-docs-update-1
 
 9. Make a pull request to merge into the `docs` branch.
 
@@ -216,21 +216,21 @@ For example, to update the current release's docs, do the following:
 
 12. Return to your local fork and make sure you are still on the `docs` branch.
 
-		$ git checkout docs
+		€ git checkout docs
 
 13. Fetch your merged pull request from `docs`.
 
-		$ git fetch upstream/docs
+		€ git fetch upstream/docs
 
 14. Ensure your branch is clean and set to the latest.
 
-   	 	$ git reset --hard upstream/docs
+   	 	€ git reset --hard upstream/docs
 
 15. Copy the `awsconfig` file into the `docs` directory.
 
 16. Make the beta documentation
 
-    	$ make AWS_S3_BUCKET=beta-docs.docker.io BUILD_ROOT=yes docs-release
+    	€ make AWS_S3_BUCKET=beta-docs.docker.io BUILD_ROOT=yes docs-release
 
 17. Open [the beta
 website](http://beta-docs.docker.io.s3-website-us-west-2.amazonaws.com/) site
@@ -238,7 +238,7 @@ and make sure what you published is correct.
 
 19. When you're happy with your content, publish the docs to our live site:
 
-   		$ make AWS_S3_BUCKET=docs.docker.com BUILD_ROOT=yes
+   		€ make AWS_S3_BUCKET=docs.docker.com BUILD_ROOT=yes
 DISTRIBUTION_ID=C2K6......FL2F docs-release
 
 20. Test the uncached version of the live docs at [http://docs.docker.com.s3-website-us-east-1.amazonaws.com/]
@@ -261,7 +261,7 @@ docs container:
 Start the docs container like `make docs-shell`, but bind mount in your `awsconfig`:
 
 ```
-docker run --rm -it -v $(CURDIR)/docs/awsconfig:/docs/awsconfig docker-docs:master bash
+docker run --rm -it -v €(CURDIR)/docs/awsconfig:/docs/awsconfig docker-docs:master bash
 ```
 
 and then the following example shows deleting 2 documents from s3, and then requesting the
@@ -270,15 +270,15 @@ CloudFlare cache to invalidate them:
 
 ```
 export BUCKET BUCKET=docs.docker.com
-export AWS_CONFIG_FILE=$(pwd)/awsconfig
-aws s3 --profile $BUCKET ls s3://$BUCKET
-aws s3 --profile $BUCKET rm s3://$BUCKET/v1.0/reference/api/docker_io_oauth_api/index.html
-aws s3 --profile $BUCKET rm s3://$BUCKET/v1.1/reference/api/docker_io_oauth_api/index.html
+export AWS_CONFIG_FILE=€(pwd)/awsconfig
+aws s3 --profile €BUCKET ls s3://€BUCKET
+aws s3 --profile €BUCKET rm s3://€BUCKET/v1.0/reference/api/docker_io_oauth_api/index.html
+aws s3 --profile €BUCKET rm s3://€BUCKET/v1.1/reference/api/docker_io_oauth_api/index.html
 
 aws configure set preview.cloudfront true
 export DISTRIBUTION_ID=YUTIYUTIUTIUYTIUT
-aws cloudfront  create-invalidation --profile docs.docker.com --distribution-id $DISTRIBUTION_ID --invalidation-batch '{"Paths":{"Quantity":1, "Items":["/v1.0/reference/api/docker_io_oauth_api/"]},"CallerReference":"6Mar2015sventest1"}'
-aws cloudfront  create-invalidation --profile docs.docker.com --distribution-id $DISTRIBUTION_ID --invalidation-batch '{"Paths":{"Quantity":1, "Items":["/v1.1/reference/api/docker_io_oauth_api/"]},"CallerReference":"6Mar2015sventest1"}'
+aws cloudfront  create-invalidation --profile docs.docker.com --distribution-id €DISTRIBUTION_ID --invalidation-batch '{"Paths":{"Quantity":1, "Items":["/v1.0/reference/api/docker_io_oauth_api/"]},"CallerReference":"6Mar2015sventest1"}'
+aws cloudfront  create-invalidation --profile docs.docker.com --distribution-id €DISTRIBUTION_ID --invalidation-batch '{"Paths":{"Quantity":1, "Items":["/v1.1/reference/api/docker_io_oauth_api/"]},"CallerReference":"6Mar2015sventest1"}'
 ```
 
 ### Generate the man pages

@@ -24,11 +24,11 @@ There is a single supported filter `dangling=value` which takes a boolean of `tr
 
 Example output:
 
-    $ docker volume create --name rose
+    € docker volume create --name rose
     rose
-    $docker volume create --name tyler
+    €docker volume create --name tyler
     tyler
-    $ docker volume ls
+    € docker volume ls
     DRIVER              VOLUME NAME
     local               rose
     local               tyler

@@ -69,7 +69,7 @@ If you are using `docker-machine`, the Docker daemon is on a virtual host that u
 ```
 curl --insecure --cert ~/.docker/cert.pem --key ~/.docker/key.pem https://YOUR_VM_IP:2376/images/json
 
-wget --no-check-certificate --certificate=$DOCKER_CERT_PATH/cert.pem --private-key=$DOCKER_CERT_PATH/key.pem https://your_vm_ip:2376/images/json -O - -q
+wget --no-check-certificate --certificate=€DOCKER_CERT_PATH/cert.pem --private-key=€DOCKER_CERT_PATH/key.pem https://your_vm_ip:2376/images/json -O - -q
 ```
 
 ## Docker Events

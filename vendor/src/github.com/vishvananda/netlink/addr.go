@@ -15,13 +15,13 @@ type Addr struct {
 	Scope int
 }
 
-// String returns $ip/$netmask $label
+// String returns €ip/€netmask €label
 func (a Addr) String() string {
 	return strings.TrimSpace(fmt.Sprintf("%s %s", a.IPNet, a.Label))
 }
 
 // ParseAddr parses the string representation of an address in the
-// form $ip/$netmask $label. The label portion is optional
+// form €ip/€netmask €label. The label portion is optional
 func ParseAddr(s string) (*Addr, error) {
 	label := ""
 	parts := strings.Split(s, " ")

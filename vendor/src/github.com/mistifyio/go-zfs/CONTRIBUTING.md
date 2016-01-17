@@ -18,27 +18,27 @@ We welcome bug fixes, improvements, and new features. Before embarking on making
 
 [Fork the project](https://help.github.com/articles/fork-a-repo), clone your fork, and add the upstream to your remote:
 
-    $ git clone git@github.com:<your-username>/go-zfs.git
-    $ cd go-zfs
-    $ git remote add upstream https://github.com/mistifyio/go-zfs.git
+    € git clone git@github.com:<your-username>/go-zfs.git
+    € cd go-zfs
+    € git remote add upstream https://github.com/mistifyio/go-zfs.git
 
 If you need to pull new changes committed upstream:
 
-    $ git checkout master
-    $ git fetch upstream
-    $ git merge upstream/master
+    € git checkout master
+    € git fetch upstream
+    € git merge upstream/master
 
 Don' work directly on master as this makes it harder to merge later. Create a feature branch for your fix or new feature:
 
-    $ git checkout -b <feature-branch-name>
+    € git checkout -b <feature-branch-name>
 
 Please try to commit your changes in logical chunks. Ideally, you should include the issue number in the commit message.
 
-    $ git commit -m "Issue #<issue-number> - <commit-message>"
+    € git commit -m "Issue #<issue-number> - <commit-message>"
 
 Push your feature branch to your fork.
 
-    $ git push origin <feature-branch-name>
+    € git push origin <feature-branch-name>
 
 [Open a Pull Request](https://help.github.com/articles/using-pull-requests) against the upstream master branch. Please give your pull request a clear title and description and note which issue(s) your pull request fixes.
 

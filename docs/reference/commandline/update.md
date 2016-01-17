@@ -49,7 +49,7 @@ name or ID. You can use **docker ps** to find these values. You can also
 use the ID returned from the **docker run** command.  Then, do the following:
 
 ```bash
-$ docker update --cpu-shares 512 abebf7571666
+€ docker update --cpu-shares 512 abebf7571666
 ```
 
 ### Update a container with cpu-shares and memory
@@ -57,5 +57,5 @@ $ docker update --cpu-shares 512 abebf7571666
 To update multiple resource configurations for multiple containers:
 
 ```bash
-$ docker update --cpu-shares 512 -m 300M abebf7571666 hopeful_morse
+€ docker update --cpu-shares 512 -m 300M abebf7571666 hopeful_morse
 ```

@@ -25,32 +25,32 @@ or by ID. Once connected, the container can communicate with other containers in
 the same network.
 
 ```bash
-$ docker network connect multi-host-network container1
+€ docker network connect multi-host-network container1
 ```
 
 You can also use the `docker run --net=<network-name>` option to start a container and immediately connect it to a network.
 
 ```bash
-$ docker run -itd --net=multi-host-network busybox
+€ docker run -itd --net=multi-host-network busybox
 ```
 
 You can specify the IP address you want to be assigned to the container's interface.
 
 ```bash
-$ docker network connect --ip 10.10.36.122 multi-host-network container2
+€ docker network connect --ip 10.10.36.122 multi-host-network container2
 ```
 
 You can use `--link` option to link another container with a prefered alias
 
 ```bash
-$ docker network connect --link container1:c1 multi-host-network container2
+€ docker network connect --link container1:c1 multi-host-network container2
 ```
 
 `--alias` option can be used to resolve the container by another name in the network
 being connected to.
 
 ```bash
-$ docker network connect --alias db --alias mysql multi-host-network container2
+€ docker network connect --alias db --alias mysql multi-host-network container2
 ```
 
 You can pause, restart, and stop containers that are connected to a network.
@@ -64,11 +64,11 @@ the static IP address(es) from outside the range. This will ensure that the IP a
 will not be given to other dynamic containers while this container is not on the network.
 
 ```bash
-$ docker network create --subnet 172.20.0.0/16 --ip-range 172.20.240.0/20 multi-host-network
+€ docker network create --subnet 172.20.0.0/16 --ip-range 172.20.240.0/20 multi-host-network
 ```
 
 ```bash
-$ docker network connect --ip 172.20.128.2 multi-host-network container2
+€ docker network connect --ip 172.20.128.2 multi-host-network container2
 ```
 
 To verify the container is connected, use the `docker network inspect` command. Use `docker network disconnect` to remove a container from the network.

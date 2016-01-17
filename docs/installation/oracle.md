@@ -34,13 +34,13 @@ btrfs storage engine on both Oracle Linux 6 and 7.
 
 2. Make sure your existing yum packages are up-to-date.
 
-        $ sudo yum update
+        € sudo yum update
 
 3. Add the yum repo yourself.
 
     For version 6:
 
-        $ sudo tee /etc/yum.repos.d/docker.repo <<-EOF
+        € sudo tee /etc/yum.repos.d/docker.repo <<-EOF
         [dockerrepo]
         name=Docker Repository
         baseurl=https://yum.dockerproject.org/repo/main/oraclelinux/6
@@ -51,7 +51,7 @@ btrfs storage engine on both Oracle Linux 6 and 7.
 
     For version 7:
 
-        $ cat >/etc/yum.repos.d/docker.repo <<-EOF
+        € cat >/etc/yum.repos.d/docker.repo <<-EOF
         [dockerrepo]
         name=Docker Repository
         baseurl=https://yum.dockerproject.org/repo/main/oraclelinux/7
@@ -62,21 +62,21 @@ btrfs storage engine on both Oracle Linux 6 and 7.
 
 4. Install the Docker package.
 
-        $ sudo yum install docker-engine
+        € sudo yum install docker-engine
 
 5. Start the Docker daemon.
 
      On Oracle Linux 6:
 
-        $ sudo service docker start
+        € sudo service docker start
 
      On Oracle Linux 7:
 
-        $ sudo systemctl start docker.service
+        € sudo systemctl start docker.service
 
 6. Verify `docker` is installed correctly by running a test image in a container.
 
-        $ sudo docker run hello-world
+        € sudo docker run hello-world
 
 ## Optional configurations
 
@@ -115,7 +115,7 @@ To create the `docker` group and add your user:
 
 4. Verify your work by running `docker` without `sudo`.
 
-        $ docker run hello-world
+        € docker run hello-world
 
 	If this fails with a message similar to this:
 
@@ -131,13 +131,13 @@ You can configure the  Docker daemon to start automatically at boot.
 On Oracle Linux 6:
 
 ```
-$ sudo chkconfig docker on
+€ sudo chkconfig docker on
 ```
 
 On Oracle Linux 7:
 
 ```
-$ sudo systemctl enable docker.service
+€ sudo systemctl enable docker.service
 ```
 
 If you need to add an HTTP Proxy, set a different directory or partition for the
@@ -166,13 +166,13 @@ To enable btrfs support on Oracle Linux:
 
 To uninstall the Docker package:
 
-    $ sudo yum -y remove docker-engine
+    € sudo yum -y remove docker-engine
 
 The above command will not remove images, containers, volumes, or user created
 configuration files on your host. If you wish to delete all images, containers,
 and volumes run the following command:
 
-    $ rm -rf /var/lib/docker
+    € rm -rf /var/lib/docker
 
 You must delete the user created configuration files manually.
 

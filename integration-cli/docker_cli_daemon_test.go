@@ -795,10 +795,10 @@ func (s *DockerDaemonSuite) TestDaemonBridgeFixedCidr2(c *check.C) {
 	c.Assert(err, checker.IsNil, check.Commentf(out))
 	defer d.Cmd("stop", "bb")
 
-	out, err = d.Cmd("exec", "bb", "/bin/sh", "-c", "ifconfig eth0 | awk '/inet addr/{print substr($2,6)}'")
+	out, err = d.Cmd("exec", "bb", "/bin/sh", "-c", "ifconfig eth0 | awk '/inet addr/{print substr(€2,6)}'")
 	c.Assert(out, checker.Equals, "10.2.2.0\n")
 
-	out, err = d.Cmd("run", "--rm", "busybox", "/bin/sh", "-c", "ifconfig eth0 | awk '/inet addr/{print substr($2,6)}'")
+	out, err = d.Cmd("run", "--rm", "busybox", "/bin/sh", "-c", "ifconfig eth0 | awk '/inet addr/{print substr(€2,6)}'")
 	c.Assert(err, checker.IsNil, check.Commentf(out))
 	c.Assert(out, checker.Equals, "10.2.2.2\n")
 }
@@ -1047,7 +1047,7 @@ func (s *DockerDaemonSuite) TestDaemonUlimitDefaults(c *check.C) {
 		c.Fatal(err)
 	}
 
-	out, err := s.d.Cmd("run", "--ulimit", "nproc=2048", "--name=test", "busybox", "/bin/sh", "-c", "echo $(ulimit -n); echo $(ulimit -p)")
+	out, err := s.d.Cmd("run", "--ulimit", "nproc=2048", "--name=test", "busybox", "/bin/sh", "-c", "echo €(ulimit -n); echo €(ulimit -p)")
 	if err != nil {
 		c.Fatal(out, err)
 	}
@@ -1574,13 +1574,13 @@ func (s *DockerDaemonSuite) TestRunContainerWithBridgeNone(c *check.C) {
 	// the extra grep and awk clean up the output of `ip` to only list the number and name of
 	// interfaces, allowing for different versions of ip (e.g. inside and outside the container) to
 	// be used while still verifying that the interface list is the exact same
-	cmd := exec.Command("sh", "-c", "ip l | grep -E '^[0-9]+:' | awk -F: ' { print $1\":\"$2 } '")
+	cmd := exec.Command("sh", "-c", "ip l | grep -E '^[0-9]+:' | awk -F: ' { print €1\":\"€2 } '")
 	stdout := bytes.NewBuffer(nil)
 	cmd.Stdout = stdout
 	if err := cmd.Run(); err != nil {
 		c.Fatal("Failed to get host network interface")
 	}
-	out, err = s.d.Cmd("run", "--rm", "--net=host", "busybox", "sh", "-c", "ip l | grep -E '^[0-9]+:' | awk -F: ' { print $1\":\"$2 } '")
+	out, err = s.d.Cmd("run", "--rm", "--net=host", "busybox", "sh", "-c", "ip l | grep -E '^[0-9]+:' | awk -F: ' { print €1\":\"€2 } '")
 	c.Assert(err, check.IsNil, check.Commentf("Output: %s", out))
 	c.Assert(out, check.Equals, fmt.Sprintf("%s", stdout),
 		check.Commentf("The network interfaces in container should be the same with host when --net=host when bridge network is disabled: %s", out))

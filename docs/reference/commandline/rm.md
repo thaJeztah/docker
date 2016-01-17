@@ -21,25 +21,25 @@ parent = "smn_cli"
 
 ## Examples
 
-    $ docker rm /redis
+    € docker rm /redis
     /redis
 
 This will remove the container referenced under the link
 `/redis`.
 
-    $ docker rm --link /webapp/redis
+    € docker rm --link /webapp/redis
     /webapp/redis
 
 This will remove the underlying link between `/webapp` and the `/redis`
 containers removing all network communication.
 
-    $ docker rm --force redis
+    € docker rm --force redis
     redis
 
 The main process inside the container referenced under the link `/redis` will receive
 `SIGKILL`, then the container will be removed.
 
-    $ docker rm $(docker ps -a -q)
+    € docker rm €(docker ps -a -q)
 
 This command will delete all stopped containers. The command
 `docker ps -a -q` will return all existing container IDs and pass them to

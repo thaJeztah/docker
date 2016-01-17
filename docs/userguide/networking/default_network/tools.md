@@ -44,36 +44,36 @@ The solution is simple: when you create your pair of peer interfaces, simply thr
 ```
 # Start up two containers in two terminal windows
 
-$ docker run -i -t --rm --net=none base /bin/bash
+€ docker run -i -t --rm --net=none base /bin/bash
 root@1f1f4c1f931a:/#
 
-$ docker run -i -t --rm --net=none base /bin/bash
+€ docker run -i -t --rm --net=none base /bin/bash
 root@12e343489d2f:/#
 
 # Learn the container process IDs
 # and create their namespace entries
 
-$ docker inspect -f '{{.State.Pid}}' 1f1f4c1f931a
+€ docker inspect -f '{{.State.Pid}}' 1f1f4c1f931a
 2989
-$ docker inspect -f '{{.State.Pid}}' 12e343489d2f
+€ docker inspect -f '{{.State.Pid}}' 12e343489d2f
 3004
-$ sudo mkdir -p /var/run/netns
-$ sudo ln -s /proc/2989/ns/net /var/run/netns/2989
-$ sudo ln -s /proc/3004/ns/net /var/run/netns/3004
+€ sudo mkdir -p /var/run/netns
+€ sudo ln -s /proc/2989/ns/net /var/run/netns/2989
+€ sudo ln -s /proc/3004/ns/net /var/run/netns/3004
 
 # Create the "peer" interfaces and hand them out
 
-$ sudo ip link add A type veth peer name B
+€ sudo ip link add A type veth peer name B
 
-$ sudo ip link set A netns 2989
-$ sudo ip netns exec 2989 ip addr add 10.1.1.1/32 dev A
-$ sudo ip netns exec 2989 ip link set A up
-$ sudo ip netns exec 2989 ip route add 10.1.1.2/32 dev A
+€ sudo ip link set A netns 2989
+€ sudo ip netns exec 2989 ip addr add 10.1.1.1/32 dev A
+€ sudo ip netns exec 2989 ip link set A up
+€ sudo ip netns exec 2989 ip route add 10.1.1.2/32 dev A
 
-$ sudo ip link set B netns 3004
-$ sudo ip netns exec 3004 ip addr add 10.1.1.2/32 dev B
-$ sudo ip netns exec 3004 ip link set B up
-$ sudo ip netns exec 3004 ip route add 10.1.1.1/32 dev B
+€ sudo ip link set B netns 3004
+€ sudo ip netns exec 3004 ip addr add 10.1.1.2/32 dev B
+€ sudo ip netns exec 3004 ip link set B up
+€ sudo ip netns exec 3004 ip route add 10.1.1.1/32 dev B
 ```
 
 The two containers should now be able to ping each other and make connections successfully.  Point-to-point links like this do not depend on a subnet nor a netmask, but on the bare assertion made by `ip route` that some other single IP address is connected to a particular network interface.

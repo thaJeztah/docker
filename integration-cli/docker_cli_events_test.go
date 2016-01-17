@@ -33,7 +33,7 @@ func (s *DockerSuite) TestEventsTimestampFormats(c *check.C) {
 	rfc3339 := func(t time.Time) string { return t.Format(time.RFC3339) }
 	duration := func(t time.Time) string { return time.Now().Sub(t).String() }
 
-	// --since=$start must contain only the 'untag' event
+	// --since=€start must contain only the 'untag' event
 	for _, f := range []func(time.Time) string{unixTs, rfc3339, duration} {
 		since, until := f(start), f(end)
 		out, _ := dockerCmd(c, "events", "--since="+since, "--until="+until)

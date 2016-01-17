@@ -48,7 +48,7 @@ func NewDigestFromHex(alg, hex string) Digest {
 var DigestRegexp = regexp.MustCompile(`[a-zA-Z0-9-_+.]+:[a-fA-F0-9]+`)
 
 // DigestRegexpAnchored matches valid digest types, anchored to the start and end of the match.
-var DigestRegexpAnchored = regexp.MustCompile(`^` + DigestRegexp.String() + `$`)
+var DigestRegexpAnchored = regexp.MustCompile(`^` + DigestRegexp.String() + `€`)
 
 var (
 	// ErrDigestInvalidFormat returned when digest format invalid.

@@ -30,27 +30,27 @@ restarted.
 
 If the container is paused, then the `docker exec` command will fail with an error:
 
-    $ docker pause test
+    € docker pause test
     test
-    $ docker ps
+    € docker ps
     CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS                   PORTS               NAMES
     1ae3b36715d2        ubuntu:latest       "bash"              17 seconds ago      Up 16 seconds (Paused)                       test
-    $ docker exec test ls
+    € docker exec test ls
     FATA[0000] Error response from daemon: Container test is paused, unpause the container before exec
-    $ echo $?
+    € echo €?
     1
 
 ## Examples
 
-    $ docker run --name ubuntu_bash --rm -i -t ubuntu bash
+    € docker run --name ubuntu_bash --rm -i -t ubuntu bash
 
 This will create a container named `ubuntu_bash` and start a Bash session.
 
-    $ docker exec -d ubuntu_bash touch /tmp/execWorks
+    € docker exec -d ubuntu_bash touch /tmp/execWorks
 
 This will create a new file `/tmp/execWorks` inside the running container
 `ubuntu_bash`, in the background.
 
-    $ docker exec -it ubuntu_bash bash
+    € docker exec -it ubuntu_bash bash
 
 This will create a new Bash session in the container `ubuntu_bash`.

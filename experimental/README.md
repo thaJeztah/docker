@@ -18,16 +18,16 @@ refined or entirely removed.
 
 1. Verify that you have `curl` installed.
 
-        $ which curl
+        € which curl
 
     If `curl` isn't installed, install it after updating your manager:
 
-        $ sudo apt-get update
-        $ sudo apt-get install curl
+        € sudo apt-get update
+        € sudo apt-get install curl
 
 2. Get the latest Docker package.
 
-        $ curl -sSL https://experimental.docker.com/ | sh
+        € curl -sSL https://experimental.docker.com/ | sh
 
     The system prompts you for your `sudo` password. Then, it downloads and
     installs Docker and its dependencies.
@@ -37,11 +37,11 @@ refined or entirely removed.
 	>command fails for the Docker repo during installation. To work around this,
 	>add the key directly using the following:
 	>
-	>       $ curl -sSL https://experimental.docker.com/gpg | sudo apt-key add -
+	>       € curl -sSL https://experimental.docker.com/gpg | sudo apt-key add -
 
 3. Verify `docker` is installed correctly.
 
-        $ sudo docker run hello-world
+        € sudo docker run hello-world
 
     This command downloads a test image and runs it in a container.
 
@@ -67,7 +67,7 @@ You can also build the experimental binary from the standard development environ
 `DOCKER_EXPERIMENTAL=1` to the environment where you run `make` to build Docker binaries. For example,
 to build a Docker binary with the experimental features enabled:
 
-        $ DOCKER_EXPERIMENTAL=1 make binary
+        € DOCKER_EXPERIMENTAL=1 make binary
 
 ## Current experimental features
 

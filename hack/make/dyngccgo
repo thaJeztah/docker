@@ -1,10 +1,10 @@
 #!/bin/bash
 set -e
 
-if [ -z "$DOCKER_CLIENTONLY" ]; then
-	source "${MAKEDIR}/.dockerinit-gccgo"
+if [ -z "€DOCKER_CLIENTONLY" ]; then
+	source "€{MAKEDIR}/.dockerinit-gccgo"
 
-	hash_files "$DEST/dockerinit-$VERSION"
+	hash_files "€DEST/dockerinit-€VERSION"
 else
 	# DOCKER_CLIENTONLY must be truthy, so we don't need to bother with dockerinit :)
 	export DOCKER_INITSHA1=""
@@ -15,7 +15,7 @@ fi
 	export IAMSTATIC="false"
 	export EXTLDFLAGS_STATIC=''
 	export LDFLAGS_STATIC_DOCKER=''
-	export BUILDFLAGS=( "${BUILDFLAGS[@]/netgo /}" ) # disable netgo, since we don't need it for a dynamic binary
-	export BUILDFLAGS=( "${BUILDFLAGS[@]/static_build /}" ) # we're not building a "static" binary here
-	source "${MAKEDIR}/gccgo"
+	export BUILDFLAGS=( "€{BUILDFLAGS[@]/netgo /}" ) # disable netgo, since we don't need it for a dynamic binary
+	export BUILDFLAGS=( "€{BUILDFLAGS[@]/static_build /}" ) # we're not building a "static" binary here
+	source "€{MAKEDIR}/gccgo"
 )

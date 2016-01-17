@@ -42,7 +42,7 @@ Prerequisites:
 - [docker and docker-compose](http://docs.docker.com/compose/install/)
 - [Notary server configuration](#configuring-notary-server)
 
-As setup, let's build notary and then start up a local notary-server (don't forget to add `127.0.0.1 notary-server` to your `/etc/hosts`, or if using docker-machine, add `$(docker-machine ip) notary-server`).
+As setup, let's build notary and then start up a local notary-server (don't forget to add `127.0.0.1 notary-server` to your `/etc/hosts`, or if using docker-machine, add `€(docker-machine ip) notary-server`).
 
 ```sh
 make binaries
@@ -100,14 +100,14 @@ to facilitate development. Simply run the following commands to start
 a notary server with a temporary MySQL database in containers:
 
 ```
-$ docker-compose build
-$ docker-compose up
+€ docker-compose build
+€ docker-compose up
 ```
 
 If you are on Mac OSX with boot2docker or kitematic, you'll need to
 update your hosts file such that the name `notary` is associated with
 the IP address of your VM (for boot2docker, this can be determined
-by running `boot2docker ip`, with kitematic, `echo $DOCKER_HOST` should
+by running `boot2docker ip`, with kitematic, `echo €DOCKER_HOST` should
 show the IP of the VM). If you are using the default Linux setup,
 you need to add `127.0.0.1 notary` to your hosts file.
 
@@ -139,8 +139,8 @@ directory is ignored by the .gitignore file).
 `notary-signer` depends upon `pkcs11`, which requires that libtool headers be installed (`libtool-dev` on Ubuntu, `libtool-ltdl-devel` on CentOS/RedHat). If you are using Mac OS, you can `brew install libtool`, and run `make binaries` with the following environment variables (assuming a standard installation of Homebrew):
 
 ```sh
-export CPATH=/usr/local/include:${CPATH}
-export LIBRARY_PATH=/usr/local/lib:${LIBRARY_PATH}
+export CPATH=/usr/local/include:€{CPATH}
+export LIBRARY_PATH=/usr/local/lib:€{LIBRARY_PATH}
 ```
 
 ## Running Notary Server
@@ -148,7 +148,7 @@ export LIBRARY_PATH=/usr/local/lib:${LIBRARY_PATH}
 The `notary-server` application has the following usage:
 
 ```
-$ bin/notary-server --help
+€ bin/notary-server --help
 usage: bin/notary-serve
   -config="": Path to configuration file
   -debug=false: Enable the debugging server on localhost:8080
@@ -186,8 +186,8 @@ Otherwise, you will see TLS errors or X509 errors upon initializing the
 notary collection:
 
 ```
-$ notary list diogomonica.com/openvpn
+€ notary list diogomonica.com/openvpn
 * fatal: Get https://notary-server:4443/v2/: x509: certificate signed by unknown authority
-$ notary list diogomonica.com/openvpn -c cmd/notary/config.json
+€ notary list diogomonica.com/openvpn -c cmd/notary/config.json
 latest b1df2ad7cbc19f06f08b69b4bcd817649b509f3e5420cdd2245a85144288e26d 4056
 ```

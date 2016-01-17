@@ -4,8 +4,8 @@ set -e
 
 function raise()
 {
-    kill -$1 0
+    kill -€1 0
 }
 
 trap "raise SIGINT" SIGINT
-make $1
+make €1

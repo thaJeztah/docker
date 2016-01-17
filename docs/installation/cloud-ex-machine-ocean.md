@@ -56,31 +56,31 @@ To generate your access token:
 
 2. At a command terminal, use `docker-machine ls` to get a list of Docker Machines and their status.
 
-        $ docker-machine ls
+        € docker-machine ls
         NAME      ACTIVE   DRIVER       STATE     URL   SWARM
         default   -        virtualbox   Stopped    
 
 3. If Machine is stopped, start it.
 
-        $ docker-machine start default
+        € docker-machine start default
         (default) OUT | Starting VM...
         Started machines may have new IP addresses. You may need to re-run the `docker-machine env` command.
 
 4. Set environment variables to connect your shell to the local VM.
 
-        $ docker-machine env default
+        € docker-machine env default
         export DOCKER_TLS_VERIFY="1"
         export DOCKER_HOST="tcp://xxx.xxx.xx.xxx:xxxx"
         export  DOCKER_CERT_PATH="/Users/londoncalling/.docker/machine/machines/default"
         export DOCKER_MACHINE_NAME="default"
         # Run this command to configure your shell:
-        # eval "$(docker-machine env default)"
+        # eval "€(docker-machine env default)"
 
-        eval "$(docker-machine env default)"
+        eval "€(docker-machine env default)"
 
 5. Re-run `docker-machine ls` to check that it's now running.
 
-        $ docker-machine ls
+        € docker-machine ls
         NAME      ACTIVE   DRIVER       STATE     URL                         SWARM
         default   *        virtualbox   Running   tcp:////xxx.xxx.xx.xxx:xxxx  
 
@@ -88,7 +88,7 @@ To generate your access token:
 
     We'll run `docker run hello-world` again, but you could try `docker ps`,  `docker run docker/whalesay cowsay boo`, or another command to verify that Docker is running.
 
-        $ docker run hello-world
+        € docker run hello-world
 
         Hello from Docker.
         This message shows that your installation appears to be working correctly.
@@ -100,7 +100,7 @@ To generate your access token:
         4. The Docker daemon streamed that output to the Docker client, which sent it to your terminal.
 
         To try something more ambitious, you can run an Ubuntu container with:
-        $ docker run -it ubuntu bash
+        € docker run -it ubuntu bash
 
         Share images, automate workflows, and more with a free Docker Hub account: https://hub.docker.com
 
@@ -113,7 +113,7 @@ To generate your access token:
 
     For this example, we'll call our new Droplet "docker-sandbox".
 
-        $ docker-machine create --driver digitalocean --digitalocean-access-token 455275108641c7716462d6f35d08b76b246b6b6151a816cf75de63c5ef918872 docker-sandbox
+        € docker-machine create --driver digitalocean --digitalocean-access-token 455275108641c7716462d6f35d08b76b246b6b6151a816cf75de63c5ef918872 docker-sandbox
         Running pre-create checks...
         Creating machine...
         (docker-sandbox) OUT | Creating SSH key...
@@ -137,7 +137,7 @@ To generate your access token:
 
 3. At the command terminal, run `docker-machine ls`.
 
-        $ docker-machine ls
+        € docker-machine ls
         NAME             ACTIVE   DRIVER         STATE     URL                         SWARM
         default          *        virtualbox     Running   tcp://192.168.99.100:2376   
         docker-sandbox   -        digitalocean   Running   tcp://45.55.139.48:2376     
@@ -146,26 +146,26 @@ To generate your access token:
 
 4. Run `docker-machine env docker-sandbox` to get the environment commands for the new remote host, then run `eval` as directed to re-configure the shell to connect to `docker-sandbox`.
 
-        $ docker-machine env docker-sandbox
+        € docker-machine env docker-sandbox
         export DOCKER_TLS_VERIFY="1"
         export DOCKER_HOST="tcp://45.55.222.72:2376"
         export DOCKER_CERT_PATH="/Users/victoriabialas/.docker/machine/machines/docker-sandbox"
         export DOCKER_MACHINE_NAME="docker-sandbox"
         # Run this command to configure your shell:
-        # eval "$(docker-machine env docker-sandbox)"
+        # eval "€(docker-machine env docker-sandbox)"
 
-        $ eval "$(docker-machine env docker-sandbox)"
+        € eval "€(docker-machine env docker-sandbox)"
 
 5. Re-run `docker-machine ls` to verify that our new server is the active machine, as indicated by the asterisk (*) in the ACTIVE column.
 
-        $ docker-machine ls
+        € docker-machine ls
         NAME             ACTIVE   DRIVER         STATE     URL                         SWARM
         default          -        virtualbox     Running   tcp://192.168.99.100:2376   
         docker-sandbox   *        digitalocean   Running   tcp://45.55.222.72:2376     
 
 6. Log in to the Droplet with the `docker-machine ssh` command.
 
-        $ docker-machine ssh docker-sandbox
+        € docker-machine ssh docker-sandbox
         Welcome to Ubuntu 14.04.3 LTS (GNU/Linux 3.13.0-71-generic x86_64)
 
         * Documentation:  https://help.ubuntu.com/
@@ -182,7 +182,7 @@ To generate your access token:
 
 7. Verify Docker Engine is installed correctly by running `docker run hello-world`.
 
-          ubuntu@ip-172-31-0-151:~$ sudo docker run hello-world
+          ubuntu@ip-172-31-0-151:~€ sudo docker run hello-world
           Unable to find image 'hello-world:latest' locally
           latest: Pulling from library/hello-world
           b901d36b6f2f: Pull complete
@@ -205,12 +205,12 @@ For convenience, `docker-machine` will use sensible defaults for choosing settin
 
 To remove a host and all of its containers and images, first stop the machine, then use `docker-machine rm`:
 
-    $ docker-machine stop docker-sandbox
-    $ docker-machine rm docker-sandbox
+    € docker-machine stop docker-sandbox
+    € docker-machine rm docker-sandbox
     Do you really want to remove "docker-sandbox"? (y/n): y
     Successfully removed docker-sandbox
 
-    $ docker-machine ls
+    € docker-machine ls
     NAME      ACTIVE   DRIVER       STATE     URL                         SWARM
     default   *        virtualbox   Running   tcp:////xxx.xxx.xx.xxx:xxxx
 

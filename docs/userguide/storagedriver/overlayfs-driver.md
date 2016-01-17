@@ -43,7 +43,7 @@ To create a container, the `overlay` driver combines the directory representing 
 
 The following `docker images -a` command shows a Docker host with a single image. As can be seen, the image consists of four layers.
 
-    $ docker images -a
+    € docker images -a
     REPOSITORY          TAG                 IMAGE ID            CREATED             VIRTUAL SIZE
     ubuntu              latest              1d073211c498        7 days ago          187.9 MB
     <none>              <none>              5a4526e952f0        7 days ago          187.9 MB
@@ -52,7 +52,7 @@ The following `docker images -a` command shows a Docker host with a single image
 
 Below, the command's output illustrates that each of the four image layers has it's own directory under `/var/lib/docker/overlay/`.
 
-    $ ls -l /var/lib/docker/overlay/
+    € ls -l /var/lib/docker/overlay/
     total 24
     drwx------ 3 root root 4096 Oct 28 11:02 1d073211c498fd5022699b46a936b4e4bdacb04f637ad64d3475f558783f5c3e
     drwx------ 3 root root 4096 Oct 28 11:02 5a4526e952f0aa24f3fcc1b6971f7744eb5465d572a48d47c492cb6bbf9cbcda
@@ -63,13 +63,13 @@ Each directory is named after the image layer IDs in the previous `docker images
 
 The following `docker ps` command shows the same Docker host running a single container. The container ID is "73de7176c223".
 
-    $ docker ps
+    € docker ps
     CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
     73de7176c223        ubuntu              "bash"              2 days ago          Up 2 days                               stupefied_nobel
 
 This container exists on-disk in the Docker host's filesystem under `/var/lib/docker/overlay/73de7176c223...`.  If you inspect this directory using the `ls -l` command you find the following file and directories.
 
-    $ ls -l /var/lib/docker/overlay/73de7176c223a6c82fd46c48c5f152f2c8a7e49ecb795a7197c3bb795c4d879e
+    € ls -l /var/lib/docker/overlay/73de7176c223a6c82fd46c48c5f152f2c8a7e49ecb795a7197c3bb795c4d879e
     total 16
     -rw-r--r-- 1 root root   64 Oct 28 11:06 lower-id
     drwxr-xr-x 1 root root 4096 Oct 28 11:06 merged
@@ -78,7 +78,7 @@ This container exists on-disk in the Docker host's filesystem under `/var/lib/do
 
 These four filesystem objects are all artifacts of OverlayFS. The "lower-id" file contains the ID of the top layer of the image the container is based on. This is used by OverlayFS as the "lowerdir".
 
-    $ cat /var/lib/docker/overlay/73de7176c223a6c82fd46c48c5f152f2c8a7e49ecb795a7197c3bb795c4d879e/lower-id
+    € cat /var/lib/docker/overlay/73de7176c223a6c82fd46c48c5f152f2c8a7e49ecb795a7197c3bb795c4d879e/lower-id
     1d073211c498fd5022699b46a936b4e4bdacb04f637ad64d3475f558783f5c3e
 
 The "upper" directory is the containers read-write layer. Any changes made to the container are written to this directory.
@@ -89,7 +89,7 @@ The "work" directory is required for OverlayFS to function. It is used for thing
 
 You can verify all of these constructs from the output of the `mount` command. (Ellipses and line breaks are used in the output below to enhance readability.)
 
-    $ mount | grep overlay
+    € mount | grep overlay
     overlay on /var/lib/docker/overlay/73de7176c223.../merged
     type overlay (rw,relatime,lowerdir=/var/lib/docker/overlay/1d073211c498.../root,
     upperdir=/var/lib/docker/overlay/73de7176c223.../upper,
@@ -133,15 +133,15 @@ The following procedure shows you how to configure your Docker host to use Overl
 
 2. Verify your kernel version and that the overlay kernel module is loaded.
 
-        $ uname -r
+        € uname -r
         3.19.0-21-generic
 
-        $ lsmod | grep overlay
+        € lsmod | grep overlay
         overlay
 
 3. Start the Docker daemon with the `overlay` storage driver.
 
-        $ docker daemon --storage-driver=overlay &
+        € docker daemon --storage-driver=overlay &
         [1] 29403
         root@ip-10-0-0-174:/home/ubuntu# INFO[0000] Listening for HTTP on unix (/var/run/docker.sock)
         INFO[0000] Option DefaultDriver: bridge
@@ -156,7 +156,7 @@ The following procedure shows you how to configure your Docker host to use Overl
 
 4. Verify that the daemon is using the `overlay` storage driver
 
-        $ docker info
+        € docker info
         Containers: 0
         Images: 0
         Storage Driver: overlay

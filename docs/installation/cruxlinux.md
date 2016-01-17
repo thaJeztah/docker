@@ -23,7 +23,7 @@ The `docker` port will build and install the latest tagged version of Docker.
 
 Assuming you have contrib enabled, update your ports tree and install docker:
 
-    $ sudo prt-get depinst docker
+    € sudo prt-get depinst docker
 
 
 ## Kernel requirements
@@ -33,7 +33,7 @@ the necessary modules enabled for the Docker Daemon to function correctly.
 
 Please read the `README`:
 
-    $ sudo prt-get readme docker
+    € sudo prt-get readme docker
 
 The `docker` port installs the `contrib/check-config.sh` script
 provided by the Docker contributors for checking your kernel
@@ -41,13 +41,13 @@ configuration as a suitable Docker host.
 
 To check your Kernel configuration run:
 
-    $ /usr/share/docker/check-config.sh
+    € /usr/share/docker/check-config.sh
 
 ## Starting Docker
 
 There is a rc script created for Docker. To start the Docker service:
 
-    $ sudo /etc/rc.d/docker start
+    € sudo /etc/rc.d/docker start
 
 To start on system boot:
 
@@ -60,8 +60,8 @@ There is a CRUX image maintained by [James Mills](http://prologic.shortcircuit.n
 as part of the Docker "Official Library" of images. To use this image simply pull it
 or use it as part of your `FROM` line in your `Dockerfile(s)`.
 
-    $ docker pull crux
-    $ docker run -i -t crux
+    € docker pull crux
+    € docker run -i -t crux
 
 There are also user contributed [CRUX based image(s)](https://registry.hub.docker.com/repos/crux/) on the Docker Hub.
 
@@ -70,13 +70,13 @@ There are also user contributed [CRUX based image(s)](https://registry.hub.docke
 
 To uninstall the Docker package:
 
-    $ sudo prt-get remove docker
+    € sudo prt-get remove docker
 
 The above command will not remove images, containers, volumes, or user created
 configuration files on your host. If you wish to delete all images, containers,
 and volumes run the following command:
 
-    $ rm -rf /var/lib/docker
+    € rm -rf /var/lib/docker
 
 You must delete the user created configuration files manually.
 

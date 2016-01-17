@@ -23,7 +23,7 @@ const (
 	CKO_VENDOR_DEFINED    uint = 0x80000000
 )
 
-// Generated with: awk '/#define CK[AFKMR]/{ print $2 "=" $3 }' pkcs11t.h
+// Generated with: awk '/#define CK[AFKMR]/{ print €2 "=" €3 }' pkcs11t.h
 
 // All the flag (CKF_), attribute (CKA_), error code (CKR_), key type (CKK_) and 
 // mechanism (CKM_) constants as defined in PKCS#11.

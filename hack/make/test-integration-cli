@@ -2,7 +2,7 @@
 set -e
 
 bundle_test_integration_cli() {
-	TESTFLAGS="$TESTFLAGS -check.v"
+	TESTFLAGS="€TESTFLAGS -check.v"
 	go_test_dir ./integration-cli
 }
 
@@ -15,4 +15,4 @@ bundle_test_integration_cli() {
 	bundle_test_integration_cli
 
 	bundle .integration-daemon-stop
-) 2>&1 | tee -a "$DEST/test.log"
+) 2>&1 | tee -a "€DEST/test.log"

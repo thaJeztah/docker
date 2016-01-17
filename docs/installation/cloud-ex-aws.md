@@ -69,23 +69,23 @@ To get help with your private key file, instance IP address, and how to log into
 
     Change directories into the directory containing the SSH key and run this command (or give the path to it as part of the command):
 
-        $ ssh -i "YourKey" ubuntu@xx.xxx.xxx.xxx
+        € ssh -i "YourKey" ubuntu@xx.xxx.xxx.xxx
 
     For our example:
 
-        $ cd ~/Desktop/keys/amazon_ec2
-        $ ssh -i "my-key-pair.pem" ubuntu@xx.xxx.xxx.xxx
+        € cd ~/Desktop/keys/amazon_ec2
+        € ssh -i "my-key-pair.pem" ubuntu@xx.xxx.xxx.xxx
 
     We'll follow the instructions for installing Docker on Ubuntu at https://docs.docker.com/engine/installation/ubuntulinux/. The next few steps reflect those instructions.
 
 2. Check the kernel version to make sure it's 3.10 or higher.
 
-        ubuntu@ip-xxx-xx-x-xxx:~$ uname -r
+        ubuntu@ip-xxx-xx-x-xxx:~€ uname -r
         3.13.0-48-generic
 
 3. Add the new `gpg` key.
 
-        ubuntu@ip-xxx-xx-x-xxx:~$ sudo apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
+        ubuntu@ip-xxx-xx-x-xxx:~€ sudo apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
         Executing: gpg --ignore-time-conflict --no-options --no-default-keyring --homedir /tmp/tmp.jNZLKNnKte --no-auto-check-trustdb --trust-model always --keyring /etc/apt/trusted.gpg --primary-keyring /etc/apt/trusted.gpg --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
         gpg: requesting key 2C52609D from hkp server p80.pool.sks-keyservers.net
         gpg: key 2C52609D: public key "Docker Release Tool (releasedocker) <docker@docker.com>" imported
@@ -94,19 +94,19 @@ To get help with your private key file, instance IP address, and how to log into
 
 4. Create a `docker.list` file, and add an entry for our OS, Ubuntu Trusty 14.04 (LTS).
 
-        ubuntu@ip-xxx-xx-x-xxx:~$ sudo vi /etc/apt/sources.list.d/docker.list
+        ubuntu@ip-xxx-xx-x-xxx:~€ sudo vi /etc/apt/sources.list.d/docker.list
 
     If we were updating an existing file, we'd delete any existing entries.
 
 5. Update the `apt` package index.
 
-        ubuntu@ip-xxx-xx-x-xxx:~$ sudo apt-get update
+        ubuntu@ip-xxx-xx-x-xxx:~€ sudo apt-get update
 
 6. Purge the old repo if it exists.
 
     In our case the repo doesn't because this is a new VM, but let's run it anyway just to be sure.
 
-        ubuntu@ip-xxx-xx-x-xxx:~$ sudo apt-get purge lxc-docker
+        ubuntu@ip-xxx-xx-x-xxx:~€ sudo apt-get purge lxc-docker
         Reading package lists... Done
         Building dependency tree       
         Reading state information... Done
@@ -115,7 +115,7 @@ To get help with your private key file, instance IP address, and how to log into
 
 7.  Verify that `apt` is pulling from the correct repository.
 
-        ubuntu@ip-172-31-0-151:~$ sudo apt-cache policy docker-engine
+        ubuntu@ip-172-31-0-151:~€ sudo apt-cache policy docker-engine
         docker-engine:
         Installed: (none)
         Candidate: 1.9.1-0~trusty
@@ -132,18 +132,18 @@ To get help with your private key file, instance IP address, and how to log into
 
 For Ubuntu Trusty (and some other versions), it’s recommended to install the `linux-image-extra` kernel package, which allows you use the `aufs` storage driver, so we'll do that now.
 
-        ubuntu@ip-xxx-xx-x-xxx:~$ sudo apt-get update
-        ubuntu@ip-172-31-0-151:~$ sudo apt-get install linux-image-extra-$(uname -r)
+        ubuntu@ip-xxx-xx-x-xxx:~€ sudo apt-get update
+        ubuntu@ip-172-31-0-151:~€ sudo apt-get install linux-image-extra-€(uname -r)
 
 ### Step 5. Install Docker Engine on the remote instance
 
 1. Update the apt package index.
 
-        ubuntu@ip-xxx-xx-x-xxx:~$ sudo apt-get update
+        ubuntu@ip-xxx-xx-x-xxx:~€ sudo apt-get update
 
 2. Install Docker Engine.
 
-        ubuntu@ip-xxx-xx-x-xxx:~$ sudo apt-get install docker-engine
+        ubuntu@ip-xxx-xx-x-xxx:~€ sudo apt-get install docker-engine
         Reading package lists... Done
         Building dependency tree       
         Reading state information... Done
@@ -164,12 +164,12 @@ For Ubuntu Trusty (and some other versions), it’s recommended to install the `
 
 3. Start the Docker daemon.
 
-        ubuntu@ip-xxx-xx-x-xxx:~$ sudo service docker start
+        ubuntu@ip-xxx-xx-x-xxx:~€ sudo service docker start
 
 4. Verify Docker Engine is installed correctly by running `docker run hello-world`.
 
-        ubuntu@ip-xxx-xx-x-xxx:~$ sudo docker run hello-world
-        ubuntu@ip-172-31-0-151:~$ sudo docker run hello-world
+        ubuntu@ip-xxx-xx-x-xxx:~€ sudo docker run hello-world
+        ubuntu@ip-172-31-0-151:~€ sudo docker run hello-world
         Unable to find image 'hello-world:latest' locally
         latest: Pulling from library/hello-world
         b901d36b6f2f: Pull complete
@@ -187,7 +187,7 @@ For Ubuntu Trusty (and some other versions), it’s recommended to install the `
         4. The Docker daemon streamed that output to the Docker client, which sent it to your terminal.
 
         To try something more ambitious, you can run an Ubuntu container with:
-        $ docker run -it ubuntu bash
+        € docker run -it ubuntu bash
 
         Share images, automate workflows, and more with a free Docker Hub account:
         https://hub.docker.com

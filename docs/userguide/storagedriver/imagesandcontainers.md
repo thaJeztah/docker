@@ -63,7 +63,7 @@ The Docker client reports on image layers when instructed to pull and push
 images with `docker pull` and `docker push`. The command below pulls the
 `ubuntu:15.04` Docker image from Docker Hub.
 
-    $ docker pull ubuntu:15.04
+    € docker pull ubuntu:15.04
     15.04: Pulling from library/ubuntu
     6e6a100fa147: Pull complete
     13c0c663a321: Pull complete
@@ -80,7 +80,7 @@ The image layers are stored in the Docker host's local storage area. Typically,
 the local storage area is in the host's `/var/lib/docker` directory. Depending
 on which storage driver the local storage area may be in a different location.  You can list the layers in the local storage area. The following example shows the storage as it appears under the AUFS storage driver:
 
-    $ sudo ls /var/lib/docker/aufs/layers
+    € sudo ls /var/lib/docker/aufs/layers
     013f3d01d24738964bb7101fa83a926181d600ebecca7206dced59669e6e6778  2bd276ed39d5fcfd3d00ce0a190beeea508332f5aec3c6a125cc619a3fdbade6
     13c0c663a321cd83a97f4ce1ecbaf17c2ba166527c3b06daaefe30695c5fcb8c  6e6a100fa147e6db53b684c8516e3e2588b160fd4898b6265545d5d4edb6796d
 
@@ -106,7 +106,7 @@ One way to do this is using a Dockerfile and the `docker build` command.
 
 2. From a terminal in the same folder as your Dockerfile, run the following command:
 
-        $ docker build -t changed-ubuntu .
+        € docker build -t changed-ubuntu .
         Sending build context to Docker daemon 2.048 kB
         Step 0 : FROM ubuntu:15.04
          ---> 013f3d01d247
@@ -128,11 +128,11 @@ One way to do this is using a Dockerfile and the `docker build` command.
 
 4. Run the `docker history` command to see which image layers were used to create the new `changed-ubuntu` image.
 
-        $ docker history changed-ubuntu
+        € docker history changed-ubuntu
         IMAGE               CREATED              CREATED BY                                      SIZE                COMMENT
         03b964f68d06        About a minute ago   /bin/sh -c echo "Hello world" > /tmp/newfile    12 B                
         013f3d01d247        6 weeks ago          /bin/sh -c #(nop) CMD ["/bin/bash"]             0 B                 
-        <missing>           6 weeks ago          /bin/sh -c sed -i 's/^#\s*\(deb.*universe\)$/   1.879 kB            
+        <missing>           6 weeks ago          /bin/sh -c sed -i 's/^#\s*\(deb.*universe\)€/   1.879 kB            
         <missing>           6 weeks ago          /bin/sh -c echo '#!/bin/sh' > /usr/sbin/polic   701 B               
         <missing>           6 weeks ago          /bin/sh -c #(nop) ADD file:49710b44e2ae0edef4   131.4 MB            
 
@@ -177,22 +177,22 @@ Let's see what happens if we spin up 5 containers based on our `changed-ubuntu` 
 
 1. From a terminal on your Docker host, run the following `docker run` command 5 times.
 
-        $ docker run -dit changed-ubuntu bash
+        € docker run -dit changed-ubuntu bash
         75bab0d54f3cf193cfdc3a86483466363f442fba30859f7dcd1b816b6ede82d4
-        $ docker run -dit changed-ubuntu bash
+        € docker run -dit changed-ubuntu bash
         9280e777d109e2eb4b13ab211553516124a3d4d4280a0edfc7abf75c59024d47
-        $ docker run -dit changed-ubuntu bash
+        € docker run -dit changed-ubuntu bash
         a651680bd6c2ef64902e154eeb8a064b85c9abf08ac46f922ad8dfc11bb5cd8a
-        $ docker run -dit changed-ubuntu bash
+        € docker run -dit changed-ubuntu bash
         8eb24b3b2d246f225b24f2fca39625aaad71689c392a7b552b78baf264647373
-        $ docker run -dit changed-ubuntu bash
+        € docker run -dit changed-ubuntu bash
         0ad25d06bdf6fca0dedc38301b2aff7478b3e1ce3d1acd676573bba57cb1cfef
 
   This launches 5 containers based on the `changed-ubuntu` image.  As the container is created, Docker adds a writable layer and assigns it a UUID. This is the value returned from the `docker run` command.
 
 2. Run the `docker ps` command to verify the 5 containers are running.
 
-        $ docker ps
+        € docker ps
         CONTAINER ID        IMAGE               COMMAND             CREATED              STATUS              PORTS               NAMES
         0ad25d06bdf6        changed-ubuntu      "bash"              About a minute ago   Up About a minute                       stoic_ptolemy
         8eb24b3b2d24        changed-ubuntu      "bash"              About a minute ago   Up About a minute                       pensive_bartik
@@ -204,7 +204,7 @@ Let's see what happens if we spin up 5 containers based on our `changed-ubuntu` 
 
 3. List the contents of the local storage area.
 
-        $ sudo ls containers
+        € sudo ls containers
         0ad25d06bdf6fca0dedc38301b2aff7478b3e1ce3d1acd676573bba57cb1cfef  9280e777d109e2eb4b13ab211553516124a3d4d4280a0edfc7abf75c59024d47
         75bab0d54f3cf193cfdc3a86483466363f442fba30859f7dcd1b816b6ede82d4  a651680bd6c2ef64902e154eeb8a064b85c9abf08ac46f922ad8dfc11bb5cd8a
         8eb24b3b2d246f225b24f2fca39625aaad71689c392a7b552b78baf264647373

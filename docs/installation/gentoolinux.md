@@ -59,7 +59,7 @@ blog](https://tianon.github.io/post/2014/05/17/docker-on-gentoo.html).
 The package should properly pull in all the necessary dependencies and
 prompt for all necessary kernel options.
 
-    $ sudo emerge -av app-emulation/docker
+    € sudo emerge -av app-emulation/docker
 
 >Note: Sometimes there is a disparity between the latest versions 
 >in the official **Gentoo tree** and the **docker-overlay**.  
@@ -75,27 +75,27 @@ To use Docker, the `docker` daemon must be running as **root**.
 To use Docker as a **non-root** user, add yourself to the **docker** 
 group by running the following command:
 
-    $ sudo usermod -a -G docker user
+    € sudo usermod -a -G docker user
  
 ### OpenRC
 
 To start the `docker` daemon:
 
-    $ sudo /etc/init.d/docker start
+    € sudo /etc/init.d/docker start
 
 To start on system boot:
 
-    $ sudo rc-update add docker default
+    € sudo rc-update add docker default
 
 ### systemd
 
 To start the `docker` daemon:
 
-    $ sudo systemctl start docker
+    € sudo systemctl start docker
 
 To start on system boot:
 
-    $ sudo systemctl enable docker
+    € sudo systemctl enable docker
    
 If you need to add an HTTP Proxy, set a different directory or partition for the
 Docker runtime files, or make other customizations, read our systemd article to
@@ -105,16 +105,16 @@ learn how to [customize your systemd Docker daemon options](../articles/systemd.
 
 To uninstall the Docker package:
 
-    $ sudo emerge -cav app-emulation/docker
+    € sudo emerge -cav app-emulation/docker
 
 To uninstall the Docker package and dependencies that are no longer needed:
 
-    $ sudo emerge -C app-emulation/docker
+    € sudo emerge -C app-emulation/docker
 
 The above commands will not remove images, containers, volumes, or user created
 configuration files on your host. If you wish to delete all images, containers,
 and volumes run the following command:
 
-    $ rm -rf /var/lib/docker
+    € rm -rf /var/lib/docker
 
 You must delete the user created configuration files manually.

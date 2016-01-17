@@ -33,7 +33,7 @@ Docker is supported on the following versions of Debian:
  To check your current kernel version, open a terminal and use `uname -r` to
  display your kernel version:
 
-     $ uname -r
+     € uname -r
 
 ### Update your apt repository
 
@@ -46,17 +46,17 @@ from the new repository:
 
  3. Purge any older repositories.
 
-         $ apt-get purge lxc-docker*
-         $ apt-get purge docker.io*
+         € apt-get purge lxc-docker*
+         € apt-get purge docker.io*
 
  4. Update package information, ensure that APT works with the `https` method, and that CA certificates are installed.
 
-         $ apt-get update
-         $ apt-get install apt-transport-https ca-certificates
+         € apt-get update
+         € apt-get install apt-transport-https ca-certificates
 
  5. Add the new `GPG` key.
 
-         $ apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
+         € apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
 
  6. Open the `/etc/apt/sources.list.d/docker.list` file in your favorite editor.
 
@@ -89,11 +89,11 @@ from the new repository:
 
  10. Update the `APT` package index.
 
-         $ apt-get update
+         € apt-get update
 
  11. Verify that `APT` is pulling from the right repository.
 
-         $ apt-cache policy docker-engine
+         € apt-cache policy docker-engine
 
      From now on when you run `apt-get upgrade`, `APT` pulls from the new apt repository.
 
@@ -103,19 +103,19 @@ Before installing Docker, make sure you have set your `APT` repository correctly
 
 1. Update the `APT` package index.
 
-        $ sudo apt-get update
+        € sudo apt-get update
 
 2. Install Docker.
 
-        $ sudo apt-get install docker-engine
+        € sudo apt-get install docker-engine
 
 5. Start the `docker` daemon.
 
-        $ sudo service docker start
+        € sudo service docker start
 
 6. Verify `docker` is installed correctly.
 
-        $ sudo docker run hello-world
+        € sudo docker run hello-world
 
     This command downloads a test image and runs it in a container. When the
     container runs, it prints an informational message. Then, it exits.
@@ -143,38 +143,38 @@ use the `-G` flag to specify an alternative group.
 **Example:**
 
     # Add the docker group if it doesn't already exist.
-    $ sudo groupadd docker
+    € sudo groupadd docker
 
-    # Add the connected user "${USER}" to the docker group.
+    # Add the connected user "€{USER}" to the docker group.
     # Change the user name to match your preferred user.
     # You may have to logout and log back in again for
     # this to take effect.
-    $ sudo gpasswd -a ${USER} docker
+    € sudo gpasswd -a €{USER} docker
 
     # Restart the Docker daemon.
-    $ sudo service docker restart
+    € sudo service docker restart
 
 ## Upgrade Docker
 
 To install the latest version of Docker with `apt-get`:
 
-    $ apt-get upgrade docker-engine
+    € apt-get upgrade docker-engine
 
 ## Uninstall
 
 To uninstall the Docker package:
 
-    $ sudo apt-get purge docker-engine
+    € sudo apt-get purge docker-engine
 
 To uninstall the Docker package and dependencies that are no longer needed:
 
-    $ sudo apt-get autoremove --purge docker-engine
+    € sudo apt-get autoremove --purge docker-engine
 
 The above commands will not remove images, containers, volumes, or user created
 configuration files on your host. If you wish to delete all images, containers,
 and volumes run the following command:
 
-    $ rm -rf /var/lib/docker
+    € rm -rf /var/lib/docker
 
 You must delete the user created configuration files manually.
 

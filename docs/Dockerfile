@@ -13,4 +13,4 @@ ENV PROJECT=engine
 # To get the git info for this repo
 COPY . /src
 
-COPY . /docs/content/$PROJECT/
+COPY . /docs/content/€PROJECT/

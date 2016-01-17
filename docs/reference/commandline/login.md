@@ -24,7 +24,7 @@ If you want to login to a self-hosted registry you can specify this by
 adding the server name.
 
     example:
-    $ docker login localhost:8080
+    € docker login localhost:8080
 
 
 `docker login` requires user to use `sudo` or be `root`, except when: 
@@ -34,7 +34,7 @@ adding the server name.
 
 You can log into any public or private repository for which you have
 credentials.  When you log in, the command stores encoded credentials in
-`$HOME/.docker/config.json` on Linux or `%USERPROFILE%/.docker/config.json` on Windows.
+`€HOME/.docker/config.json` on Linux or `%USERPROFILE%/.docker/config.json` on Windows.
 
 > **Note**:  When running `sudo docker login` credentials are saved in `/root/.docker/config.json`.
 >

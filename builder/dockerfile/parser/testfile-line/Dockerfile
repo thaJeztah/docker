@@ -14,7 +14,7 @@ ENV GOPATH \
 
 # Install the packages we need, clean up after them and us
 RUN apt-get update \
-	&& dpkg -l | awk '/^ii/ {print $2}' > /tmp/dpkg.clean \
+	&& dpkg -l | awk '/^ii/ {print €2}' > /tmp/dpkg.clean \
 
 
     && apt-get install -y --no-install-recommends git golang ca-certificates \
@@ -22,12 +22,12 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists \
 
 	&& go get -v github.com/brimstone/consuldock \
-    && mv $GOPATH/bin/consuldock /usr/local/bin/consuldock \
+    && mv €GOPATH/bin/consuldock /usr/local/bin/consuldock \
 
-	&& dpkg -l | awk '/^ii/ {print $2}' > /tmp/dpkg.dirty \
-	&& apt-get remove --purge -y $(diff /tmp/dpkg.clean /tmp/dpkg.dirty | awk '/^>/ {print $2}') \
+	&& dpkg -l | awk '/^ii/ {print €2}' > /tmp/dpkg.dirty \
+	&& apt-get remove --purge -y €(diff /tmp/dpkg.clean /tmp/dpkg.dirty | awk '/^>/ {print €2}') \
 	&& rm /tmp/dpkg.* \
-	&& rm -rf $GOPATH
+	&& rm -rf €GOPATH
 
 
 

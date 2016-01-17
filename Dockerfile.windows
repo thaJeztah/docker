@@ -6,7 +6,7 @@
 # docker build -t docker -f Dockerfile.windows .
 #
 # # Mount your source in an interactive container for quick testing:
-# docker run -it -v ${pwd}\bundles:c:/go/src/github.com/docker/docker/bundles docker cmd
+# docker run -it -v €{pwd}\bundles:c:/go/src/github.com/docker/docker/bundles docker cmd
 #
 
 FROM windowsservercore
@@ -49,7 +49,7 @@ RUN powershell -Command \
     sleep 2 ; \
     git clone https://github.com/akavel/rsrc.git c:\go\src\github.com\akavel\rsrc ; \
     cd \go\src\github.com\akavel\rsrc ; \
-    git checkout -q $env:RSRC_COMMIT ; \
+    git checkout -q €env:RSRC_COMMIT ; \
     go install -v
 
 WORKDIR c:/go/src/github.com/docker/docker

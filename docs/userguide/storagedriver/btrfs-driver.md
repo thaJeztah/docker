@@ -83,7 +83,7 @@ that as Btrfs filesystem objects and not as individual mounts.
 The following example shows a single Docker image with four image layers.
 
 ```bash
-$ sudo docker images -a
+€ sudo docker images -a
 REPOSITORY          TAG                 IMAGE ID            CREATED             VIRTUAL SIZE
 ubuntu              latest              0a17decee413        2 weeks ago         188.3 MB
 <none>              <none>              3c9a9d7cc6a2        2 weeks ago         188.3 MB
@@ -94,7 +94,7 @@ ubuntu              latest              0a17decee413        2 weeks ago         
 Each image layer exists as a Btrfs subvolume or snapshot with the same name as its image ID as illustrated by the `btrfs subvolume list` command shown below:
 
 ```bash
-$ sudo btrfs subvolume list /var/lib/docker
+€ sudo btrfs subvolume list /var/lib/docker
 ID 257 gen 9 top level 5 path btrfs/subvolumes/f9a9f253f6105141e0f8e091a6bcdb19e3f27af949842db93acba9048ed2410b
 ID 258 gen 10 top level 5 path btrfs/subvolumes/eeb7cb91b09d5de9edb2798301aeedf50848eacc2123e98538f9d014f80f243c
 ID 260 gen 11 top level 5 path btrfs/subvolumes/3c9a9d7cc6a235eb2de58ca9ef3551c67ae42a991933ba4958d207b29142902b
@@ -104,7 +104,7 @@ ID 261 gen 12 top level 5 path btrfs/subvolumes/0a17decee4139b0de68478f149cc1634
 Under the `/var/lib/docker/btrfs/subvolumes` directory, each of these subvolumes and snapshots are visible as a normal Unix directory:
 
 ```bash
-$ ls -l /var/lib/docker/btrfs/subvolumes/
+€ ls -l /var/lib/docker/btrfs/subvolumes/
 total 0
 drwxr-xr-x 1 root root 132 Oct 16 14:44 0a17decee4139b0de68478f149cc16346f5e711c5ae3bb969895f22dd6723751
 drwxr-xr-x 1 root root 132 Oct 16 14:44 3c9a9d7cc6a235eb2de58ca9ef3551c67ae42a991933ba4958d207b29142902b
@@ -118,7 +118,7 @@ The example below shows a truncated output of an `ls -l` command against the
 image's top layer:
 
 ```bash
-$ ls -l /var/lib/docker/btrfs/subvolumes/0a17decee4139b0de68478f149cc16346f5e711c5ae3bb969895f22dd6723751/
+€ ls -l /var/lib/docker/btrfs/subvolumes/0a17decee4139b0de68478f149cc16346f5e711c5ae3bb969895f22dd6723751/
 total 0
 drwxr-xr-x 1 root root 1372 Oct  9 08:39 bin
 drwxr-xr-x 1 root root    0 Apr 10  2014 boot
@@ -165,7 +165,7 @@ Stop the Docker daemon. Then, ensure that you have a spare block device at `/dev
 The procedure also assumes your kernel has the appropriate Btrfs modules loaded. To verify this, use the following command:
 
 ```bash
-$ cat /proc/filesystems | grep btrfs
+€ cat /proc/filesystems | grep btrfs
 ```
 
 ### Configure Btrfs on Ubuntu 14.04 LTS
@@ -174,7 +174,7 @@ Assuming your system meets the prerequisites, do the following:
 
 1. Install the "btrfs-tools" package.
 
-        $ sudo apt-get install btrfs-tools
+        € sudo apt-get install btrfs-tools
         Reading package lists... Done
         Building dependency tree
         <output truncated>
@@ -183,7 +183,7 @@ Assuming your system meets the prerequisites, do the following:
 
     Btrfs storage pools are created with the `mkfs.btrfs` command. Passing multiple devices to the `mkfs.btrfs` command creates a pool across all of those devices. Here you create a pool with a single device at `/dev/xvdb`.
 
-        $ sudo mkfs.btrfs -f /dev/xvdb
+        € sudo mkfs.btrfs -f /dev/xvdb
         WARNING! - Btrfs v3.12 IS EXPERIMENTAL
         WARNING! - see http://btrfs.wiki.kernel.org before using
 
@@ -201,13 +201,13 @@ Assuming your system meets the prerequisites, do the following:
 
 3. If it does not already exist, create a directory for the Docker host's local storage area at `/var/lib/docker`.
 
-        $ sudo mkdir /var/lib/docker
+        € sudo mkdir /var/lib/docker
 
 4. Configure the system to automatically mount the Btrfs filesystem each time the system boots.
 
     a. Obtain the Btrfs filesystem's UUID.
 
-        $ sudo blkid /dev/xvdb
+        € sudo blkid /dev/xvdb
         /dev/xvdb: UUID="a0ed851e-158b-4120-8416-c9b072c8cf47" UUID_SUB="c3927a64-4454-4eef-95c2-a7d44ac0cf27" TYPE="btrfs"
 
     b. Create a `/etc/fstab` entry to automatically mount `/var/lib/docker` each time the system boots.
@@ -217,8 +217,8 @@ Assuming your system meets the prerequisites, do the following:
 
 5. Mount the new filesystem and verify the operation.
 
-        $ sudo mount -a
-        $ mount
+        € sudo mount -a
+        € mount
         /dev/xvda1 on / type ext4 (rw,discard)
         <output truncated>
         /dev/xvdb on /var/lib/docker type btrfs (rw)
@@ -230,7 +230,7 @@ Now that you have a Btrfs filesystem mounted at `/var/lib/docker`, the daemon sh
 
 1. Start the Docker daemon.
 
-        $ sudo service docker start
+        € sudo service docker start
         docker start/running, process 2315
 
     The procedure for starting the Docker daemon may differ depending on the
@@ -242,7 +242,7 @@ Now that you have a Btrfs filesystem mounted at `/var/lib/docker`, the daemon sh
 
 2. Verify the storage driver with the `docker info` command.
 
-        $ sudo docker info
+        € sudo docker info
         Containers: 0
         Images: 0
         Storage Driver: btrfs

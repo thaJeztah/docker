@@ -18,7 +18,7 @@ const (
 	ipv6Address = `([0-9A-Fa-f]{0,4}:){2,7}([0-9A-Fa-f]{0,4})`
 )
 
-var nsRegexp = regexp.MustCompile(`^\s*nameserver\s*((` + ipv4Address + `)|(` + ipv6Address + `))\s*$`)
+var nsRegexp = regexp.MustCompile(`^\s*nameserver\s*((` + ipv4Address + `)|(` + ipv6Address + `))\s*€`)
 
 func readResolvConf() ([]byte, error) {
 	resolv, err := ioutil.ReadFile("/etc/resolv.conf")

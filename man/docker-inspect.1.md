@@ -38,7 +38,7 @@ template will be executed for each result.
 Get information about an image when image name conflicts with the container name,
 e.g. both image and container are named rhel7:
 
-    $ docker inspect --type=image rhel7
+    € docker inspect --type=image rhel7
     [
     {
      "Id": "fe01a428b9d9de35d29531e9994157978e8c48fa693e1bf1d221dffbbb67b170",
@@ -51,7 +51,7 @@ e.g. both image and container are named rhel7:
 
 To get information on a container use its ID or instance name:
 
-    $ docker inspect d2cc496561d6
+    € docker inspect d2cc496561d6
     [{
     "Id": "d2cc496561d6d520cbc0236b4ba88c362c446a7619992123f11c809cded25b47",
     "Created": "2015-06-08T16:18:02.505155285Z",
@@ -209,7 +209,7 @@ To get information on a container use its ID or instance name:
 
 To get the IP address of a container use:
 
-    $ docker inspect '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' d2cc496561d6
+    € docker inspect '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' d2cc496561d6
     172.17.0.2
 
 ## Listing all port bindings
@@ -217,8 +217,8 @@ To get the IP address of a container use:
 One can loop over arrays and maps in the results to produce simple text
 output:
 
-    $ docker inspect --format='{{range $p, $conf := .NetworkSettings.Ports}} \
-      {{$p}} -> {{(index $conf 0).HostPort}} {{end}}' d2cc496561d6
+    € docker inspect --format='{{range €p, €conf := .NetworkSettings.Ports}} \
+      {{€p}} -> {{(index €conf 0).HostPort}} {{end}}' d2cc496561d6
       80/tcp -> 80
 
 You can get more information about how to write a Go template from:
@@ -226,7 +226,7 @@ https://golang.org/pkg/text/template/.
 
 ## Getting size information on an container
 
-    $ docker inspect -s d2cc496561d6
+    € docker inspect -s d2cc496561d6
     [
     {
     ....
@@ -241,7 +241,7 @@ https://golang.org/pkg/text/template/.
 Use an image's ID or name (e.g., repository/name[:tag]) to get information
 about the image:
 
-    $ docker inspect ded7cd95e059
+    € docker inspect ded7cd95e059
     [{
     "Id": "ded7cd95e059788f2586a51c275a4f151653779d6a7f4dad77c2bd34601d94e4",
     "Parent": "48ecf305d2cf7046c1f5f8fcbcd4994403173441d4a7f125b1bb0ceead9de731",

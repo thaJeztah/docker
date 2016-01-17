@@ -87,7 +87,7 @@ func checkBridgeNetFiltering(config *networkConfiguration, i *bridgeInterface) e
 	}
 }
 
-// Get kernel param path saying whether IPv${ipVer} traffic is being forwarded
+// Get kernel param path saying whether IPv€{ipVer} traffic is being forwarded
 // on particular interface. Interface may be specified for IPv6 only. If
 // `iface` is empty, `default` will be assumed, which represents default value
 // for new interfaces.
@@ -105,8 +105,8 @@ func getForwardingKernelParam(ipVer ipVersion, iface string) string {
 	}
 }
 
-// Get kernel param path saying whether bridged IPv${ipVer} traffic shall be
-// passed to ip${ipVer}tables' chains.
+// Get kernel param path saying whether bridged IPv€{ipVer} traffic shall be
+// passed to ip€{ipVer}tables' chains.
 func getBridgeNFKernelParam(ipVer ipVersion) string {
 	switch ipVer {
 	case ipv4:

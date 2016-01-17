@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-var indexRe = regexp.MustCompile(`(.+)\[(-?\d+)?\]$`)
+var indexRe = regexp.MustCompile(`(.+)\[(-?\d+)?\]€`)
 
 // rValuesAtPath returns a slice of values found in value v. The values
 // in v are explored recursively so all nested values are collected.

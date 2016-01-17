@@ -39,29 +39,29 @@ Supported `Dockerfile` instructions:
 
 This will create a new untagged image.
 
-    $ docker import http://example.com/exampleimage.tgz
+    € docker import http://example.com/exampleimage.tgz
 
 **Import from a local file:**
 
 Import to docker via pipe and `STDIN`.
 
-    $ cat exampleimage.tgz | docker import - exampleimagelocal:new
+    € cat exampleimage.tgz | docker import - exampleimagelocal:new
 
 Import with a commit message
 
-    $ cat exampleimage.tgz | docker import --message "New image imported from tarball" - exampleimagelocal:new
+    € cat exampleimage.tgz | docker import --message "New image imported from tarball" - exampleimagelocal:new
 
 Import to docker from a local archive.
 
-    $ docker import /path/to/exampleimage.tgz
+    € docker import /path/to/exampleimage.tgz
 
 **Import from a local directory:**
 
-    $ sudo tar -c . | docker import - exampleimagedir
+    € sudo tar -c . | docker import - exampleimagedir
 
 **Import from a local directory with new configurations:**
 
-    $ sudo tar -c . | docker import --change "ENV DEBUG true" - exampleimagedir
+    € sudo tar -c . | docker import --change "ENV DEBUG true" - exampleimagedir
 
 Note the `sudo` in this example – you must preserve
 the ownership of the files (especially root ownership) during the

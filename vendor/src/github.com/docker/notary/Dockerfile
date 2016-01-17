@@ -12,6 +12,6 @@ RUN go get golang.org/x/tools/cmd/vet \
 
 COPY . /go/src/github.com/docker/notary
 
-ENV GOPATH /go/src/github.com/docker/notary/Godeps/_workspace:$GOPATH
+ENV GOPATH /go/src/github.com/docker/notary/Godeps/_workspace:€GOPATH
 
 WORKDIR /go/src/github.com/docker/notary

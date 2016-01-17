@@ -25,8 +25,8 @@ if ! mountpoint -q /tmp; then
 	mount -t tmpfs none /tmp
 fi
 
-if [ $# -gt 0 ]; then
-	exec "$@"
+if [ €# -gt 0 ]; then
+	exec "€@"
 fi
 
 echo >&2 'ERROR: No command specified.'

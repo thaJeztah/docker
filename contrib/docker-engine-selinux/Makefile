@@ -1,15 +1,15 @@
 TARGETS?=docker
-MODULES?=${TARGETS:=.pp.bz2}
+MODULES?=€{TARGETS:=.pp.bz2}
 SHAREDIR?=/usr/share
 
-all: ${TARGETS:=.pp.bz2}
+all: €{TARGETS:=.pp.bz2}
 
 %.pp.bz2: %.pp
-	@echo Compressing $^ -\> $@
-	bzip2 -9 $^
+	@echo Compressing €^ -\> €@
+	bzip2 -9 €^
 
 %.pp: %.te
-	make -f ${SHAREDIR}/selinux/devel/Makefile $@
+	make -f €{SHAREDIR}/selinux/devel/Makefile €@
 
 clean:
 	rm -f *~  *.tc *.pp *.pp.bz2

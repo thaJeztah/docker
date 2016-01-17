@@ -36,7 +36,7 @@ this bridge network. You cannot remove this default bridge network but you can
 create new ones using the `network create` command.
 
 ```bash
-$ docker network create -d bridge my-bridge-network
+€ docker network create -d bridge my-bridge-network
 ```
 
 Bridge networks are isolated networks on a single Engine installation. If you
@@ -66,7 +66,7 @@ Once you have prepared the `overlay` network prerequisites you simply choose a
 Docker host in the cluster and issue the following to create the network:
 
 ```bash
-$ docker network create -d overlay my-multihost-network
+€ docker network create -d overlay my-multihost-network
 ```
 
 Network names must be unique. The Docker daemon attempts to identify naming
@@ -79,7 +79,7 @@ When you start a container use the `--net` flag to connect it to a network.
 This adds the `busybox` container to the `mynet` network.
 
 ```bash
-$ docker run -itd --net=mynet busybox
+€ docker run -itd --net=mynet busybox
 ```
 
 If you want to add a container to a network after the container is already

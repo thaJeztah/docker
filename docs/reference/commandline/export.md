@@ -28,8 +28,8 @@ the user guide for examples on exporting data in a volume.
 
 ## Examples
 
-    $ docker export red_panda > latest.tar
+    € docker export red_panda > latest.tar
 
 Or
 
-    $ docker export --output="latest.tar" red_panda
+    € docker export --output="latest.tar" red_panda

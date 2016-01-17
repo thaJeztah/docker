@@ -84,7 +84,7 @@ If transport is either `tcp` or `udp` and `port` is not specified it defaults to
 The following example shows how to have the `syslog` driver connect to a `syslog`
 remote server at `192.168.0.42` on port `123`
 
-    $ docker run --log-driver=syslog --log-opt syslog-address=tcp://192.168.0.42:123
+    € docker run --log-driver=syslog --log-opt syslog-address=tcp://192.168.0.42:123
 
 The `syslog-facility` option configures the syslog facility. By default, the system uses the
 `daemon` value. To override this behavior, you can provide an integer of 0 to 23 or any of
@@ -149,7 +149,7 @@ driver connects to. Currently, only `udp` is supported as the transport and you 
 specify a `port` value. The following example shows how to connect the `gelf`
 driver to a GELF remote server at `192.168.0.42` on port `12201`
 
-    $ docker run --log-driver=gelf --log-opt gelf-address=udp://192.168.0.42:12201
+    € docker run --log-driver=gelf --log-opt gelf-address=udp://192.168.0.42:12201
 
 By default, Docker uses the first 12 characters of the container ID to tag log messages.
 Refer to the [log tag option documentation](log_tags.md) for customizing

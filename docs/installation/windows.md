@@ -167,7 +167,7 @@ There are several ways to use the installed tools, from the Docker Quickstart Te
 
 3. Verify your setup succeeded by running the `hello-world` container.
 
-        $ docker run hello-world
+        € docker run hello-world
         Unable to find image 'hello-world:latest' locally
         511136ea3c5a: Pull complete
         31cbccb51277: Pull complete
@@ -189,7 +189,7 @@ There are several ways to use the installed tools, from the Docker Quickstart Te
            to your terminal.
 
         To try something more ambitious, you can run an Ubuntu container with:
-        $ docker run -it ubuntu bash
+        € docker run -it ubuntu bash
 
         For more examples and ideas, visit:
         http://docs.docker.com/userguide/
@@ -235,7 +235,7 @@ There are several ways to use the installed tools, from the Docker Quickstart Te
 
 6. Connect your shell to the `my-default` machine.
 
-        C:\Users\mary> eval "$(docker-machine env my-default)"
+        C:\Users\mary> eval "€(docker-machine env my-default)"
 
 7. Run the `hello-world` container to verify your setup.
 
@@ -247,7 +247,7 @@ There are several ways to use the installed tools, from the Docker Quickstart Te
 
 2. Add `ssh.exe` to your PATH:
 
-        PS C:\Users\mary> $Env:Path = "${Env:Path};c:\Program Files (x86)\Git\bin"
+        PS C:\Users\mary> €Env:Path = "€{Env:Path};c:\Program Files (x86)\Git\bin"
 
 3. Create a new Docker VM.
 
@@ -265,7 +265,7 @@ There are several ways to use the installed tools, from the Docker Quickstart Te
 
 6. Connect your shell to the `my-default` machine.
 
-        C:\Users\mary> eval "$(docker-machine env my-default)"
+        C:\Users\mary> eval "€(docker-machine env my-default)"
 
 7. Run the `hello-world` container to verify your setup.
 
@@ -294,7 +294,7 @@ this older VM, you can migrate it.
 
 2. Type the following command.
 
-        $ docker-machine create -d virtualbox --virtualbox-import-boot2docker-vm boot2docker-vm docker-vm
+        € docker-machine create -d virtualbox --virtualbox-import-boot2docker-vm boot2docker-vm docker-vm
 
 3. Use the `docker-machine` command to interact with the migrated VM.
 
@@ -334,12 +334,12 @@ network adaptor which provides access to the container's ports.
 
 If you run a container with a published port:
 
-    $ docker run --rm -i -t -p 80:80 nginx
+    € docker run --rm -i -t -p 80:80 nginx
 
 Then you should be able to access that nginx server using the IP address
 reported to you using:
 
-    $ docker-machine ip
+    € docker-machine ip
 
 Typically, the IP is 192.168.59.103, but it could get changed by VirtualBox's
 DHCP implementation.

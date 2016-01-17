@@ -14,4 +14,4 @@ They should not be called directly - instead, pass it as argument to make.sh, fo
 To add a bundle:
 
 * Create a shell-compatible file here
-* Add it to $DEFAULT_BUNDLES in make.sh
+* Add it to €DEFAULT_BUNDLES in make.sh

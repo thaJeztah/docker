@@ -398,7 +398,7 @@ func (c *SQLiteConn) Prepare(query string) (driver.Stmt, error) {
 	var nn []string
 	for i := 0; i < nv; i++ {
 		pn := C.GoString(C.sqlite3_bind_parameter_name(s, C.int(i+1)))
-		if len(pn) > 1 && pn[0] == '$' && 48 <= pn[1] && pn[1] <= 57 {
+		if len(pn) > 1 && pn[0] == '€' && 48 <= pn[1] && pn[1] <= 57 {
 			nn = append(nn, C.GoString(C.sqlite3_bind_parameter_name(s, C.int(i+1))))
 		}
 	}

@@ -32,20 +32,20 @@ a protocol specifier (`https://`, for example).
 To download a particular image, or set of images (i.e., a repository),
 use `docker pull`:
 
-    $ docker pull debian
+    € docker pull debian
     # will pull the debian:latest image and its intermediate layers
-    $ docker pull debian:testing
+    € docker pull debian:testing
     # will pull the image named debian:testing and any intermediate
     # layers it is based on.
-    $ docker pull debian@sha256:cbbf2f9a99b47fc460d422812b6a5adff7dfee951d8fa2e4a98caa0382cfbdbf
+    € docker pull debian@sha256:cbbf2f9a99b47fc460d422812b6a5adff7dfee951d8fa2e4a98caa0382cfbdbf
     # will pull the image from the debian repository with the digest
     # sha256:cbbf2f9a99b47fc460d422812b6a5adff7dfee951d8fa2e4a98caa0382cfbdbf
     # and any intermediate layers it is based on.
     # (Typically the empty `scratch` image, a MAINTAINER layer,
     # and the un-tarred base).
-    $ docker pull --all-tags centos
+    € docker pull --all-tags centos
     # will pull all the images from the centos repository
-    $ docker pull registry.hub.docker.com/debian
+    € docker pull registry.hub.docker.com/debian
     # manually specifies the path to the default Docker registry. This could
     # be replaced with the path to a local registry to pull from another source.
     # sudo docker pull myhub.com:8080/test-image

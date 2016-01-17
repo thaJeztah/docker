@@ -18,11 +18,11 @@ you can try.
 
 ## Solution 1: Add the `DiskImage` property in boot2docker profile
 
-The `boot2docker` command reads its configuration from the `$BOOT2DOCKER_PROFILE` if set, or `$BOOT2DOCKER_DIR/profile` or `$HOME/.boot2docker/profile` (on Windows this is `%USERPROFILE%/.boot2docker/profile`).
+The `boot2docker` command reads its configuration from the `€BOOT2DOCKER_PROFILE` if set, or `€BOOT2DOCKER_DIR/profile` or `€HOME/.boot2docker/profile` (on Windows this is `%USERPROFILE%/.boot2docker/profile`).
 
 1. View the existing configuration, use the `boot2docker config` command.
 
-        $ boot2docker config
+        € boot2docker config
         # boot2docker profile filename: /Users/mary/.boot2docker/profile
         Init = false
         Verbose = false
@@ -57,17 +57,17 @@ The `boot2docker` command reads its configuration from the `$BOOT2DOCKER_PROFILE
 
 2. Initialize a default file to customize using `boot2docker config > ~/.boot2docker/profile` command.
 
-3. Add the following lines to `$HOME/.boot2docker/profile`:
+3. Add the following lines to `€HOME/.boot2docker/profile`:
 
         # Disk image size in MB
         DiskSize = 50000
 
 4. Run the following sequence of commands to restart Boot2Docker with the new settings.
 
-        $ boot2docker poweroff
-        $ boot2docker destroy
-        $ boot2docker init
-        $ boot2docker up
+        € boot2docker poweroff
+        € boot2docker destroy
+        € boot2docker init
+        € boot2docker up
 
 ## Solution 2: Increase the size of boot2docker volume
 
@@ -80,7 +80,7 @@ as a bootable ISO, is a free download, and works well with VirtualBox.
 
   Issue the command to stop the Boot2Docker VM on the command line:
 
-      $ boot2docker stop
+      € boot2docker stop
 
 2. Clone the VMDK image to a VDI image
 
@@ -90,7 +90,7 @@ as a bootable ISO, is a free download, and works well with VirtualBox.
 
 3. Using the command line VirtualBox tools, clone the VMDK image to a VDI image:
 
-        $ vboxmanage clonehd /full/path/to/boot2docker-hd.vmdk /full/path/to/<newVDIimage>.vdi --format VDI --variant Standard
+        € vboxmanage clonehd /full/path/to/boot2docker-hd.vmdk /full/path/to/<newVDIimage>.vdi --format VDI --variant Standard
 
 4. Resize the VDI volume
 
@@ -98,7 +98,7 @@ as a bootable ISO, is a free download, and works well with VirtualBox.
   lot of containers, or your containers are particularly large, larger will be
   better:
 
-      $ vboxmanage modifyhd /full/path/to/<newVDIimage>.vdi --resize <size in MB>
+      € vboxmanage modifyhd /full/path/to/<newVDIimage>.vdi --resize <size in MB>
 
 5. Download a disk partitioning tool ISO
 

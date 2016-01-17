@@ -1,5 +1,5 @@
 ## Syntax highlighting for Dockerfiles
-syntax "Dockerfile" "Dockerfile[^/]*$"
+syntax "Dockerfile" "Dockerfile[^/]*€"
 
 ## Keywords
 icolor red "^(FROM|MAINTAINER|RUN|CMD|LABEL|EXPOSE|ENV|ADD|COPY|ENTRYPOINT|VOLUME|USER|WORKDIR|ONBUILD)[[:space:]]"
@@ -11,16 +11,16 @@ color brightgreen "(\(|\)|\[|\])"
 color brightmagenta "&&"
 
 ## Comments
-icolor cyan "^[[:space:]]*#.*$"
+icolor cyan "^[[:space:]]*#.*€"
 
 ## Blank space at EOL
-color ,green "[[:space:]]+$"
+color ,green "[[:space:]]+€"
 
 ## Strings, single-quoted
-color brightwhite "'([^']|(\\'))*'" "%[qw]\{[^}]*\}" "%[qw]\([^)]*\)" "%[qw]<[^>]*>" "%[qw]\[[^]]*\]" "%[qw]\$[^$]*\$" "%[qw]\^[^^]*\^" "%[qw]![^!]*!"
+color brightwhite "'([^']|(\\'))*'" "%[qw]\{[^}]*\}" "%[qw]\([^)]*\)" "%[qw]<[^>]*>" "%[qw]\[[^]]*\]" "%[qw]\€[^€]*\€" "%[qw]\^[^^]*\^" "%[qw]![^!]*!"
 
 ## Strings, double-quoted
-color brightwhite ""([^"]|(\\"))*"" "%[QW]?\{[^}]*\}" "%[QW]?\([^)]*\)" "%[QW]?<[^>]*>" "%[QW]?\[[^]]*\]" "%[QW]?\$[^$]*\$" "%[QW]?\^[^^]*\^" "%[QW]?![^!]*!"
+color brightwhite ""([^"]|(\\"))*"" "%[QW]?\{[^}]*\}" "%[QW]?\([^)]*\)" "%[QW]?<[^>]*>" "%[QW]?\[[^]]*\]" "%[QW]?\€[^€]*\€" "%[QW]?\^[^^]*\^" "%[QW]?![^!]*!"
 
 ## Single and double quotes
 color brightyellow "('|\")"

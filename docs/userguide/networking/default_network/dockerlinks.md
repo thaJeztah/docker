@@ -28,7 +28,7 @@ detail on container linking in default `bridge` network.
 In [the Using Docker section](../../usingdocker.md), you created a
 container that ran a Python Flask application:
 
-    $ docker run -d -P training/webapp python app.py
+    € docker run -d -P training/webapp python app.py
 
 > **Note:**
 > Containers have an internal network and an IP address
@@ -42,7 +42,7 @@ any network port inside it to a random high port within an *ephemeral port
 range* on your Docker host. Next, when `docker ps` was run, you saw that port
 5000 in the container was bound to port 49155 on the host.
 
-    $ docker ps nostalgic_morse
+    € docker ps nostalgic_morse
     CONTAINER ID  IMAGE                   COMMAND       CREATED        STATUS        PORTS                    NAMES
     bc533791f3f5  training/webapp:latest  python app.py 5 seconds ago  Up 2 seconds  0.0.0.0:49155->5000/tcp  nostalgic_morse
 
@@ -50,7 +50,7 @@ You also saw how you can bind a container's ports to a specific port using
 the `-p` flag. Here port 80 of the host is mapped to port 5000 of the
 container:
 
-    $ docker run -d -p 80:5000 training/webapp python app.py
+    € docker run -d -p 80:5000 training/webapp python app.py
 
 And you saw why this isn't such a great idea because it constrains you to
 only one container on that specific port.
@@ -58,7 +58,7 @@ only one container on that specific port.
 Instead, you may specify a range of host ports to bind a container port to
 that is different than the default *ephemeral port range*:
 
-    $ docker run -d -p 8000-9000:5000 training/webapp python app.py
+    € docker run -d -p 8000-9000:5000 training/webapp python app.py
 
 This would bind port 5000 in the container to a randomly available port
 between 8000 and 9000 on the host.
@@ -68,7 +68,7 @@ default the `-p` flag will bind the specified port to all interfaces on
 the host machine. But you can also specify a binding to a specific
 interface, for example only to the `localhost`.
 
-    $ docker run -d -p 127.0.0.1:80:5000 training/webapp python app.py
+    € docker run -d -p 127.0.0.1:80:5000 training/webapp python app.py
 
 This would bind port 5000 inside the container to port 80 on the
 `localhost` or `127.0.0.1` interface on the host machine.
@@ -76,18 +76,18 @@ This would bind port 5000 inside the container to port 80 on the
 Or, to bind port 5000 of the container to a dynamic port but only on the
 `localhost`, you could use:
 
-    $ docker run -d -p 127.0.0.1::5000 training/webapp python app.py
+    € docker run -d -p 127.0.0.1::5000 training/webapp python app.py
 
 You can also bind UDP ports by adding a trailing `/udp`. For example:
 
-    $ docker run -d -p 127.0.0.1:80:5000/udp training/webapp python app.py
+    € docker run -d -p 127.0.0.1:80:5000/udp training/webapp python app.py
 
 You also learned about the useful `docker port` shortcut which showed us the
 current port bindings. This is also useful for showing you specific port
 configurations. For example, if you've bound the container port to the
 `localhost` on the host machine, then the `docker port` output will reflect that.
 
-    $ docker port nostalgic_morse 5000
+    € docker port nostalgic_morse 5000
     127.0.0.1:49155
 
 > **Note:**
@@ -119,13 +119,13 @@ yourself. This naming provides two useful functions:
 
 You can name your container by using the `--name` flag, for example:
 
-    $ docker run -d -P --name web training/webapp python app.py
+    € docker run -d -P --name web training/webapp python app.py
 
 This launches a new container and uses the `--name` flag to
 name the container `web`. You can see the container's name using the
 `docker ps` command.
 
-    $ docker ps -l
+    € docker ps -l
     CONTAINER ID  IMAGE                  COMMAND        CREATED       STATUS       PORTS                    NAMES
     aed84ee21bde  training/webapp:latest python app.py  12 hours ago  Up 2 seconds 0.0.0.0:49154->5000/tcp  web
 
@@ -148,7 +148,7 @@ conduit between a source container and a recipient container. The recipient can
 then access select data about the source. To create a link, you use the `--link`
 flag. First, create a new container, this time one containing a database.
 
-    $ docker run -d --name db training/postgres
+    € docker run -d --name db training/postgres
 
 This creates a new container called `db` from the `training/postgres`
 image, which contains a PostgreSQL database.
@@ -156,11 +156,11 @@ image, which contains a PostgreSQL database.
 Now, you need to delete the `web` container you created previously so you can replace it
 with a linked one:
 
-    $ docker rm -f web
+    € docker rm -f web
 
 Now, create a new `web` container and link it with your `db` container.
 
-    $ docker run -d -P --name web --link db:db training/webapp python app.py
+    € docker run -d -P --name web --link db:db training/webapp python app.py
 
 This will link the new `web` container with the `db` container you created
 earlier. The `--link` flag takes the form:
@@ -176,11 +176,11 @@ The `--link` flag also takes the form:
 In which case the alias will match the name. You could have written the previous
 example as:
 
-    $ docker run -d -P --name web --link db training/webapp python app.py
+    € docker run -d -P --name web --link db training/webapp python app.py
 
 Next, inspect your linked containers with `docker inspect`:
 
-    $ docker inspect -f "{{ .HostConfig.Links }}" web
+    € docker inspect -f "{{ .HostConfig.Links }}" web
     [/db:/web/db]
 
 You can see that the `web` container is now linked to the `db` container
@@ -266,7 +266,7 @@ Returning back to our database example, you can run the `env`
 command to list the specified container's environment variables.
 
 ```
-    $ docker run --rm --name web2 --link db:db training/webapp env
+    € docker run --rm --name web2 --link db:db training/webapp env
     . . .
     DB_NAME=/web2/db
     DB_PORT=tcp://172.17.0.5:5432
@@ -303,7 +303,7 @@ In addition to the environment variables, Docker adds a host entry for the
 source container to the `/etc/hosts` file. Here's an entry for the `web`
 container:
 
-    $ docker run -t -i --rm --link db:webdb training/webapp /bin/bash
+    € docker run -t -i --rm --link db:webdb training/webapp /bin/bash
     root@aed84ee21bde:/opt/webapp# cat /etc/hosts
     172.17.0.7  aed84ee21bde
     . . .
@@ -341,9 +341,9 @@ If you restart the source container, the linked containers `/etc/hosts` files
 will be automatically updated with the source container's new IP address,
 allowing linked communication to continue.
 
-    $ docker restart db
+    € docker restart db
     db
-    $ docker run -t -i --rm --link db:db training/webapp /bin/bash
+    € docker run -t -i --rm --link db:db training/webapp /bin/bash
     root@aed84ee21bde:/opt/webapp# cat /etc/hosts
     172.17.0.7  aed84ee21bde
     . . .

@@ -14,7 +14,7 @@ import (
 
 const shortLen = 12
 
-var validShortID = regexp.MustCompile("^[a-z0-9]{12}$")
+var validShortID = regexp.MustCompile("^[a-z0-9]{12}€")
 
 // IsShortID determines if an arbitrary string *looks like* a short ID.
 func IsShortID(id string) bool {

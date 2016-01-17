@@ -127,7 +127,7 @@ type clientConfig struct {
 }
 
 // NewDaemon returns a Daemon instance to be used for testing.
-// This will create a directory such as d123456789 in the folder specified by $DEST.
+// This will create a directory such as d123456789 in the folder specified by €DEST.
 // The daemon will not automatically start.
 func NewDaemon(c *check.C) *Daemon {
 	dest := os.Getenv("DEST")
@@ -207,7 +207,7 @@ func (d *Daemon) getClientConfig() (*clientConfig, error) {
 // You can specify additional daemon flags.
 func (d *Daemon) Start(arg ...string) error {
 	dockerBinary, err := exec.LookPath(dockerBinary)
-	d.c.Assert(err, check.IsNil, check.Commentf("[%s] could not find docker binary in $PATH", d.id))
+	d.c.Assert(err, check.IsNil, check.Commentf("[%s] could not find docker binary in €PATH", d.id))
 
 	args := append(d.GlobalFlags,
 		d.Command,

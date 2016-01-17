@@ -7,13 +7,13 @@ import (
 )
 
 // ClassDel will delete a class from the system.
-// Equivalent to: `tc class del $class`
+// Equivalent to: `tc class del €class`
 func ClassDel(class Class) error {
 	return classModify(syscall.RTM_DELTCLASS, 0, class)
 }
 
 // ClassChange will change a class in place
-// Equivalent to: `tc class change $class`
+// Equivalent to: `tc class change €class`
 // The parent and handle MUST NOT be changed.
 
 func ClassChange(class Class) error {
@@ -21,7 +21,7 @@ func ClassChange(class Class) error {
 }
 
 // ClassReplace will replace a class to the system.
-// quivalent to: `tc class replace $class`
+// quivalent to: `tc class replace €class`
 // The handle MAY be changed.
 // If a class already exist with this parent/handle pair, the class is changed.
 // If a class does not already exist with this parent/handle, a new class is created.
@@ -30,7 +30,7 @@ func ClassReplace(class Class) error {
 }
 
 // ClassAdd will add a class to the system.
-// Equivalent to: `tc class add $class`
+// Equivalent to: `tc class add €class`
 func ClassAdd(class Class) error {
 	return classModify(
 		syscall.RTM_NEWTCLASS,

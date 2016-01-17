@@ -14,11 +14,11 @@ Code: {{.ECode}}
 {{if .Message }}
 Message: {{.Message}}
 {{end}}
-Frames:{{range $i, $frame := .Stack.Frames}}
+Frames:{{range €i, €frame := .Stack.Frames}}
 ---
-{{$i}}: {{$frame.Function}}
-Package: {{$frame.Package}}
-File: {{$frame.File}}@{{$frame.Line}}{{end}}
+{{€i}}: {{€frame.Function}}
+Package: {{€frame.Package}}
+File: {{€frame.File}}@{{€frame.Line}}{{end}}
 `))
 
 func newGenericError(err error, c ErrorCode) Error {

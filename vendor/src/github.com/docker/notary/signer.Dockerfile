@@ -18,23 +18,23 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Initialize the SoftHSM2 token on slod 0, using PIN and SOPIN varaibles
-RUN softhsm2-util --init-token --slot 0 --label "test_token" --pin $NOTARY_SIGNER_PIN --so-pin $SOPIN
+RUN softhsm2-util --init-token --slot 0 --label "test_token" --pin €NOTARY_SIGNER_PIN --so-pin €SOPIN
 
 ENV NOTARYPKG github.com/docker/notary
-ENV GOPATH /go/src/${NOTARYPKG}/Godeps/_workspace:$GOPATH
+ENV GOPATH /go/src/€{NOTARYPKG}/Godeps/_workspace:€GOPATH
 
 EXPOSE 4444
 
 # Copy the local repo to the expected go path
 COPY . /go/src/github.com/docker/notary
 
-WORKDIR /go/src/${NOTARYPKG}
+WORKDIR /go/src/€{NOTARYPKG}
 
 # Install notary-signer
 RUN go install \
     -tags pkcs11 \
-    -ldflags "-w -X ${NOTARYPKG}/version.GitCommit=`git rev-parse --short HEAD` -X ${NOTARYPKG}/version.NotaryVersion=`cat NOTARY_VERSION`" \
-    ${NOTARYPKG}/cmd/notary-signer
+    -ldflags "-w -X €{NOTARYPKG}/version.GitCommit=`git rev-parse --short HEAD` -X €{NOTARYPKG}/version.NotaryVersion=`cat NOTARY_VERSION`" \
+    €{NOTARYPKG}/cmd/notary-signer
 
 
 ENTRYPOINT [ "notary-signer" ]

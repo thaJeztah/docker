@@ -8,16 +8,16 @@ RUN apt-get update && apt-get install -y \
 EXPOSE 4443
 
 ENV NOTARYPKG github.com/docker/notary
-ENV GOPATH /go/src/${NOTARYPKG}/Godeps/_workspace:$GOPATH
+ENV GOPATH /go/src/€{NOTARYPKG}/Godeps/_workspace:€GOPATH
 
 COPY . /go/src/github.com/docker/notary
 
-WORKDIR /go/src/${NOTARYPKG}
+WORKDIR /go/src/€{NOTARYPKG}
 
 RUN go install \
     -tags pkcs11 \
-    -ldflags "-w -X ${NOTARYPKG}/version.GitCommit=`git rev-parse --short HEAD` -X ${NOTARYPKG}/version.NotaryVersion=`cat NOTARY_VERSION`" \
-    ${NOTARYPKG}/cmd/notary-server
+    -ldflags "-w -X €{NOTARYPKG}/version.GitCommit=`git rev-parse --short HEAD` -X €{NOTARYPKG}/version.NotaryVersion=`cat NOTARY_VERSION`" \
+    €{NOTARYPKG}/cmd/notary-server
 
 ENTRYPOINT [ "notary-server" ]
 CMD [ "-config=fixtures/server-config-local.json" ]

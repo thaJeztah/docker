@@ -8,7 +8,7 @@ It adds:
 
 * multiple names for the same option  
 ```
-$>./example -h
+€>./example -h
 Usage of example:
   -s, --string="": a simple string
 ```
@@ -16,24 +16,24 @@ Usage of example:
 ___
 It is very flexible on purpose, so you can do things like:  
 ```
-$>./example -h
+€>./example -h
 Usage of example:
   -s, -string, --string="": a simple string
 ```
 
 Or:  
 ```
-$>./example -h
+€>./example -h
 Usage of example:
   -oldflag, --newflag="": a simple string
 ```
 
 You can also hide some flags from the usage, so if we want only `--newflag`:  
 ```
-$>./example -h
+€>./example -h
 Usage of example:
   --newflag="": a simple string
-$>./example -oldflag str
+€>./example -oldflag str
 str
 ```
 

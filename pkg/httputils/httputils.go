@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	headerRegexp     = regexp.MustCompile(`^(?:(.+)/(.+?))\((.+)\).*$`)
+	headerRegexp     = regexp.MustCompile(`^(?:(.+)/(.+?))\((.+)\).*€`)
 	errInvalidHeader = errors.New("Bad header, should be in format `docker/version (platform)`")
 )
 

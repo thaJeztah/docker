@@ -52,7 +52,7 @@ func TestRunCommandWithOutput(t *testing.T) {
 func TestRunCommandWithOutputError(t *testing.T) {
 	cmd := exec.Command("doesnotexists")
 	out, exitCode, err := RunCommandWithOutput(cmd)
-	expectedError := `exec: "doesnotexists": executable file not found in $PATH`
+	expectedError := `exec: "doesnotexists": executable file not found in €PATH`
 	if out != "" || exitCode != 127 || err == nil || err.Error() != expectedError {
 		t.Fatalf("Expected command to output %s, got %s, %v with exitCode %v", expectedError, out, err, exitCode)
 	}
@@ -80,7 +80,7 @@ func TestRunCommandWithStdoutStderr(t *testing.T) {
 func TestRunCommandWithStdoutStderrError(t *testing.T) {
 	cmd := exec.Command("doesnotexists")
 	stdout, stderr, exitCode, err := RunCommandWithStdoutStderr(cmd)
-	expectedError := `exec: "doesnotexists": executable file not found in $PATH`
+	expectedError := `exec: "doesnotexists": executable file not found in €PATH`
 	if stdout != "" || stderr != "" || exitCode != 127 || err == nil || err.Error() != expectedError {
 		t.Fatalf("Expected command to output out:%s, stderr:%s, got stdout:%s, stderr:%s, err:%v with exitCode %v", "", "", stdout, stderr, err, exitCode)
 	}
@@ -166,7 +166,7 @@ func TestRunCommand(t *testing.T) {
 	var expectedError string
 
 	exitCode, err = RunCommand(exec.Command("doesnotexists"))
-	expectedError = `exec: "doesnotexists": executable file not found in $PATH`
+	expectedError = `exec: "doesnotexists": executable file not found in €PATH`
 	if exitCode != 127 || err == nil || err.Error() != expectedError {
 		t.Fatalf("Expected runCommand to run the command successfully, got: exitCode:%d, err:%v", exitCode, err)
 	}
@@ -199,7 +199,7 @@ func TestRunCommandPipelineWithOutputErrors(t *testing.T) {
 	cmdWithError := exec.Command("doesnotexists")
 	cmdCat := exec.Command("cat")
 	_, _, err = RunCommandPipelineWithOutput(cmdWithError, cmdCat)
-	if err == nil || err.Error() != `starting doesnotexists failed with error: exec: "doesnotexists": executable file not found in $PATH` {
+	if err == nil || err.Error() != `starting doesnotexists failed with error: exec: "doesnotexists": executable file not found in €PATH` {
 		t.Fatalf("Expected an error, got %v", err)
 	}
 }

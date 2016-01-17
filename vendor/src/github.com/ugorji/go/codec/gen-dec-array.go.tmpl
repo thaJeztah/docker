@@ -22,7 +22,7 @@ if {{var "l"}} == 0 { {{ if isSlice }}
 	{{ if isChan }}
 	for {{var "r"}} := 0; {{var "r"}} < {{var "l"}}; {{var "r"}}++ {
 		var {{var "t"}} {{ .Typ }}
-		{{ $x := printf "%st%s" .TempVar .Rand }}{{ decLineVar $x }}
+		{{ €x := printf "%st%s" .TempVar .Rand }}{{ decLineVar €x }}
 		{{var "v"}} <- {{var "t"}} 
 	{{ else }} 
 	{{var "n"}} := {{var "l"}} 
@@ -44,7 +44,7 @@ if {{var "l"}} == 0 { {{ if isSlice }}
 	}
 	{{var "j"}} := 0
 	for ; {{var "j"}} < {{var "n"}} ; {{var "j"}}++ {
-		{{ $x := printf "%[1]vv%[2]v[%[1]vj%[2]v]" .TempVar .Rand }}{{ decLineVar $x }}
+		{{ €x := printf "%[1]vv%[2]v[%[1]vj%[2]v]" .TempVar .Rand }}{{ decLineVar €x }}
 	} {{ if isArray }}
 	for ; {{var "j"}} < {{var "l"}} ; {{var "j"}}++ {
 		z.DecSwallow()
@@ -62,11 +62,11 @@ if {{var "l"}} == 0 { {{ if isSlice }}
 		}
 		{{ if isChan}}
 		var {{var "t"}} {{ .Typ }}
-		{{ $x := printf "%st%s" .TempVar .Rand }}{{ decLineVar $x }}
+		{{ €x := printf "%st%s" .TempVar .Rand }}{{ decLineVar €x }}
 		{{var "v"}} <- {{var "t"}} 
 		{{ else }}
 		if {{var "j"}} < len({{var "v"}}) {
-			{{ $x := printf "%[1]vv%[2]v[%[1]vj%[2]v]" .TempVar .Rand }}{{ decLineVar $x }}
+			{{ €x := printf "%[1]vv%[2]v[%[1]vj%[2]v]" .TempVar .Rand }}{{ decLineVar €x }}
 		} else {
 			z.DecSwallow()
 		}

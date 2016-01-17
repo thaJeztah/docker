@@ -66,8 +66,8 @@ containers, see [**Configuration file** section](cli.md#configuration-files).
 
 #### Examples
 
-    $ docker run -d --name topdemo ubuntu /usr/bin/top -b
-    $ docker attach topdemo
+    € docker run -d --name topdemo ubuntu /usr/bin/top -b
+    € docker attach topdemo
     top - 02:05:52 up  3:05,  0 users,  load average: 0.01, 0.02, 0.05
     Tasks:   1 total,   1 running,   0 sleeping,   0 stopped,   0 zombie
     Cpu(s):  0.1%us,  0.2%sy,  0.0%ni, 99.7%id,  0.0%wa,  0.0%hi,  0.0%si,  0.0%st
@@ -95,21 +95,21 @@ containers, see [**Configuration file** section](cli.md#configuration-files).
 
      PID USER      PR  NI  VIRT  RES  SHR S %CPU %MEM    TIME+  COMMAND
           1 root      20   0 17208 1144  932 R    0  0.3   0:00.03 top
-    ^C$
-    $ echo $?
+    ^C€
+    € echo €?
     0
-    $ docker ps -a | grep topdemo
+    € docker ps -a | grep topdemo
     7998ac8581f9        ubuntu:14.04        "/usr/bin/top -b"   38 seconds ago      Exited (0) 21 seconds ago                          topdemo
 
 And in this second example, you can see the exit code returned by the `bash`
 process is returned by the `docker attach` command to its caller too:
 
-    $ docker run --name test -d -it debian
+    € docker run --name test -d -it debian
     275c44472aebd77c926d4527885bb09f2f6db21d878c75f0a1c212c03d3bcfab
-    $ docker attach test
-    $$ exit 13
+    € docker attach test
+    €€ exit 13
     exit
-    $ echo $?
+    € echo €?
     13
-    $ docker ps -a | grep test
+    € docker ps -a | grep test
     275c44472aeb        debian:7            "/bin/bash"         26 seconds ago      Exited (13) 17 seconds ago                         test

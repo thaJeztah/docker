@@ -24,7 +24,7 @@ func (s *DockerSuite) TestHelpTextVerify(c *check.C) {
 	// modify the array - the rest of the testing infrastructure should work
 	homes := []string{homedir.Get()}
 
-	// Non-Windows machines need to test for this special case of $HOME
+	// Non-Windows machines need to test for this special case of €HOME
 	if runtime.GOOS != "windows" {
 		homes = append(homes, "/")
 	}

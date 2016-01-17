@@ -129,13 +129,13 @@ The following example illustrates how to configure Docker on Ubuntu to recognize
 Edit the `/etc/default/docker` file:
 
 ```
-$ echo 'DOCKER_OPTS="-b=bridge0"' >> /etc/default/docker
+€ echo 'DOCKER_OPTS="-b=bridge0"' >> /etc/default/docker
 ```
 
 Then restart the Docker server.
 
 ```
-$ sudo service docker start
+€ sudo service docker start
 ```
 
 For additional information on bridges, see [building your own bridge](#building-your-own-bridge) later on this page.

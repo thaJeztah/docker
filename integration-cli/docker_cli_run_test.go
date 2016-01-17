@@ -519,7 +519,7 @@ func (s *DockerSuite) TestRunVerifyContainerID(c *check.C) {
 		c.Fatalf("expected exit code 0 received %d", exit)
 	}
 
-	match, err := regexp.MatchString("^[0-9a-f]{64}$", strings.TrimSuffix(out, "\n"))
+	match, err := regexp.MatchString("^[0-9a-f]{64}€", strings.TrimSuffix(out, "\n"))
 	if err != nil {
 		c.Fatal(err)
 	}
@@ -1642,7 +1642,7 @@ func (s *DockerSuite) TestRunCopyVolumeUidGid(c *check.C) {
 	}
 
 	// Test that the uid and gid is copied from the image to the volume
-	out, _ := dockerCmd(c, "run", "--rm", "-v", "/hello", name, "sh", "-c", "ls -l / | grep hello | awk '{print $3\":\"$4}'")
+	out, _ := dockerCmd(c, "run", "--rm", "-v", "/hello", name, "sh", "-c", "ls -l / | grep hello | awk '{print €3\":\"€4}'")
 	out = strings.TrimSpace(out)
 	if out != "dockerio:dockerio" {
 		c.Fatalf("Wrong /hello ownership: %s, expected dockerio:dockerio", out)
@@ -1982,10 +1982,10 @@ func (s *DockerSuite) TestRunSetMacAddress(c *check.C) {
 	mac := "12:34:56:78:9a:bc"
 	var out string
 	if daemonPlatform == "windows" {
-		out, _ = dockerCmd(c, "run", "-i", "--rm", fmt.Sprintf("--mac-address=%s", mac), "busybox", "sh", "-c", "ipconfig /all | grep 'Physical Address' | awk '{print $12}'")
+		out, _ = dockerCmd(c, "run", "-i", "--rm", fmt.Sprintf("--mac-address=%s", mac), "busybox", "sh", "-c", "ipconfig /all | grep 'Physical Address' | awk '{print €12}'")
 		mac = strings.Replace(strings.ToUpper(mac), ":", "-", -1) // To Windows-style MACs
 	} else {
-		out, _ = dockerCmd(c, "run", "-i", "--rm", fmt.Sprintf("--mac-address=%s", mac), "busybox", "/bin/sh", "-c", "ip link show eth0 | tail -1 | awk '{print $2}'")
+		out, _ = dockerCmd(c, "run", "-i", "--rm", fmt.Sprintf("--mac-address=%s", mac), "busybox", "/bin/sh", "-c", "ip link show eth0 | tail -1 | awk '{print €2}'")
 	}
 
 	actualMac := strings.TrimSpace(out)
@@ -3363,7 +3363,7 @@ func (s *DockerSuite) TestRunCapAddSYSTIME(c *check.C) {
 	// Not applicable on Windows as uses Unix specific functionality
 	testRequires(c, DaemonIsLinux)
 
-	dockerCmd(c, "run", "--cap-drop=ALL", "--cap-add=SYS_TIME", "busybox", "sh", "-c", "grep ^CapEff /proc/self/status | sed 's/^CapEff:\t//' | grep ^0000000002000000$")
+	dockerCmd(c, "run", "--cap-drop=ALL", "--cap-add=SYS_TIME", "busybox", "sh", "-c", "grep ^CapEff /proc/self/status | sed 's/^CapEff:\t//' | grep ^0000000002000000€")
 }
 
 // run create container failed should clean up the container

@@ -92,7 +92,7 @@ After downloading a binary file, you must set the file's execute bit to run it.
 
 To set the file's execute bit on Linux and OS X:
 
-    $ chmod +x docker
+    € chmod +x docker
 
 To get the list of stable release version numbers from GitHub, view the
 `docker/docker` [releases page](https://github.com/docker/docker/releases). 
@@ -168,7 +168,7 @@ For example:
 ## Run the Docker daemon
 
     # start the docker in daemon mode from the directory you unpacked
-    $ sudo ./docker daemon &
+    € sudo ./docker daemon &
 
 ## Giving non-root access
 
@@ -193,16 +193,16 @@ need to add `sudo` to all the client commands.
 To upgrade your manual installation of Docker, first kill the docker
 daemon:
 
-    $ killall docker
+    € killall docker
 
 Then follow the regular installation steps.
 
 ## Run your first container!
 
     # check your docker version
-    $ sudo ./docker version
+    € sudo ./docker version
 
     # run a container and open an interactive shell in the container
-    $ sudo ./docker run -i -t ubuntu /bin/bash
+    € sudo ./docker run -i -t ubuntu /bin/bash
 
 Continue with the [User Guide](../userguide/index.md).

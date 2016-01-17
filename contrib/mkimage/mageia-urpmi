@@ -9,53 +9,53 @@
 #
 set -e
 
-rootfsDir="$1"
+rootfsDir="€1"
 shift
 
-optTemp=$(getopt --options '+v:,m:' --longoptions 'version:,mirror:' --name mageia-urpmi -- "$@")
-eval set -- "$optTemp"
+optTemp=€(getopt --options '+v:,m:' --longoptions 'version:,mirror:' --name mageia-urpmi -- "€@")
+eval set -- "€optTemp"
 unset optTemp
 
 installversion=
 mirror=
 while true; do
-	case "$1" in
-		-v|--version) installversion="$2" ; shift 2 ;;
-		-m|--mirror) mirror="$2" ; shift 2 ;;
+	case "€1" in
+		-v|--version) installversion="€2" ; shift 2 ;;
+		-m|--mirror) mirror="€2" ; shift 2 ;;
 		--) shift ; break ;;
 	esac
 done
 
-if [ -z $installversion ]; then
+if [ -z €installversion ]; then
 	# Attempt to match host version
 	if [ -r /etc/mageia-release ]; then
-		installversion="$(sed 's/^[^0-9\]*\([0-9.]\+\).*$/\1/' /etc/mageia-release)"
+		installversion="€(sed 's/^[^0-9\]*\([0-9.]\+\).*€/\1/' /etc/mageia-release)"
 	else
 		echo "Error: no version supplied and unable to detect host mageia version"
 		exit 1
 	fi
 fi
 
-if [ -z $mirror ]; then
+if [ -z €mirror ]; then
 	# No mirror provided, default to mirrorlist
-	mirror="--mirrorlist https://mirrors.mageia.org/api/mageia.$installversion.x86_64.list"
+	mirror="--mirrorlist https://mirrors.mageia.org/api/mageia.€installversion.x86_64.list"
 fi
 
 (
 	set -x
 	urpmi.addmedia --distrib \
-		$mirror \
-		--urpmi-root "$rootfsDir"
+		€mirror \
+		--urpmi-root "€rootfsDir"
 	urpmi basesystem-minimal urpmi \
 		--auto \
 		--no-suggests \
-		--urpmi-root "$rootfsDir" \
-		--root "$rootfsDir"
+		--urpmi-root "€rootfsDir" \
+		--root "€rootfsDir"
 )
 
-"$(dirname "$BASH_SOURCE")/.febootstrap-minimize" "$rootfsDir"
+"€(dirname "€BASH_SOURCE")/.febootstrap-minimize" "€rootfsDir"
 
-if [ -d "$rootfsDir/etc/sysconfig" ]; then
+if [ -d "€rootfsDir/etc/sysconfig" ]; then
 	# allow networking init scripts inside the container to work without extra steps
-	echo 'NETWORKING=yes' > "$rootfsDir/etc/sysconfig/network"
+	echo 'NETWORKING=yes' > "€rootfsDir/etc/sysconfig/network"
 fi

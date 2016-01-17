@@ -26,14 +26,14 @@ for the keys. For example, an image publisher can export the repository `target`
 and `snapshot` passphrases:
 
 ```bash
-$  export DOCKER_CONTENT_TRUST_ROOT_PASSPHRASE="u7pEQcGoebUHm6LHe6"
-$  export DOCKER_CONTENT_TRUST_REPOSITORY_PASSPHRASE="l7pEQcTKJjUHm6Lpe4"
+€  export DOCKER_CONTENT_TRUST_ROOT_PASSPHRASE="u7pEQcGoebUHm6LHe6"
+€  export DOCKER_CONTENT_TRUST_REPOSITORY_PASSPHRASE="l7pEQcTKJjUHm6Lpe4"
 ```
 
 Then, when pushing a new tag the Docker client does not request these values but signs automatically:
 
 ```bash
-$  docker push docker/trusttest:latest
+€  docker push docker/trusttest:latest
 The push refers to a repository [docker.io/docker/trusttest] (len: 1)
 a9539b34a6ab: Image already exists
 b3dbab3810fc: Image already exists
@@ -55,7 +55,7 @@ The `FROM` tag is pulling a signed image. You cannot build an image that has a
 data exists for the tag `latest`, the following build should succeed:
 
 ```bash
-$  docker build -t docker/trusttest:testing .
+€  docker build -t docker/trusttest:testing .
 Using default tag: latest
 latest: Pulling from docker/trusttest
 
@@ -67,7 +67,7 @@ Digest: sha256:d149ab53f871
 If content trust is enabled, building from a Dockerfile that relies on tag without trust data, causes the build command to fail:
 
 ```bash
-$  docker build -t docker/trusttest:testing .
+€  docker build -t docker/trusttest:testing .
 unable to process Dockerfile: No trust data for notrust
 ```
 

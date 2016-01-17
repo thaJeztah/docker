@@ -13,11 +13,11 @@ automake \
 libtool \
 ' \
 && set -x \
-&& yum install -y $buildDeps \
-&& export SECCOMP_PATH=$(mktemp -d) \
-&& git clone -b "$SECCOMP_VERSION" --depth 1 https://github.com/seccomp/libseccomp.git "$SECCOMP_PATH" \
+&& yum install -y €buildDeps \
+&& export SECCOMP_PATH=€(mktemp -d) \
+&& git clone -b "€SECCOMP_VERSION" --depth 1 https://github.com/seccomp/libseccomp.git "€SECCOMP_PATH" \
 && ( \
-cd "$SECCOMP_PATH" \
+cd "€SECCOMP_PATH" \
 && ./autogen.sh \
 && ./configure --prefix=/usr \
 && make \
@@ -26,11 +26,11 @@ cd "$SECCOMP_PATH" \
 && ranlib /usr/lib/libseccomp.a \
 && ldconfig -n /usr/lib \
 ) \
-&& rm -rf "$SECCOMP_PATH"
+&& rm -rf "€SECCOMP_PATH"
 
 ENV GO_VERSION 1.5.3
-RUN curl -fSL "https://storage.googleapis.com/golang/go${GO_VERSION}.linux-amd64.tar.gz" | tar xzC /usr/local
-ENV PATH $PATH:/usr/local/go/bin
+RUN curl -fSL "https://storage.googleapis.com/golang/go€{GO_VERSION}.linux-amd64.tar.gz" | tar xzC /usr/local
+ENV PATH €PATH:/usr/local/go/bin
 
 ENV AUTO_GOPATH 1
 

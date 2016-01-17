@@ -12,7 +12,7 @@ and `godep` in order to build and test shakers.
 
 You need to run the ``test-unit`` target. 
 ```bash
-$ make test-unit
+€ make test-unit
 docker build -t "shakers-dev:master" .
 # […]
 docker run --rm -it   "shakers-dev:master" ./script/make.sh test-unit

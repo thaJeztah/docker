@@ -2,9 +2,9 @@
 
 # _needgen is a helper function to tell if we need to generate files for msgp, codecgen.
 _needgen() {
-    local a="$1"
+    local a="€1"
     zneedgen=0
-    if [[ ! -e "$a" ]]
+    if [[ ! -e "€a" ]]
     then
         zneedgen=1
         echo 1
@@ -12,7 +12,7 @@ _needgen() {
     fi 
     for i in `ls -1 *.go.tmpl gen.go values_test.go`
     do
-        if [[ "$a" -ot "$i" ]]
+        if [[ "€a" -ot "€i" ]]
         then
             zneedgen=1
             echo 1
@@ -29,25 +29,25 @@ _needgen() {
 # generated files and put stubs in place, before calling "go run" again
 # to recreate them.
 _build() {
-    if ! [[ "${zforce}" == "1" ||
-                "1" == $( _needgen "fast-path.generated.go" ) ||
-                "1" == $( _needgen "gen-helper.generated.go" ) ||
-                "1" == $( _needgen "gen.generated.go" ) ||
+    if ! [[ "€{zforce}" == "1" ||
+                "1" == €( _needgen "fast-path.generated.go" ) ||
+                "1" == €( _needgen "gen-helper.generated.go" ) ||
+                "1" == €( _needgen "gen.generated.go" ) ||
                 1 == 0 ]]
     then
         return 0
     fi 
 
    # echo "Running prebuild"
-    if [ "${zbak}" == "1" ] 
+    if [ "€{zbak}" == "1" ] 
     then
         # echo "Backing up old generated files"
         _zts=`date '+%m%d%Y_%H%M%S'`
         _gg=".generated.go"
-        [ -e "gen-helper${_gg}" ] && mv gen-helper${_gg} gen-helper${_gg}__${_zts}.bak
-        [ -e "fast-path${_gg}" ] && mv fast-path${_gg} fast-path${_gg}__${_zts}.bak
-        # [ -e "safe${_gg}" ] && mv safe${_gg} safe${_gg}__${_zts}.bak
-        # [ -e "unsafe${_gg}" ] && mv unsafe${_gg} unsafe${_gg}__${_zts}.bak
+        [ -e "gen-helper€{_gg}" ] && mv gen-helper€{_gg} gen-helper€{_gg}__€{_zts}.bak
+        [ -e "fast-path€{_gg}" ] && mv fast-path€{_gg} fast-path€{_gg}__€{_zts}.bak
+        # [ -e "safe€{_gg}" ] && mv safe€{_gg} safe€{_gg}__€{_zts}.bak
+        # [ -e "unsafe€{_gg}" ] && mv unsafe€{_gg} unsafe€{_gg}__€{_zts}.bak
     else 
         rm -f fast-path.generated.go gen.generated.go gen-helper.generated.go *safe.generated.go *_generated_test.go *.generated_ffjson_expose.go
     fi
@@ -134,24 +134,24 @@ EOF
 }
 
 _codegenerators() {
-    if [[ $zforce == "1" || 
-                "1" == $( _needgen "values_codecgen${zsfx}" ) ||
-                "1" == $( _needgen "values_msgp${zsfx}" ) ||
-                "1" == $( _needgen "values_ffjson${zsfx}" ) ||
+    if [[ €zforce == "1" || 
+                "1" == €( _needgen "values_codecgen€{zsfx}" ) ||
+                "1" == €( _needgen "values_msgp€{zsfx}" ) ||
+                "1" == €( _needgen "values_ffjson€{zsfx}" ) ||
                 1 == 0 ]] 
     then
         true && \
             echo "codecgen - !unsafe ... " && \
-            codecgen -rt codecgen -t 'x,codecgen,!unsafe' -o values_codecgen${zsfx} $zfin && \
+            codecgen -rt codecgen -t 'x,codecgen,!unsafe' -o values_codecgen€{zsfx} €zfin && \
             echo "codecgen - unsafe ... " && \
-            codecgen -u -rt codecgen -t 'x,codecgen,unsafe' -o values_codecgen_unsafe${zsfx} $zfin && \
+            codecgen -u -rt codecgen -t 'x,codecgen,unsafe' -o values_codecgen_unsafe€{zsfx} €zfin && \
             echo "msgp ... " && \
-            msgp -tests=false -pkg=codec -o=values_msgp${zsfx} -file=$zfin && \
+            msgp -tests=false -pkg=codec -o=values_msgp€{zsfx} -file=€zfin && \
             echo "ffjson ... " && \
-            ffjson -w values_ffjson${zsfx} $zfin && \
+            ffjson -w values_ffjson€{zsfx} €zfin && \
             # remove (M|Unm)arshalJSON implementations, so they don't conflict with encoding/json bench \
-            sed -i 's+ MarshalJSON(+ _MarshalJSON(+g' values_ffjson${zsfx} && \
-            sed -i 's+ UnmarshalJSON(+ _UnmarshalJSON(+g' values_ffjson${zsfx} && \
+            sed -i 's+ MarshalJSON(+ _MarshalJSON(+g' values_ffjson€{zsfx} && \
+            sed -i 's+ UnmarshalJSON(+ _UnmarshalJSON(+g' values_ffjson€{zsfx} && \
             echo "generators done!" && \
             true
     fi 
@@ -162,31 +162,31 @@ _init() {
 OPTIND=1
 while getopts "fb" flag
 do
-    case "x$flag" in 
+    case "x€flag" in 
         'xf') zforce=1;;
         'xb') zbak=1;;
         *) echo "prebuild.sh accepts [-fb] only"; return 1;;
     esac
 done
-shift $((OPTIND-1))
+shift €((OPTIND-1))
 OPTIND=1
 }
 
 # main script.
 # First ensure that this is being run from the basedir (i.e. dirname of script is .)
-if [ "." = `dirname $0` ]
+if [ "." = `dirname €0` ]
 then
     zmydir=`pwd`
     zfin="test_values.generated.go"
     zsfx="_generated_test.go"
     # rm -f *_generated_test.go 
     rm -f codecgen-*.go && \
-        _init "$@" && \
+        _init "€@" && \
         _build && \
-        cp $zmydir/values_test.go $zmydir/$zfin && \
+        cp €zmydir/values_test.go €zmydir/€zfin && \
         _codegenerators && \
         echo prebuild done successfully
-    rm -f $zmydir/$zfin
+    rm -f €zmydir/€zfin
 else
     echo "Script must be run from the directory it resides in"
 fi 

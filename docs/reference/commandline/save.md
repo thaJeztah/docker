@@ -23,15 +23,15 @@ each argument provided.
 
 It is used to create a backup that can then be used with `docker load`
 
-    $ docker save busybox > busybox.tar
-    $ ls -sh busybox.tar
+    € docker save busybox > busybox.tar
+    € ls -sh busybox.tar
     2.7M busybox.tar
-    $ docker save --output busybox.tar busybox
-    $ ls -sh busybox.tar
+    € docker save --output busybox.tar busybox
+    € ls -sh busybox.tar
     2.7M busybox.tar
-    $ docker save -o fedora-all.tar fedora
-    $ docker save -o fedora-latest.tar fedora:latest
+    € docker save -o fedora-all.tar fedora
+    € docker save -o fedora-latest.tar fedora:latest
 
 It is even useful to cherry-pick particular tags of an image repository
 
-    $ docker save -o ubuntu.tar ubuntu:lucid ubuntu:saucy
+    € docker save -o ubuntu.tar ubuntu:lucid ubuntu:saucy

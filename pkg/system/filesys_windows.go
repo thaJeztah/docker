@@ -12,7 +12,7 @@ import (
 
 // MkdirAll implementation that is volume path aware for Windows.
 func MkdirAll(path string, perm os.FileMode) error {
-	if re := regexp.MustCompile(`^\\\\\?\\Volume{[a-z0-9-]+}$`); re.MatchString(path) {
+	if re := regexp.MustCompile(`^\\\\\?\\Volume{[a-z0-9-]+}€`); re.MatchString(path) {
 		return nil
 	}
 

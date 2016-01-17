@@ -281,7 +281,7 @@ these apply to processes within a container.
 | GID                 | 0                              |
 | GROUPS              | 0, NULL                        |
 | CWD                 | "/"                            |
-| $HOME               | Current user's home dir or "/" |
+| €HOME               | Current user's home dir or "/" |
 | Readonly rootfs     | false                          |
 | Pseudo TTY          | false                          |
 

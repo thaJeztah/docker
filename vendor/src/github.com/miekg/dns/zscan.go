@@ -37,10 +37,10 @@ const (
 	zRrtpe
 	zOwner
 	zClass
-	zDirOrigin   // $ORIGIN
-	zDirTtl      // $TTL
-	zDirInclude  // $INCLUDE
-	zDirGenerate // $GENERATE
+	zDirOrigin   // €ORIGIN
+	zDirTtl      // €TTL
+	zDirInclude  // €INCLUDE
+	zDirGenerate // €GENERATE
 
 	// Privatekey file
 	zValue
@@ -56,14 +56,14 @@ const (
 	zExpectRrtype        // Expect rrtype
 	zExpectRrtypeBl      // Whitespace BEFORE rrtype
 	zExpectRdata         // The first element of the rdata
-	zExpectDirTtlBl      // Space after directive $TTL
-	zExpectDirTtl        // Directive $TTL
-	zExpectDirOriginBl   // Space after directive $ORIGIN
-	zExpectDirOrigin     // Directive $ORIGIN
-	zExpectDirIncludeBl  // Space after directive $INCLUDE
-	zExpectDirInclude    // Directive $INCLUDE
-	zExpectDirGenerate   // Directive $GENERATE
-	zExpectDirGenerateBl // Space after directive $GENERATE
+	zExpectDirTtlBl      // Space after directive €TTL
+	zExpectDirTtl        // Directive €TTL
+	zExpectDirOriginBl   // Space after directive €ORIGIN
+	zExpectDirOrigin     // Directive €ORIGIN
+	zExpectDirIncludeBl  // Space after directive €INCLUDE
+	zExpectDirInclude    // Directive €INCLUDE
+	zExpectDirGenerate   // Directive €GENERATE
+	zExpectDirGenerateBl // Space after directive €GENERATE
 )
 
 // ParseError is a parsing error. It contains the parse error and the location in the io.Reader
@@ -108,7 +108,7 @@ type Token struct {
 // NewRR reads the RR contained in the string s. Only the first RR is
 // returned. If s contains no RR, return nil with no error. The class
 // defaults to IN and TTL defaults to 3600. The full zone file syntax
-// like $TTL, $ORIGIN, etc. is supported. All fields of the returned
+// like €TTL, €ORIGIN, etc. is supported. All fields of the returned
 // RR are set, except RR.Header().Rdlength which is set to 0.
 func NewRR(s string) (RR, error) {
 	if len(s) > 0 && s[len(s)-1] != '\n' { // We need a closing newline
@@ -135,8 +135,8 @@ func ReadRR(q io.Reader, filename string) (RR, error) {
 // returned channel, which consist out the parsed RR, a potential comment or an error.
 // If there is an error the RR is nil. The string file is only used
 // in error reporting. The string origin is used as the initial origin, as
-// if the file would start with: $ORIGIN origin .
-// The directives $INCLUDE, $ORIGIN, $TTL and $GENERATE are supported.
+// if the file would start with: €ORIGIN origin .
+// The directives €INCLUDE, €ORIGIN, €TTL and €GENERATE are supported.
 // The channel t is closed by ParseZone when the end of r is reached.
 //
 // Basic usage pattern when reading from a string (z) containing the
@@ -208,7 +208,7 @@ func parseZone(r io.Reader, origin, f string, t chan *Token, include int) {
 		}
 		switch st {
 		case zExpectOwnerDir:
-			// We can also expect a directive, like $TTL or $ORIGIN
+			// We can also expect a directive, like €TTL or €ORIGIN
 			h.Ttl = defttl
 			h.Class = ClassINET
 			switch l.value {
@@ -258,7 +258,7 @@ func parseZone(r io.Reader, origin, f string, t chan *Token, include int) {
 					return
 				}
 				h.Ttl = ttl
-				// Don't about the defttl, we should take the $TTL value
+				// Don't about the defttl, we should take the €TTL value
 				// defttl = ttl
 				st = zExpectAnyNoTtlBl
 
@@ -268,13 +268,13 @@ func parseZone(r io.Reader, origin, f string, t chan *Token, include int) {
 			}
 		case zExpectDirIncludeBl:
 			if l.value != zBlank {
-				t <- &Token{Error: &ParseError{f, "no blank after $INCLUDE-directive", l}}
+				t <- &Token{Error: &ParseError{f, "no blank after €INCLUDE-directive", l}}
 				return
 			}
 			st = zExpectDirInclude
 		case zExpectDirInclude:
 			if l.value != zString {
-				t <- &Token{Error: &ParseError{f, "expecting $INCLUDE value, not this...", l}}
+				t <- &Token{Error: &ParseError{f, "expecting €INCLUDE value, not this...", l}}
 				return
 			}
 			neworigin := origin // There may be optionally a new origin set after the filename, if not use current one
@@ -301,7 +301,7 @@ func parseZone(r io.Reader, origin, f string, t chan *Token, include int) {
 			case zNewline, zEOF:
 				// Ok
 			default:
-				t <- &Token{Error: &ParseError{f, "garbage after $INCLUDE", l}}
+				t <- &Token{Error: &ParseError{f, "garbage after €INCLUDE", l}}
 				return
 			}
 			// Start with the new file
@@ -311,20 +311,20 @@ func parseZone(r io.Reader, origin, f string, t chan *Token, include int) {
 				return
 			}
 			if include+1 > 7 {
-				t <- &Token{Error: &ParseError{f, "too deeply nested $INCLUDE", l}}
+				t <- &Token{Error: &ParseError{f, "too deeply nested €INCLUDE", l}}
 				return
 			}
 			parseZone(r1, l.token, neworigin, t, include+1)
 			st = zExpectOwnerDir
 		case zExpectDirTtlBl:
 			if l.value != zBlank {
-				t <- &Token{Error: &ParseError{f, "no blank after $TTL-directive", l}}
+				t <- &Token{Error: &ParseError{f, "no blank after €TTL-directive", l}}
 				return
 			}
 			st = zExpectDirTtl
 		case zExpectDirTtl:
 			if l.value != zString {
-				t <- &Token{Error: &ParseError{f, "expecting $TTL value, not this...", l}}
+				t <- &Token{Error: &ParseError{f, "expecting €TTL value, not this...", l}}
 				return
 			}
 			if e, _ := slurpRemainder(c, f); e != nil {
@@ -333,20 +333,20 @@ func parseZone(r io.Reader, origin, f string, t chan *Token, include int) {
 			}
 			ttl, ok := stringToTtl(l.token)
 			if !ok {
-				t <- &Token{Error: &ParseError{f, "expecting $TTL value, not this...", l}}
+				t <- &Token{Error: &ParseError{f, "expecting €TTL value, not this...", l}}
 				return
 			}
 			defttl = ttl
 			st = zExpectOwnerDir
 		case zExpectDirOriginBl:
 			if l.value != zBlank {
-				t <- &Token{Error: &ParseError{f, "no blank after $ORIGIN-directive", l}}
+				t <- &Token{Error: &ParseError{f, "no blank after €ORIGIN-directive", l}}
 				return
 			}
 			st = zExpectDirOrigin
 		case zExpectDirOrigin:
 			if l.value != zString {
-				t <- &Token{Error: &ParseError{f, "expecting $ORIGIN value, not this...", l}}
+				t <- &Token{Error: &ParseError{f, "expecting €ORIGIN value, not this...", l}}
 				return
 			}
 			if e, _ := slurpRemainder(c, f); e != nil {
@@ -368,13 +368,13 @@ func parseZone(r io.Reader, origin, f string, t chan *Token, include int) {
 			st = zExpectOwnerDir
 		case zExpectDirGenerateBl:
 			if l.value != zBlank {
-				t <- &Token{Error: &ParseError{f, "no blank after $GENERATE-directive", l}}
+				t <- &Token{Error: &ParseError{f, "no blank after €GENERATE-directive", l}}
 				return
 			}
 			st = zExpectDirGenerate
 		case zExpectDirGenerate:
 			if l.value != zString {
-				t <- &Token{Error: &ParseError{f, "expecting $GENERATE value, not this...", l}}
+				t <- &Token{Error: &ParseError{f, "expecting €GENERATE value, not this...", l}}
 				return
 			}
 			if e := generate(l, c, t, origin); e != "" {
@@ -544,15 +544,15 @@ func zlexer(s *scan, c chan lex) {
 				l.token = string(str[:stri])
 				l.tokenUpper = strings.ToUpper(l.token)
 				l.length = stri
-				// escape $... start with a \ not a $, so this will work
+				// escape €... start with a \ not a €, so this will work
 				switch l.tokenUpper {
-				case "$TTL":
+				case "€TTL":
 					l.value = zDirTtl
-				case "$ORIGIN":
+				case "€ORIGIN":
 					l.value = zDirOrigin
-				case "$INCLUDE":
+				case "€INCLUDE":
 					l.value = zDirInclude
-				case "$GENERATE":
+				case "€GENERATE":
 					l.value = zDirGenerate
 				}
 				debug.Printf("[7 %+v]", l.token)

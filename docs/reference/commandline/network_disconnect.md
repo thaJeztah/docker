@@ -21,7 +21,7 @@ parent = "smn_cli"
 Disconnects a container from a network. The container must be running to disconnect it from the network.
 
 ```bash
-  $ docker network disconnect multi-host-network container1
+  € docker network disconnect multi-host-network container1
 ```
 
 

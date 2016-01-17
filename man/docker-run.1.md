@@ -412,8 +412,8 @@ Both hostPort and containerPort can be specified as a range of ports.
 When specifying ranges for both, the number of container ports in the range must match the number of host ports in the range.
 (e.g., `docker run -p 1234-1236:1222-1224 --name thisWorks -t busybox`
 but not `docker run -p 1230-1236:1230-1240 --name RangeContainerPortsBiggerThanRangeHostPorts -t busybox`)
-With ip: `docker run -p 127.0.0.1:$HOSTPORT:$CONTAINERPORT --name CONTAINER -t someimage`
-Use `docker port` to see the actual mapping: `docker port CONTAINER $CONTAINERPORT`
+With ip: `docker run -p 127.0.0.1:€HOSTPORT:€CONTAINERPORT --name CONTAINER -t someimage`
+Use `docker port` to see the actual mapping: `docker port CONTAINER €CONTAINERPORT`
 
 **--pid**=*host*
    Set the PID mode for the container
@@ -488,7 +488,7 @@ standard input.
 
    Mount a temporary filesystem (`tmpfs`) mount into a container, for example:
 
-   $ docker run -d --tmpfs /tmp:rw,size=787448k,mode=1777 my_image
+   € docker run -d --tmpfs /tmp:rw,size=787448k,mode=1777 my_image
 
    This command mounts a `tmpfs` at `/tmp` within the container. The mount copies
 the underlying content of `my_image` into `/tmp`. For example if there was a
@@ -621,28 +621,28 @@ the exit codes follow the `chroot` standard, see below:
 
 **_125_** if the error is with Docker daemon **_itself_** 
 
-    $ docker run --foo busybox; echo $?
+    € docker run --foo busybox; echo €?
     # flag provided but not defined: --foo
       See 'docker run --help'.
       125
 
 **_126_** if the **_contained command_** cannot be invoked
 
-    $ docker run busybox /etc; echo $?
+    € docker run busybox /etc; echo €?
     # exec: "/etc": permission denied
       docker: Error response from daemon: Contained command could not be invoked
       126
 
 **_127_** if the **_contained command_** cannot be found
 
-    $ docker run busybox foo; echo $?
-    # exec: "foo": executable file not found in $PATH
+    € docker run busybox foo; echo €?
+    # exec: "foo": executable file not found in €PATH
       docker: Error response from daemon: Contained command not found or does not exist
       127
 
 **_Exit code_** of **_contained command_** otherwise 
     
-    $ docker run busybox /bin/sh -c 'exit 3' 
+    € docker run busybox /bin/sh -c 'exit 3' 
     # 3
 
 # EXAMPLES
@@ -696,7 +696,7 @@ Testing `--ipc=host` mode:
 Host shows a shared memory segment with 7 pids attached, happens to be from httpd:
 
 ```
- $ sudo ipcs -m
+ € sudo ipcs -m
 
  ------ Shared Memory Segments --------
  key        shmid      owner      perms      bytes      nattch     status      
@@ -706,7 +706,7 @@ Host shows a shared memory segment with 7 pids attached, happens to be from http
 Now run a regular container, and it correctly does NOT see the shared memory segment from the host:
 
 ```
- $ docker run -it shm ipcs -m
+ € docker run -it shm ipcs -m
 
  ------ Shared Memory Segments --------
  key        shmid      owner      perms      bytes      nattch     status      
@@ -715,7 +715,7 @@ Now run a regular container, and it correctly does NOT see the shared memory seg
 Run a container with the new `--ipc=host` option, and it now sees the shared memory segment from the host httpd:
 
  ```
- $ docker run -it --ipc=host shm ipcs -m
+ € docker run -it --ipc=host shm ipcs -m
 
  ------ Shared Memory Segments --------
  key        shmid      owner      perms      bytes      nattch     status      
@@ -725,9 +725,9 @@ Testing `--ipc=container:CONTAINERID` mode:
 
 Start a container with a program to create a shared memory segment:
 ```
- $ docker run -it shm bash
- $ sudo shm/shm_server &
- $ sudo ipcs -m
+ € docker run -it shm bash
+ € sudo shm/shm_server &
+ € sudo ipcs -m
 
  ------ Shared Memory Segments --------
  key        shmid      owner      perms      bytes      nattch     status      
@@ -735,7 +735,7 @@ Start a container with a program to create a shared memory segment:
 ```
 Create a 2nd container correctly shows no shared memory segment from 1st container:
 ```
- $ docker run shm ipcs -m
+ € docker run shm ipcs -m
 
  ------ Shared Memory Segments --------
  key        shmid      owner      perms      bytes      nattch     status      
@@ -744,8 +744,8 @@ Create a 2nd container correctly shows no shared memory segment from 1st contain
 Create a 3rd container using the new --ipc=container:CONTAINERID option, now it shows the shared memory segment from the first:
 
 ```
- $ docker run -it --ipc=container:ed735b2264ac shm ipcs -m
- $ sudo ipcs -m
+ € docker run -it --ipc=container:ed735b2264ac shm ipcs -m
+ € sudo ipcs -m
 
  ------ Shared Memory Segments --------
  key        shmid      owner      perms      bytes      nattch     status      
@@ -892,8 +892,8 @@ technology. On Linux, the only supported is the `default` option which uses
 Linux namespaces. These two commands are equivalent on Linux:
 
 ```
-$ docker run -d busybox top
-$ docker run -d --isolation default busybox top
+€ docker run -d busybox top
+€ docker run -d --isolation default busybox top
 ```
 
 On Microsoft Windows, can take any of these values:
@@ -905,15 +905,15 @@ On Microsoft Windows, can take any of these values:
 In practice, when running on Microsoft Windows without a `daemon` option set,  these two commands are equivalent:
 
 ```
-$ docker run -d --isolation default busybox top
-$ docker run -d --isolation process busybox top
+€ docker run -d --isolation default busybox top
+€ docker run -d --isolation process busybox top
 ```
 
 If you have set the `--exec-opt isolation=hyperv` option on the Docker `daemon`, any of these commands also result in `hyperv` isolation:
 
 ```
-$ docker run -d --isolation default busybox top
-$ docker run -d --isolation hyperv busybox top
+€ docker run -d --isolation default busybox top
+€ docker run -d --isolation hyperv busybox top
 ```
 
 # HISTORY

@@ -148,7 +148,7 @@ under `loop-lvm` mode.
 
 You can detect the mode by viewing the `docker info` command:
 
-    $ sudo docker info
+    € sudo docker info
     Containers: 0
     Images: 0
     Storage Driver: devicemapper
@@ -178,23 +178,23 @@ The procedure below will create a 90GB data volume and 4GB metadata volume to us
 
 2. If it exists, delete your existing image store by removing the `/var/lib/docker` directory.
 
-        $ sudo rm -rf /var/lib/docker
+        € sudo rm -rf /var/lib/docker
 
 3. Create an LVM physical volume (PV) on your spare block device using the `pvcreate` command.
 
-        $ sudo pvcreate /dev/xvdf
+        € sudo pvcreate /dev/xvdf
         Physical volume `/dev/xvdf` successfully created
 
     The device identifier may be different on your system. Remember to substitute your value in the command above.
 
 4. Create a new volume group (VG) called `vg-docker` using the PV created in the previous step.
 
-        $ sudo vgcreate vg-docker /dev/xvdf
+        € sudo vgcreate vg-docker /dev/xvdf
         Volume group `vg-docker` successfully created
 
 5. Create a new 90GB logical volume (LV) called `data` from space in the `vg-docker` volume group.
 
-        $ sudo lvcreate -L 90G -n data vg-docker
+        € sudo lvcreate -L 90G -n data vg-docker
         Logical volume `data` created.
 
     The command creates an LVM logical volume called `data` and an associated block device file at `/dev/vg-docker/data`. In a later step, you instruct the `devicemapper` storage driver to use this block device to store image and container data.
@@ -203,7 +203,7 @@ The procedure below will create a 90GB data volume and 4GB metadata volume to us
 
 6. Create a new logical volume (LV) called `metadata` from space in the `vg-docker` volume group.
 
-        $ sudo lvcreate -L 4G -n metadata vg-docker
+        € sudo lvcreate -L 4G -n metadata vg-docker
         Logical volume `metadata` created.
 
     This creates an LVM logical volume called `metadata` and an associated block device file at `/dev/vg-docker/metadata`. In the next step you instruct the `devicemapper` storage driver to use this block device to store image and container metadata.
@@ -212,7 +212,7 @@ The procedure below will create a 90GB data volume and 4GB metadata volume to us
 
     The `data` and `metadata` devices that you pass to the `--storage-opt` options were created in the previous steps.
 
-          $ sudo docker daemon --storage-driver=devicemapper --storage-opt dm.datadev=/dev/vg-docker/data --storage-opt dm.metadatadev=/dev/vg-docker/metadata &
+          € sudo docker daemon --storage-driver=devicemapper --storage-opt dm.datadev=/dev/vg-docker/data --storage-opt dm.metadatadev=/dev/vg-docker/metadata &
           [1] 2163
           [root@ip-10-0-0-75 centos]# INFO[0000] Listening for HTTP on unix (/var/run/docker.sock)
           INFO[0027] Option DefaultDriver: bridge
@@ -227,7 +227,7 @@ The procedure below will create a 90GB data volume and 4GB metadata volume to us
 
 6. Use the `docker info` command to verify that the daemon is using `data` and `metadata` devices you created.
 
-        $ sudo docker info
+        € sudo docker info
         INFO[0180] GET /v1.20/info
         Containers: 0
         Images: 0
@@ -245,7 +245,7 @@ The procedure below will create a 90GB data volume and 4GB metadata volume to us
 
 You can use the `lsblk` command to see the device files created above and the `pool` that the `devicemapper` storage driver creates on top of them.
 
-    $ sudo lsblk
+    € sudo lsblk
     NAME                       MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
     xvda                       202:0    0    8G  0 disk
     └─xvda1                    202:1    0    8G  0 part /

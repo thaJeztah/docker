@@ -11,8 +11,8 @@ RUN yum install -y yum-utils && curl -o /etc/yum.repos.d/public-yum-ol6.repo htt
 RUN yum install -y kernel-uek-devel-4.1.12-32.el6uek
 
 ENV GO_VERSION 1.5.2
-RUN curl -fSL "https://storage.googleapis.com/golang/go${GO_VERSION}.linux-amd64.tar.gz" | tar xzC /usr/local
-ENV PATH $PATH:/usr/local/go/bin
+RUN curl -fSL "https://storage.googleapis.com/golang/go€{GO_VERSION}.linux-amd64.tar.gz" | tar xzC /usr/local
+ENV PATH €PATH:/usr/local/go/bin
 
 ENV AUTO_GOPATH 1
 

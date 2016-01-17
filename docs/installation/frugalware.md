@@ -34,7 +34,7 @@ in the packages. The core dependencies are:
 
 A simple
 
-    $ sudo pacman -S lxc-docker
+    € sudo pacman -S lxc-docker
 
 is all that is needed.
 
@@ -43,11 +43,11 @@ is all that is needed.
 There is a systemd service unit created for Docker. To start Docker as
 service:
 
-    $ sudo systemctl start lxc-docker
+    € sudo systemctl start lxc-docker
 
 To start on system boot:
 
-    $ sudo systemctl enable lxc-docker
+    € sudo systemctl enable lxc-docker
 
 ## Custom daemon options
 
@@ -59,16 +59,16 @@ learn how to [customize your systemd Docker daemon options](../articles/systemd.
 
 To uninstall the Docker package:
 
-    $ sudo pacman -R lxc-docker
+    € sudo pacman -R lxc-docker
 
 To uninstall the Docker package and dependencies that are no longer needed:
 
-    $ sudo pacman -Rns lxc-docker
+    € sudo pacman -Rns lxc-docker
 
 The above commands will not remove images, containers, volumes, or user created
 configuration files on your host. If you wish to delete all images, containers,
 and volumes run the following command:
 
-    $ rm -rf /var/lib/docker
+    € rm -rf /var/lib/docker
 
 You must delete the user created configuration files manually.

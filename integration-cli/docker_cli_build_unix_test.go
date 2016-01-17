@@ -90,8 +90,8 @@ func (s *DockerSuite) TestBuildAddChangeOwnership(c *check.C) {
 		dockerfile := `
 			FROM busybox
 			ADD foo /bar/
-			RUN [ $(stat -c %U:%G "/bar") = 'root:root' ]
-			RUN [ $(stat -c %U:%G "/bar/foo") = 'root:root' ]
+			RUN [ €(stat -c %U:%G "/bar") = 'root:root' ]
+			RUN [ €(stat -c %U:%G "/bar/foo") = 'root:root' ]
 			`
 		tmpDir, err := ioutil.TempDir("", "fake-context")
 		c.Assert(err, check.IsNil)

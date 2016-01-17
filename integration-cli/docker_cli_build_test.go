@@ -94,7 +94,7 @@ func (s *DockerSuite) TestBuildEnvironmentReplacementUser(c *check.C) {
 	_, err := buildImage(name, `
   FROM scratch
   ENV user foo
-  USER ${user}
+  USER €{user}
   `, true)
 	if err != nil {
 		c.Fatal(err)
@@ -118,7 +118,7 @@ func (s *DockerSuite) TestBuildEnvironmentReplacementVolume(c *check.C) {
 	_, err := buildImage(name, `
   FROM scratch
   ENV volume /quux
-  VOLUME ${volume}
+  VOLUME €{volume}
   `, true)
 	if err != nil {
 		c.Fatal(err)
@@ -148,9 +148,9 @@ func (s *DockerSuite) TestBuildEnvironmentReplacementExpose(c *check.C) {
 	_, err := buildImage(name, `
   FROM scratch
   ENV port 80
-  EXPOSE ${port}
+  EXPOSE €{port}
   ENV ports "  99   100 "
-  EXPOSE ${ports}
+  EXPOSE €{ports}
   `, true)
 	if err != nil {
 		c.Fatal(err)
@@ -185,8 +185,8 @@ func (s *DockerSuite) TestBuildEnvironmentReplacementWorkdir(c *check.C) {
 	_, err := buildImage(name, `
   FROM busybox
   ENV MYWORKDIR /work
-  RUN mkdir ${MYWORKDIR}
-  WORKDIR ${MYWORKDIR}
+  RUN mkdir €{MYWORKDIR}
+  WORKDIR €{MYWORKDIR}
   `, true)
 
 	if err != nil {
@@ -207,10 +207,10 @@ func (s *DockerSuite) TestBuildEnvironmentReplacementAddCopy(c *check.C) {
   ENV fee fff
   ENV gee ggg
 
-  ADD ${baz} ${dot}
-  COPY ${quux} ${dot}
-  ADD ${zzz:-${fee}} ${dot}
-  COPY ${zzz:-${gee}} ${dot}
+  ADD €{baz} €{dot}
+  COPY €{quux} €{dot}
+  ADD €{zzz:-€{fee}} €{dot}
+  COPY €{zzz:-€{gee}} €{dot}
   `,
 		map[string]string{
 			"foo": "test1",
@@ -238,16 +238,16 @@ func (s *DockerSuite) TestBuildEnvironmentReplacementEnv(c *check.C) {
 		`
   FROM busybox
   ENV foo zzz
-  ENV bar ${foo}
-  ENV abc1='$foo'
-  ENV env1=$foo env2=${foo} env3="$foo" env4="${foo}"
-  RUN [ "$abc1" = '$foo' ] && (echo "$abc1" | grep -q foo)
-  ENV abc2="\$foo"
-  RUN [ "$abc2" = '$foo' ] && (echo "$abc2" | grep -q foo)
-  ENV abc3 '$foo'
-  RUN [ "$abc3" = '$foo' ] && (echo "$abc3" | grep -q foo)
-  ENV abc4 "\$foo"
-  RUN [ "$abc4" = '$foo' ] && (echo "$abc4" | grep -q foo)
+  ENV bar €{foo}
+  ENV abc1='€foo'
+  ENV env1=€foo env2=€{foo} env3="€foo" env4="€{foo}"
+  RUN [ "€abc1" = '€foo' ] && (echo "€abc1" | grep -q foo)
+  ENV abc2="\€foo"
+  RUN [ "€abc2" = '€foo' ] && (echo "€abc2" | grep -q foo)
+  ENV abc3 '€foo'
+  RUN [ "€abc3" = '€foo' ] && (echo "€abc3" | grep -q foo)
+  ENV abc4 "\€foo"
+  RUN [ "€abc4" = '€foo' ] && (echo "€abc4" | grep -q foo)
   `, true)
 
 	if err != nil {
@@ -306,7 +306,7 @@ func (s *DockerSuite) TestBuildHandleEscapes(c *check.C) {
 		`
   FROM scratch
   ENV FOO bar
-  VOLUME ${FOO}
+  VOLUME €{FOO}
   `, true)
 
 	if err != nil {
@@ -334,7 +334,7 @@ func (s *DockerSuite) TestBuildHandleEscapes(c *check.C) {
 		`
   FROM scratch
   ENV FOO bar
-  VOLUME \${FOO}
+  VOLUME \€{FOO}
   `, true)
 
 	if err != nil {
@@ -350,8 +350,8 @@ func (s *DockerSuite) TestBuildHandleEscapes(c *check.C) {
 		c.Fatal(err)
 	}
 
-	if _, ok := result["${FOO}"]; !ok {
-		c.Fatal("Could not find volume ${FOO} set from env foo in volumes table")
+	if _, ok := result["€{FOO}"]; !ok {
+		c.Fatal("Could not find volume €{FOO} set from env foo in volumes table")
 	}
 
 	deleteImages(name)
@@ -364,7 +364,7 @@ func (s *DockerSuite) TestBuildHandleEscapes(c *check.C) {
 		`
   FROM scratch
   ENV FOO bar
-  VOLUME \\\\\\\${FOO}
+  VOLUME \\\\\\\€{FOO}
   `, true)
 
 	if err != nil {
@@ -380,8 +380,8 @@ func (s *DockerSuite) TestBuildHandleEscapes(c *check.C) {
 		c.Fatal(err)
 	}
 
-	if _, ok := result[`\\\${FOO}`]; !ok {
-		c.Fatal(`Could not find volume \\\${FOO} set from env foo in volumes table`, result)
+	if _, ok := result[`\\\€{FOO}`]; !ok {
+		c.Fatal(`Could not find volume \\\€{FOO} set from env foo in volumes table`, result)
 	}
 
 }
@@ -426,7 +426,7 @@ func (s *DockerSuite) TestBuildEnvEscapes(c *check.C) {
 		`
     FROM busybox
     ENV TEST foo
-    CMD echo \$
+    CMD echo \€
     `,
 		true)
 
@@ -436,7 +436,7 @@ func (s *DockerSuite) TestBuildEnvEscapes(c *check.C) {
 
 	out, _ := dockerCmd(c, "run", "-t", name)
 
-	if strings.TrimSpace(out) != "$" {
+	if strings.TrimSpace(out) != "€" {
 		c.Fatalf("Env TEST was not overwritten with bar when foo was supplied to dockerfile: was %q", strings.TrimSpace(out))
 	}
 
@@ -450,7 +450,7 @@ func (s *DockerSuite) TestBuildEnvOverwrite(c *check.C) {
 		`
     FROM busybox
     ENV TEST foo
-    CMD echo ${TEST}
+    CMD echo €{TEST}
     `,
 		true)
 
@@ -720,9 +720,9 @@ RUN echo 'dockerio:x:1001:' >> /etc/group
 RUN touch /exists
 RUN chown dockerio.dockerio /exists
 ADD test_file /
-RUN [ $(ls -l /test_file | awk '{print $3":"$4}') = 'root:root' ]
-RUN [ $(ls -l /test_file | awk '{print $1}') = '%s' ]
-RUN [ $(ls -l /exists | awk '{print $3":"$4}') = 'dockerio:dockerio' ]`, expectedFileChmod),
+RUN [ €(ls -l /test_file | awk '{print €3":"€4}') = 'root:root' ]
+RUN [ €(ls -l /test_file | awk '{print €1}') = '%s' ]
+RUN [ €(ls -l /exists | awk '{print €3":"€4}') = 'dockerio:dockerio' ]`, expectedFileChmod),
 		map[string]string{
 			"test_file": "test1",
 		})
@@ -774,9 +774,9 @@ RUN mkdir /exists
 RUN touch /exists/exists_file
 RUN chown -R dockerio.dockerio /exists
 ADD test_file /exists/
-RUN [ $(ls -l / | grep exists | awk '{print $3":"$4}') = 'dockerio:dockerio' ]
-RUN [ $(ls -l /exists/test_file | awk '{print $3":"$4}') = 'root:root' ]
-RUN [ $(ls -l /exists/exists_file | awk '{print $3":"$4}') = 'dockerio:dockerio' ]`,
+RUN [ €(ls -l / | grep exists | awk '{print €3":"€4}') = 'dockerio:dockerio' ]
+RUN [ €(ls -l /exists/test_file | awk '{print €3":"€4}') = 'root:root' ]
+RUN [ €(ls -l /exists/exists_file | awk '{print €3":"€4}') = 'dockerio:dockerio' ]`,
 		map[string]string{
 			"test_file": "test1",
 		})
@@ -809,15 +809,15 @@ RUN touch /exists/exists_file
 RUN chown -R dockerio.dockerio /exists
 COPY test_file1 test_file2 /exists/
 ADD test_file3 test_file4 %s/robots.txt /exists/
-RUN [ $(ls -l / | grep exists | awk '{print $3":"$4}') = 'dockerio:dockerio' ]
-RUN [ $(ls -l /exists/test_file1 | awk '{print $3":"$4}') = 'root:root' ]
-RUN [ $(ls -l /exists/test_file2 | awk '{print $3":"$4}') = 'root:root' ]
+RUN [ €(ls -l / | grep exists | awk '{print €3":"€4}') = 'dockerio:dockerio' ]
+RUN [ €(ls -l /exists/test_file1 | awk '{print €3":"€4}') = 'root:root' ]
+RUN [ €(ls -l /exists/test_file2 | awk '{print €3":"€4}') = 'root:root' ]
 
-RUN [ $(ls -l /exists/test_file3 | awk '{print $3":"$4}') = 'root:root' ]
-RUN [ $(ls -l /exists/test_file4 | awk '{print $3":"$4}') = 'root:root' ]
-RUN [ $(ls -l /exists/robots.txt | awk '{print $3":"$4}') = 'root:root' ]
+RUN [ €(ls -l /exists/test_file3 | awk '{print €3":"€4}') = 'root:root' ]
+RUN [ €(ls -l /exists/test_file4 | awk '{print €3":"€4}') = 'root:root' ]
+RUN [ €(ls -l /exists/robots.txt | awk '{print €3":"€4}') = 'root:root' ]
 
-RUN [ $(ls -l /exists/exists_file | awk '{print $3":"$4}') = 'dockerio:dockerio' ]
+RUN [ €(ls -l /exists/exists_file | awk '{print €3":"€4}') = 'dockerio:dockerio' ]
 `, server.URL()),
 		map[string]string{
 			"test_file1": "test1",
@@ -979,12 +979,12 @@ ADD [ "test file3", "/test file3" ]
 ADD [ "test dir/test_file4", "/test_dir/test_file4" ]
 ADD [ "test_dir/test_file5", "/test dir/test_file5" ]
 ADD [ "test dir/test_file6", "/test dir/test_file6" ]
-RUN [ $(cat "/test_file1") = 'test1' ]
-RUN [ $(cat "/test file2") = 'test2' ]
-RUN [ $(cat "/test file3") = 'test3' ]
-RUN [ $(cat "/test_dir/test_file4") = 'test4' ]
-RUN [ $(cat "/test dir/test_file5") = 'test5' ]
-RUN [ $(cat "/test dir/test_file6") = 'test6' ]`,
+RUN [ €(cat "/test_file1") = 'test1' ]
+RUN [ €(cat "/test file2") = 'test2' ]
+RUN [ €(cat "/test file3") = 'test3' ]
+RUN [ €(cat "/test_dir/test_file4") = 'test4' ]
+RUN [ €(cat "/test dir/test_file5") = 'test5' ]
+RUN [ €(cat "/test dir/test_file6") = 'test6' ]`,
 		map[string]string{
 			"test file1":          "test1",
 			"test_file2":          "test2",
@@ -1015,12 +1015,12 @@ COPY [ "test file3", "/test file3" ]
 COPY [ "test dir/test_file4", "/test_dir/test_file4" ]
 COPY [ "test_dir/test_file5", "/test dir/test_file5" ]
 COPY [ "test dir/test_file6", "/test dir/test_file6" ]
-RUN [ $(cat "/test_file1") = 'test1' ]
-RUN [ $(cat "/test file2") = 'test2' ]
-RUN [ $(cat "/test file3") = 'test3' ]
-RUN [ $(cat "/test_dir/test_file4") = 'test4' ]
-RUN [ $(cat "/test dir/test_file5") = 'test5' ]
-RUN [ $(cat "/test dir/test_file6") = 'test6' ]`,
+RUN [ €(cat "/test_file1") = 'test1' ]
+RUN [ €(cat "/test file2") = 'test2' ]
+RUN [ €(cat "/test file3") = 'test3' ]
+RUN [ €(cat "/test_dir/test_file4") = 'test4' ]
+RUN [ €(cat "/test dir/test_file5") = 'test5' ]
+RUN [ €(cat "/test dir/test_file6") = 'test6' ]`,
 		map[string]string{
 			"test file1":          "test1",
 			"test_file2":          "test2",
@@ -1160,7 +1160,7 @@ func (s *DockerSuite) TestBuildCopyWildcardInName(c *check.C) {
 	name := "testcopywildcardinname"
 	ctx, err := fakeContext(`FROM busybox
 	COPY *.txt /tmp/
-	RUN [ "$(cat /tmp/\*.txt)" = 'hi there' ]
+	RUN [ "€(cat /tmp/\*.txt)" = 'hi there' ]
 	`, map[string]string{"*.txt": "hi there"})
 
 	if err != nil {
@@ -1223,9 +1223,9 @@ RUN echo 'dockerio:x:1001:' >> /etc/group
 RUN touch /exists
 RUN chown dockerio.dockerio /exists
 ADD test_file /test_dir/
-RUN [ $(ls -l / | grep test_dir | awk '{print $3":"$4}') = 'root:root' ]
-RUN [ $(ls -l /test_dir/test_file | awk '{print $3":"$4}') = 'root:root' ]
-RUN [ $(ls -l /exists | awk '{print $3":"$4}') = 'dockerio:dockerio' ]`,
+RUN [ €(ls -l / | grep test_dir | awk '{print €3":"€4}') = 'root:root' ]
+RUN [ €(ls -l /test_dir/test_file | awk '{print €3":"€4}') = 'root:root' ]
+RUN [ €(ls -l /exists | awk '{print €3":"€4}') = 'dockerio:dockerio' ]`,
 		map[string]string{
 			"test_file": "test1",
 		})
@@ -1249,8 +1249,8 @@ RUN echo 'dockerio:x:1001:' >> /etc/group
 RUN touch /exists
 RUN chown dockerio.dockerio exists
 ADD test_dir /
-RUN [ $(ls -l /test_file | awk '{print $3":"$4}') = 'root:root' ]
-RUN [ $(ls -l /exists | awk '{print $3":"$4}') = 'dockerio:dockerio' ]`,
+RUN [ €(ls -l /test_file | awk '{print €3":"€4}') = 'root:root' ]
+RUN [ €(ls -l /exists | awk '{print €3":"€4}') = 'dockerio:dockerio' ]`,
 		map[string]string{
 			"test_dir/test_file": "test1",
 		})
@@ -1274,9 +1274,9 @@ RUN mkdir /exists
 RUN touch /exists/exists_file
 RUN chown -R dockerio.dockerio /exists
 ADD test_dir/ /exists/
-RUN [ $(ls -l / | grep exists | awk '{print $3":"$4}') = 'dockerio:dockerio' ]
-RUN [ $(ls -l /exists/exists_file | awk '{print $3":"$4}') = 'dockerio:dockerio' ]
-RUN [ $(ls -l /exists/test_file | awk '{print $3":"$4}') = 'root:root' ]`,
+RUN [ €(ls -l / | grep exists | awk '{print €3":"€4}') = 'dockerio:dockerio' ]
+RUN [ €(ls -l /exists/exists_file | awk '{print €3":"€4}') = 'dockerio:dockerio' ]
+RUN [ €(ls -l /exists/test_file | awk '{print €3":"€4}') = 'root:root' ]`,
 		map[string]string{
 			"test_dir/test_file": "test1",
 		})
@@ -1299,11 +1299,11 @@ RUN echo 'dockerio:x:1001:' >> /etc/group
 RUN touch /exists
 RUN chown dockerio.dockerio exists
 ADD test_dir /test_dir
-RUN [ $(ls -l / | grep test_dir | awk '{print $3":"$4}') = 'root:root' ]
-RUN [ $(ls -l / | grep test_dir | awk '{print $1}') = 'drwxr-xr-x' ]
-RUN [ $(ls -l /test_dir/test_file | awk '{print $3":"$4}') = 'root:root' ]
-RUN [ $(ls -l /test_dir/test_file | awk '{print $1}') = '%s' ]
-RUN [ $(ls -l /exists | awk '{print $3":"$4}') = 'dockerio:dockerio' ]`, expectedFileChmod),
+RUN [ €(ls -l / | grep test_dir | awk '{print €3":"€4}') = 'root:root' ]
+RUN [ €(ls -l / | grep test_dir | awk '{print €1}') = 'drwxr-xr-x' ]
+RUN [ €(ls -l /test_dir/test_file | awk '{print €3":"€4}') = 'root:root' ]
+RUN [ €(ls -l /test_dir/test_file | awk '{print €1}') = '%s' ]
+RUN [ €(ls -l /exists | awk '{print €3":"€4}') = 'dockerio:dockerio' ]`, expectedFileChmod),
 		map[string]string{
 			"test_dir/test_file": "test1",
 		})
@@ -1343,9 +1343,9 @@ func (s *DockerSuite) TestBuildAddPreservesFilesSpecialBits(c *check.C) {
 	ctx, err := fakeContext(`FROM busybox
 ADD suidbin /usr/bin/suidbin
 RUN chmod 4755 /usr/bin/suidbin
-RUN [ $(ls -l /usr/bin/suidbin | awk '{print $1}') = '-rwsr-xr-x' ]
+RUN [ €(ls -l /usr/bin/suidbin | awk '{print €1}') = '-rwsr-xr-x' ]
 ADD ./data/ /
-RUN [ $(ls -l /usr/bin/suidbin | awk '{print $1}') = '-rwsr-xr-x' ]`,
+RUN [ €(ls -l /usr/bin/suidbin | awk '{print €1}') = '-rwsr-xr-x' ]`,
 		map[string]string{
 			"suidbin":             "suidbin",
 			"/data/usr/test_file": "test1",
@@ -1369,9 +1369,9 @@ RUN echo 'dockerio:x:1001:' >> /etc/group
 RUN touch /exists
 RUN chown dockerio.dockerio /exists
 COPY test_file /
-RUN [ $(ls -l /test_file | awk '{print $3":"$4}') = 'root:root' ]
-RUN [ $(ls -l /test_file | awk '{print $1}') = '%s' ]
-RUN [ $(ls -l /exists | awk '{print $3":"$4}') = 'dockerio:dockerio' ]`, expectedFileChmod),
+RUN [ €(ls -l /test_file | awk '{print €3":"€4}') = 'root:root' ]
+RUN [ €(ls -l /test_file | awk '{print €1}') = '%s' ]
+RUN [ €(ls -l /exists | awk '{print €3":"€4}') = 'dockerio:dockerio' ]`, expectedFileChmod),
 		map[string]string{
 			"test_file": "test1",
 		})
@@ -1423,9 +1423,9 @@ RUN mkdir /exists
 RUN touch /exists/exists_file
 RUN chown -R dockerio.dockerio /exists
 COPY test_file /exists/
-RUN [ $(ls -l / | grep exists | awk '{print $3":"$4}') = 'dockerio:dockerio' ]
-RUN [ $(ls -l /exists/test_file | awk '{print $3":"$4}') = 'root:root' ]
-RUN [ $(ls -l /exists/exists_file | awk '{print $3":"$4}') = 'dockerio:dockerio' ]`,
+RUN [ €(ls -l / | grep exists | awk '{print €3":"€4}') = 'dockerio:dockerio' ]
+RUN [ €(ls -l /exists/test_file | awk '{print €3":"€4}') = 'root:root' ]
+RUN [ €(ls -l /exists/exists_file | awk '{print €3":"€4}') = 'dockerio:dockerio' ]`,
 		map[string]string{
 			"test_file": "test1",
 		})
@@ -1448,9 +1448,9 @@ RUN echo 'dockerio:x:1001:' >> /etc/group
 RUN touch /exists
 RUN chown dockerio.dockerio /exists
 COPY test_file /test_dir/
-RUN [ $(ls -l / | grep test_dir | awk '{print $3":"$4}') = 'root:root' ]
-RUN [ $(ls -l /test_dir/test_file | awk '{print $3":"$4}') = 'root:root' ]
-RUN [ $(ls -l /exists | awk '{print $3":"$4}') = 'dockerio:dockerio' ]`,
+RUN [ €(ls -l / | grep test_dir | awk '{print €3":"€4}') = 'root:root' ]
+RUN [ €(ls -l /test_dir/test_file | awk '{print €3":"€4}') = 'root:root' ]
+RUN [ €(ls -l /exists | awk '{print €3":"€4}') = 'dockerio:dockerio' ]`,
 		map[string]string{
 			"test_file": "test1",
 		})
@@ -1473,8 +1473,8 @@ RUN echo 'dockerio:x:1001:' >> /etc/group
 RUN touch /exists
 RUN chown dockerio.dockerio exists
 COPY test_dir /
-RUN [ $(ls -l /test_file | awk '{print $3":"$4}') = 'root:root' ]
-RUN [ $(ls -l /exists | awk '{print $3":"$4}') = 'dockerio:dockerio' ]`,
+RUN [ €(ls -l /test_file | awk '{print €3":"€4}') = 'root:root' ]
+RUN [ €(ls -l /exists | awk '{print €3":"€4}') = 'dockerio:dockerio' ]`,
 		map[string]string{
 			"test_dir/test_file": "test1",
 		})
@@ -1498,9 +1498,9 @@ RUN mkdir /exists
 RUN touch /exists/exists_file
 RUN chown -R dockerio.dockerio /exists
 COPY test_dir/ /exists/
-RUN [ $(ls -l / | grep exists | awk '{print $3":"$4}') = 'dockerio:dockerio' ]
-RUN [ $(ls -l /exists/exists_file | awk '{print $3":"$4}') = 'dockerio:dockerio' ]
-RUN [ $(ls -l /exists/test_file | awk '{print $3":"$4}') = 'root:root' ]`,
+RUN [ €(ls -l / | grep exists | awk '{print €3":"€4}') = 'dockerio:dockerio' ]
+RUN [ €(ls -l /exists/exists_file | awk '{print €3":"€4}') = 'dockerio:dockerio' ]
+RUN [ €(ls -l /exists/test_file | awk '{print €3":"€4}') = 'root:root' ]`,
 		map[string]string{
 			"test_dir/test_file": "test1",
 		})
@@ -1523,11 +1523,11 @@ RUN echo 'dockerio:x:1001:' >> /etc/group
 RUN touch /exists
 RUN chown dockerio.dockerio exists
 COPY test_dir /test_dir
-RUN [ $(ls -l / | grep test_dir | awk '{print $3":"$4}') = 'root:root' ]
-RUN [ $(ls -l / | grep test_dir | awk '{print $1}') = 'drwxr-xr-x' ]
-RUN [ $(ls -l /test_dir/test_file | awk '{print $3":"$4}') = 'root:root' ]
-RUN [ $(ls -l /test_dir/test_file | awk '{print $1}') = '%s' ]
-RUN [ $(ls -l /exists | awk '{print $3":"$4}') = 'dockerio:dockerio' ]`, expectedFileChmod),
+RUN [ €(ls -l / | grep test_dir | awk '{print €3":"€4}') = 'root:root' ]
+RUN [ €(ls -l / | grep test_dir | awk '{print €1}') = 'drwxr-xr-x' ]
+RUN [ €(ls -l /test_dir/test_file | awk '{print €3":"€4}') = 'root:root' ]
+RUN [ €(ls -l /test_dir/test_file | awk '{print €1}') = '%s' ]
+RUN [ €(ls -l /exists | awk '{print €3":"€4}') = 'dockerio:dockerio' ]`, expectedFileChmod),
 		map[string]string{
 			"test_dir/test_file": "test1",
 		})
@@ -2017,7 +2017,7 @@ func (s *DockerSuite) TestBuildUser(c *check.C) {
 		`FROM busybox
 		RUN echo 'dockerio:x:1001:1001::/bin:/bin/false' >> /etc/passwd
 		USER dockerio
-		RUN [ $(whoami) = 'dockerio' ]`,
+		RUN [ €(whoami) = 'dockerio' ]`,
 		true)
 	if err != nil {
 		c.Fatal(err)
@@ -2037,13 +2037,13 @@ func (s *DockerSuite) TestBuildRelativeWorkdir(c *check.C) {
 	expected := "/test2/test3"
 	_, err := buildImage(name,
 		`FROM busybox
-		RUN [ "$PWD" = '/' ]
+		RUN [ "€PWD" = '/' ]
 		WORKDIR test1
-		RUN [ "$PWD" = '/test1' ]
+		RUN [ "€PWD" = '/test1' ]
 		WORKDIR /test2
-		RUN [ "$PWD" = '/test2' ]
+		RUN [ "€PWD" = '/test2' ]
 		WORKDIR test3
-		RUN [ "$PWD" = '/test2/test3' ]`,
+		RUN [ "€PWD" = '/test2/test3' ]`,
 		true)
 	if err != nil {
 		c.Fatal(err)
@@ -2065,8 +2065,8 @@ func (s *DockerSuite) TestBuildWorkdirWithEnvVariables(c *check.C) {
 		`FROM busybox
 		ENV DIRPATH /test1
 		ENV SUBDIRNAME test2
-		WORKDIR $DIRPATH
-		WORKDIR $SUBDIRNAME/$MISSING_VAR`,
+		WORKDIR €DIRPATH
+		WORKDIR €SUBDIRNAME/€MISSING_VAR`,
 		true)
 	if err != nil {
 		c.Fatal(err)
@@ -2089,24 +2089,24 @@ func (s *DockerSuite) TestBuildRelativeCopy(c *check.C) {
 		FROM busybox
 			WORKDIR /test1
 			WORKDIR test2
-			RUN [ "$PWD" = '/test1/test2' ]
+			RUN [ "€PWD" = '/test1/test2' ]
 			COPY foo ./
-			RUN [ "$(cat /test1/test2/foo)" = 'hello' ]
+			RUN [ "€(cat /test1/test2/foo)" = 'hello' ]
 			ADD foo ./bar/baz
-			RUN [ "$(cat /test1/test2/bar/baz)" = 'hello' ]
+			RUN [ "€(cat /test1/test2/bar/baz)" = 'hello' ]
 			COPY foo ./bar/baz2
-			RUN [ "$(cat /test1/test2/bar/baz2)" = 'hello' ]
+			RUN [ "€(cat /test1/test2/bar/baz2)" = 'hello' ]
 			WORKDIR ..
 			COPY foo ./
-			RUN [ "$(cat /test1/foo)" = 'hello' ]
+			RUN [ "€(cat /test1/foo)" = 'hello' ]
 			COPY foo /test3/
-			RUN [ "$(cat /test3/foo)" = 'hello' ]
+			RUN [ "€(cat /test3/foo)" = 'hello' ]
 			WORKDIR /test4
 			COPY . .
-			RUN [ "$(cat /test4/foo)" = 'hello' ]
+			RUN [ "€(cat /test4/foo)" = 'hello' ]
 			WORKDIR /test5/test6
 			COPY foo ../
-			RUN [ "$(cat /test5/foo)" = 'hello' ]
+			RUN [ "€(cat /test5/foo)" = 'hello' ]
 			`
 	ctx, err := fakeContext(dockerfile, map[string]string{
 		"foo": "hello",
@@ -2127,9 +2127,9 @@ func (s *DockerSuite) TestBuildEnv(c *check.C) {
 	expected := "[PATH=/test:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin PORT=2375]"
 	_, err := buildImage(name,
 		`FROM busybox
-		ENV PATH /test:$PATH
+		ENV PATH /test:€PATH
         ENV PORT 2375
-		RUN [ $(env | grep PORT) = 'PORT=2375' ]`,
+		RUN [ €(env | grep PORT) = 'PORT=2375' ]`,
 		true)
 	if err != nil {
 		c.Fatal(err)
@@ -2625,7 +2625,7 @@ func (s *DockerSuite) TestBuildAddLocalFileWithCache(c *check.C) {
 		FROM busybox
         MAINTAINER dockerio
         ADD foo /usr/lib/bla/bar
-		RUN [ "$(cat /usr/lib/bla/bar)" = "hello" ]`
+		RUN [ "€(cat /usr/lib/bla/bar)" = "hello" ]`
 	ctx, err := fakeContext(dockerfile, map[string]string{
 		"foo": "hello",
 	})
@@ -2654,7 +2654,7 @@ func (s *DockerSuite) TestBuildAddMultipleLocalFileWithCache(c *check.C) {
 		FROM busybox
         MAINTAINER dockerio
         ADD foo Dockerfile /usr/lib/bla/
-		RUN [ "$(cat /usr/lib/bla/foo)" = "hello" ]`
+		RUN [ "€(cat /usr/lib/bla/foo)" = "hello" ]`
 	ctx, err := fakeContext(dockerfile, map[string]string{
 		"foo": "hello",
 	})
@@ -2685,7 +2685,7 @@ func (s *DockerSuite) TestBuildAddLocalFileWithoutCache(c *check.C) {
 		FROM busybox
         MAINTAINER dockerio
         ADD foo /usr/lib/bla/bar
-		RUN [ "$(cat /usr/lib/bla/bar)" = "hello" ]`
+		RUN [ "€(cat /usr/lib/bla/bar)" = "hello" ]`
 	ctx, err := fakeContext(dockerfile, map[string]string{
 		"foo": "hello",
 	})
@@ -3809,8 +3809,8 @@ func (s *DockerSuite) TestBuildLineBreak(c *check.C) {
 RUN    sh -c 'echo root:testpass \
 	> /tmp/passwd'
 RUN    mkdir -p /var/run/sshd
-RUN    [ "$(cat /tmp/passwd)" = "root:testpass" ]
-RUN    [ "$(ls -d /var/run/sshd)" = "/var/run/sshd" ]`,
+RUN    [ "€(cat /tmp/passwd)" = "root:testpass" ]
+RUN    [ "€(ls -d /var/run/sshd)" = "/var/run/sshd" ]`,
 		true)
 	if err != nil {
 		c.Fatal(err)
@@ -3825,8 +3825,8 @@ func (s *DockerSuite) TestBuildEOLInLine(c *check.C) {
 RUN    sh -c 'echo root:testpass > /tmp/passwd'
 RUN    echo "foo \n bar"; echo "baz"
 RUN    mkdir -p /var/run/sshd
-RUN    [ "$(cat /tmp/passwd)" = "root:testpass" ]
-RUN    [ "$(ls -d /var/run/sshd)" = "/var/run/sshd" ]`,
+RUN    [ "€(cat /tmp/passwd)" = "root:testpass" ]
+RUN    [ "€(ls -d /var/run/sshd)" = "/var/run/sshd" ]`,
 		true)
 	if err != nil {
 		c.Fatal(err)
@@ -3844,8 +3844,8 @@ RUN [ ! -x /hello.sh ]
 # comment with line break \
 RUN chmod +x /hello.sh
 RUN [ -x /hello.sh ]
-RUN [ "$(cat /hello.sh)" = $'#!/bin/sh\necho hello world' ]
-RUN [ "$(/hello.sh)" = "hello world" ]`,
+RUN [ "€(cat /hello.sh)" = €'#!/bin/sh\necho hello world' ]
+RUN [ "€(/hello.sh)" = "hello world" ]`,
 		true)
 	if err != nil {
 		c.Fatal(err)
@@ -3859,11 +3859,11 @@ func (s *DockerSuite) TestBuildUsersAndGroups(c *check.C) {
 		`FROM busybox
 
 # Make sure our defaults work
-RUN [ "$(id -u):$(id -g)/$(id -un):$(id -gn)" = '0:0/root:root' ]
+RUN [ "€(id -u):€(id -g)/€(id -un):€(id -gn)" = '0:0/root:root' ]
 
 # TODO decide if "args.user = strconv.Itoa(syscall.Getuid())" is acceptable behavior for changeUser in sysvinit instead of "return nil" when "USER" isn't specified (so that we get the proper group list even if that is the empty list, even in the default case of not supplying an explicit USER to run as, which implies USER 0)
 USER root
-RUN [ "$(id -G):$(id -Gn)" = '0 10:root wheel' ]
+RUN [ "€(id -G):€(id -Gn)" = '0 10:root wheel' ]
 
 # Setup dockerio user and group
 RUN echo 'dockerio:x:1001:1001::/bin:/bin/false' >> /etc/passwd
@@ -3873,42 +3873,42 @@ RUN echo 'dockerio:x:1001:' >> /etc/group
 USER dockerio
 RUN id -G
 RUN id -Gn
-RUN [ "$(id -u):$(id -g)/$(id -un):$(id -gn)/$(id -G):$(id -Gn)" = '1001:1001/dockerio:dockerio/1001:dockerio' ]
+RUN [ "€(id -u):€(id -g)/€(id -un):€(id -gn)/€(id -G):€(id -Gn)" = '1001:1001/dockerio:dockerio/1001:dockerio' ]
 
 # Switch back to root and double check that worked exactly as we might expect it to
 USER root
-RUN [ "$(id -u):$(id -g)/$(id -un):$(id -gn)/$(id -G):$(id -Gn)" = '0:0/root:root/0 10:root wheel' ]
+RUN [ "€(id -u):€(id -g)/€(id -un):€(id -gn)/€(id -G):€(id -Gn)" = '0:0/root:root/0 10:root wheel' ]
 
 # Add a "supplementary" group for our dockerio user
 RUN echo 'supplementary:x:1002:dockerio' >> /etc/group
 
 # ... and then go verify that we get it like we expect
 USER dockerio
-RUN [ "$(id -u):$(id -g)/$(id -un):$(id -gn)/$(id -G):$(id -Gn)" = '1001:1001/dockerio:dockerio/1001 1002:dockerio supplementary' ]
+RUN [ "€(id -u):€(id -g)/€(id -un):€(id -gn)/€(id -G):€(id -Gn)" = '1001:1001/dockerio:dockerio/1001 1002:dockerio supplementary' ]
 USER 1001
-RUN [ "$(id -u):$(id -g)/$(id -un):$(id -gn)/$(id -G):$(id -Gn)" = '1001:1001/dockerio:dockerio/1001 1002:dockerio supplementary' ]
+RUN [ "€(id -u):€(id -g)/€(id -un):€(id -gn)/€(id -G):€(id -Gn)" = '1001:1001/dockerio:dockerio/1001 1002:dockerio supplementary' ]
 
 # super test the new "user:group" syntax
 USER dockerio:dockerio
-RUN [ "$(id -u):$(id -g)/$(id -un):$(id -gn)/$(id -G):$(id -Gn)" = '1001:1001/dockerio:dockerio/1001:dockerio' ]
+RUN [ "€(id -u):€(id -g)/€(id -un):€(id -gn)/€(id -G):€(id -Gn)" = '1001:1001/dockerio:dockerio/1001:dockerio' ]
 USER 1001:dockerio
-RUN [ "$(id -u):$(id -g)/$(id -un):$(id -gn)/$(id -G):$(id -Gn)" = '1001:1001/dockerio:dockerio/1001:dockerio' ]
+RUN [ "€(id -u):€(id -g)/€(id -un):€(id -gn)/€(id -G):€(id -Gn)" = '1001:1001/dockerio:dockerio/1001:dockerio' ]
 USER dockerio:1001
-RUN [ "$(id -u):$(id -g)/$(id -un):$(id -gn)/$(id -G):$(id -Gn)" = '1001:1001/dockerio:dockerio/1001:dockerio' ]
+RUN [ "€(id -u):€(id -g)/€(id -un):€(id -gn)/€(id -G):€(id -Gn)" = '1001:1001/dockerio:dockerio/1001:dockerio' ]
 USER 1001:1001
-RUN [ "$(id -u):$(id -g)/$(id -un):$(id -gn)/$(id -G):$(id -Gn)" = '1001:1001/dockerio:dockerio/1001:dockerio' ]
+RUN [ "€(id -u):€(id -g)/€(id -un):€(id -gn)/€(id -G):€(id -Gn)" = '1001:1001/dockerio:dockerio/1001:dockerio' ]
 USER dockerio:supplementary
-RUN [ "$(id -u):$(id -g)/$(id -un):$(id -gn)/$(id -G):$(id -Gn)" = '1001:1002/dockerio:supplementary/1002:supplementary' ]
+RUN [ "€(id -u):€(id -g)/€(id -un):€(id -gn)/€(id -G):€(id -Gn)" = '1001:1002/dockerio:supplementary/1002:supplementary' ]
 USER dockerio:1002
-RUN [ "$(id -u):$(id -g)/$(id -un):$(id -gn)/$(id -G):$(id -Gn)" = '1001:1002/dockerio:supplementary/1002:supplementary' ]
+RUN [ "€(id -u):€(id -g)/€(id -un):€(id -gn)/€(id -G):€(id -Gn)" = '1001:1002/dockerio:supplementary/1002:supplementary' ]
 USER 1001:supplementary
-RUN [ "$(id -u):$(id -g)/$(id -un):$(id -gn)/$(id -G):$(id -Gn)" = '1001:1002/dockerio:supplementary/1002:supplementary' ]
+RUN [ "€(id -u):€(id -g)/€(id -un):€(id -gn)/€(id -G):€(id -Gn)" = '1001:1002/dockerio:supplementary/1002:supplementary' ]
 USER 1001:1002
-RUN [ "$(id -u):$(id -g)/$(id -un):$(id -gn)/$(id -G):$(id -Gn)" = '1001:1002/dockerio:supplementary/1002:supplementary' ]
+RUN [ "€(id -u):€(id -g)/€(id -un):€(id -gn)/€(id -G):€(id -Gn)" = '1001:1002/dockerio:supplementary/1002:supplementary' ]
 
 # make sure unknown uid/gid still works properly
 USER 1042:1043
-RUN [ "$(id -u):$(id -g)/$(id -un):$(id -gn)/$(id -G):$(id -Gn)" = '1042:1043/1042:1043/1043:1043' ]`,
+RUN [ "€(id -u):€(id -g)/€(id -un):€(id -gn)/€(id -G):€(id -Gn)" = '1042:1043/1042:1043/1043:1043' ]`,
 		true)
 	if err != nil {
 		c.Fatal(err)
@@ -3922,22 +3922,22 @@ func (s *DockerSuite) TestBuildEnvUsage(c *check.C) {
 	name := "testbuildenvusage"
 	dockerfile := `FROM busybox
 ENV    HOME /root
-ENV    PATH $HOME/bin:$PATH
-ENV    PATH /tmp:$PATH
-RUN    [ "$PATH" = "/tmp:$HOME/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" ]
+ENV    PATH €HOME/bin:€PATH
+ENV    PATH /tmp:€PATH
+RUN    [ "€PATH" = "/tmp:€HOME/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" ]
 ENV    FOO /foo/baz
 ENV    BAR /bar
-ENV    BAZ $BAR
-ENV    FOOPATH $PATH:$FOO
-RUN    [ "$BAR" = "$BAZ" ]
-RUN    [ "$FOOPATH" = "$PATH:/foo/baz" ]
+ENV    BAZ €BAR
+ENV    FOOPATH €PATH:€FOO
+RUN    [ "€BAR" = "€BAZ" ]
+RUN    [ "€FOOPATH" = "€PATH:/foo/baz" ]
 ENV	   FROM hello/docker/world
 ENV    TO /docker/world/hello
-ADD    $FROM $TO
-RUN    [ "$(cat $TO)" = "hello" ]
+ADD    €FROM €TO
+RUN    [ "€(cat €TO)" = "hello" ]
 ENV    abc=def
-ENV    ghi=$abc
-RUN    [ "$ghi" = "def" ]
+ENV    ghi=€abc
+RUN    [ "€ghi" = "def" ]
 `
 	ctx, err := fakeContext(dockerfile, map[string]string{
 		"hello/docker/world": "hello",
@@ -3960,88 +3960,88 @@ func (s *DockerSuite) TestBuildEnvUsage2(c *check.C) {
 	name := "testbuildenvusage2"
 	dockerfile := `FROM busybox
 ENV    abc=def
-RUN    [ "$abc" = "def" ]
+RUN    [ "€abc" = "def" ]
 ENV    def="hello world"
-RUN    [ "$def" = "hello world" ]
+RUN    [ "€def" = "hello world" ]
 ENV    def=hello\ world
-RUN    [ "$def" = "hello world" ]
+RUN    [ "€def" = "hello world" ]
 ENV    v1=abc v2="hi there"
-RUN    [ "$v1" = "abc" ]
-RUN    [ "$v2" = "hi there" ]
+RUN    [ "€v1" = "abc" ]
+RUN    [ "€v2" = "hi there" ]
 ENV    v3='boogie nights' v4="with'quotes too"
-RUN    [ "$v3" = "boogie nights" ]
-RUN    [ "$v4" = "with'quotes too" ]
+RUN    [ "€v3" = "boogie nights" ]
+RUN    [ "€v4" = "with'quotes too" ]
 ENV    abc=zzz FROM=hello/docker/world
 ENV    abc=zzz TO=/docker/world/hello
-ADD    $FROM $TO
-RUN    [ "$(cat $TO)" = "hello" ]
+ADD    €FROM €TO
+RUN    [ "€(cat €TO)" = "hello" ]
 ENV    abc "zzz"
-RUN    [ $abc = "zzz" ]
+RUN    [ €abc = "zzz" ]
 ENV    abc 'yyy'
-RUN    [ $abc = 'yyy' ]
+RUN    [ €abc = 'yyy' ]
 ENV    abc=
-RUN    [ "$abc" = "" ]
+RUN    [ "€abc" = "" ]
 
-# use grep to make sure if the builder substitutes \$foo by mistake
+# use grep to make sure if the builder substitutes \€foo by mistake
 # we don't get a false positive
-ENV    abc=\$foo
-RUN    [ "$abc" = "\$foo" ] && (echo "$abc" | grep foo)
-ENV    abc \$foo
-RUN    [ "$abc" = "\$foo" ] && (echo "$abc" | grep foo)
+ENV    abc=\€foo
+RUN    [ "€abc" = "\€foo" ] && (echo "€abc" | grep foo)
+ENV    abc \€foo
+RUN    [ "€abc" = "\€foo" ] && (echo "€abc" | grep foo)
 
 ENV    abc=\'foo\'
-RUN    [ "$abc" = "'foo'" ]
+RUN    [ "€abc" = "'foo'" ]
 ENV    abc=\"foo\"
-RUN    [ "$abc" = "\"foo\"" ]
+RUN    [ "€abc" = "\"foo\"" ]
 ENV    abc "foo"
-RUN    [ "$abc" = "foo" ]
+RUN    [ "€abc" = "foo" ]
 ENV    abc 'foo'
-RUN    [ "$abc" = 'foo' ]
+RUN    [ "€abc" = 'foo' ]
 ENV    abc \'foo\'
-RUN    [ "$abc" = "'foo'" ]
+RUN    [ "€abc" = "'foo'" ]
 ENV    abc \"foo\"
-RUN    [ "$abc" = '"foo"' ]
+RUN    [ "€abc" = '"foo"' ]
 
 ENV    abc=ABC
-RUN    [ "$abc" = "ABC" ]
-ENV    def=${abc:-DEF}
-RUN    [ "$def" = "ABC" ]
-ENV    def=${ccc:-DEF}
-RUN    [ "$def" = "DEF" ]
-ENV    def=${ccc:-${def}xx}
-RUN    [ "$def" = "DEFxx" ]
-ENV    def=${def:+ALT}
-RUN    [ "$def" = "ALT" ]
-ENV    def=${def:+${abc}:}
-RUN    [ "$def" = "ABC:" ]
-ENV    def=${ccc:-\$abc:}
-RUN    [ "$def" = '$abc:' ]
-ENV    def=${ccc:-\${abc}:}
-RUN    [ "$def" = '${abc:}' ]
-ENV    mypath=${mypath:+$mypath:}/home
-RUN    [ "$mypath" = '/home' ]
-ENV    mypath=${mypath:+$mypath:}/away
-RUN    [ "$mypath" = '/home:/away' ]
+RUN    [ "€abc" = "ABC" ]
+ENV    def=€{abc:-DEF}
+RUN    [ "€def" = "ABC" ]
+ENV    def=€{ccc:-DEF}
+RUN    [ "€def" = "DEF" ]
+ENV    def=€{ccc:-€{def}xx}
+RUN    [ "€def" = "DEFxx" ]
+ENV    def=€{def:+ALT}
+RUN    [ "€def" = "ALT" ]
+ENV    def=€{def:+€{abc}:}
+RUN    [ "€def" = "ABC:" ]
+ENV    def=€{ccc:-\€abc:}
+RUN    [ "€def" = '€abc:' ]
+ENV    def=€{ccc:-\€{abc}:}
+RUN    [ "€def" = '€{abc:}' ]
+ENV    mypath=€{mypath:+€mypath:}/home
+RUN    [ "€mypath" = '/home' ]
+ENV    mypath=€{mypath:+€mypath:}/away
+RUN    [ "€mypath" = '/home:/away' ]
 
 ENV    e1=bar
-ENV    e2=$e1
-ENV    e3=$e11
-ENV    e4=\$e1
-ENV    e5=\$e11
-RUN    [ "$e0,$e1,$e2,$e3,$e4,$e5" = ',bar,bar,,$e1,$e11' ]
+ENV    e2=€e1
+ENV    e3=€e11
+ENV    e4=\€e1
+ENV    e5=\€e11
+RUN    [ "€e0,€e1,€e2,€e3,€e4,€e5" = ',bar,bar,,€e1,€e11' ]
 
 ENV    ee1 bar
-ENV    ee2 $ee1
-ENV    ee3 $ee11
-ENV    ee4 \$ee1
-ENV    ee5 \$ee11
-RUN    [ "$ee1,$ee2,$ee3,$ee4,$ee5" = 'bar,bar,,$ee1,$ee11' ]
+ENV    ee2 €ee1
+ENV    ee3 €ee11
+ENV    ee4 \€ee1
+ENV    ee5 \€ee11
+RUN    [ "€ee1,€ee2,€ee3,€ee4,€ee5" = 'bar,bar,,€ee1,€ee11' ]
 
 ENV    eee1="foo"
 ENV    eee2='foo'
 ENV    eee3 "foo"
 ENV    eee4 'foo'
-RUN    [ "$eee1,$eee2,$eee3,$eee4" = 'foo,foo,foo,foo' ]
+RUN    [ "€eee1,€eee2,€eee3,€eee4" = 'foo,foo,foo,foo' ]
 
 `
 	ctx, err := fakeContext(dockerfile, map[string]string{
@@ -4066,7 +4066,7 @@ FROM busybox
 ADD test /test
 RUN ["chmod","+x","/test"]
 RUN ["/test"]
-RUN [ "$(cat /testfile)" = 'test!' ]`
+RUN [ "€(cat /testfile)" = 'test!' ]`
 	ctx, err := fakeContext(dockerfile, map[string]string{
 		"test": "#!/bin/sh\necho 'test!' > /testfile",
 	})
@@ -4716,19 +4716,19 @@ func (s *DockerSuite) TestBuildExoticShellInterpolation(c *check.C) {
 
 		ENV SOME_VAR a.b.c
 
-		RUN [ "$SOME_VAR"       = 'a.b.c' ]
-		RUN [ "${SOME_VAR}"     = 'a.b.c' ]
-		RUN [ "${SOME_VAR%.*}"  = 'a.b'   ]
-		RUN [ "${SOME_VAR%%.*}" = 'a'     ]
-		RUN [ "${SOME_VAR#*.}"  = 'b.c'   ]
-		RUN [ "${SOME_VAR##*.}" = 'c'     ]
-		RUN [ "${SOME_VAR/c/d}" = 'a.b.d' ]
-		RUN [ "${#SOME_VAR}"    = '5'     ]
+		RUN [ "€SOME_VAR"       = 'a.b.c' ]
+		RUN [ "€{SOME_VAR}"     = 'a.b.c' ]
+		RUN [ "€{SOME_VAR%.*}"  = 'a.b'   ]
+		RUN [ "€{SOME_VAR%%.*}" = 'a'     ]
+		RUN [ "€{SOME_VAR#*.}"  = 'b.c'   ]
+		RUN [ "€{SOME_VAR##*.}" = 'c'     ]
+		RUN [ "€{SOME_VAR/c/d}" = 'a.b.d' ]
+		RUN [ "€{#SOME_VAR}"    = '5'     ]
 
-		RUN [ "${SOME_UNSET_VAR:-$SOME_VAR}" = 'a.b.c' ]
-		RUN [ "${SOME_VAR:+Version: ${SOME_VAR}}" = 'Version: a.b.c' ]
-		RUN [ "${SOME_UNSET_VAR:+${SOME_VAR}}" = '' ]
-		RUN [ "${SOME_UNSET_VAR:-${SOME_VAR:-d.e.f}}" = 'a.b.c' ]
+		RUN [ "€{SOME_UNSET_VAR:-€SOME_VAR}" = 'a.b.c' ]
+		RUN [ "€{SOME_VAR:+Version: €{SOME_VAR}}" = 'Version: a.b.c' ]
+		RUN [ "€{SOME_UNSET_VAR:+€{SOME_VAR}}" = '' ]
+		RUN [ "€{SOME_UNSET_VAR:-€{SOME_VAR:-d.e.f}}" = 'a.b.c' ]
 	`, false)
 	if err != nil {
 		c.Fatal(err)
@@ -4871,7 +4871,7 @@ func (s *DockerSuite) TestBuildNotVerboseSuccess(c *check.C) {
 	// stdout has only the image ID (long image ID) and stderr is empty.
 	var stdout, stderr string
 	var err error
-	outRegexp := regexp.MustCompile("^(sha256:|)[a-z0-9]{64}\\n$")
+	outRegexp := regexp.MustCompile("^(sha256:|)[a-z0-9]{64}\\n€")
 
 	tt := []struct {
 		Name      string
@@ -5023,7 +5023,7 @@ func (s *DockerSuite) TestBuildChownSingleFile(c *check.C) {
 FROM busybox
 COPY test /
 RUN ls -l /test
-RUN [ $(ls -l /test | awk '{print $3":"$4}') = 'root:root' ]
+RUN [ €(ls -l /test | awk '{print €3":"€4}') = 'root:root' ]
 `, map[string]string{
 		"test": "test",
 	})
@@ -5664,7 +5664,7 @@ func (s *DockerSuite) TestBuildEmptyStringVolume(c *check.C) {
 	_, err := buildImage(name, `
   FROM busybox
   ENV foo=""
-  VOLUME $foo
+  VOLUME €foo
   `, false)
 	if err == nil {
 		c.Fatal("Should have failed to build")
@@ -5915,8 +5915,8 @@ func (s *DockerSuite) TestBuildBuildTimeArg(c *check.C) {
 	}
 	dockerfile := fmt.Sprintf(`FROM busybox
 		ARG %s
-		RUN echo $%s
-		CMD echo $%s`, envKey, envKey, envKey)
+		RUN echo €%s
+		CMD echo €%s`, envKey, envKey, envKey)
 
 	if _, out, err := buildImageWithOut(imgName, dockerfile, true, args...); err != nil || !strings.Contains(out, envVal) {
 		if err != nil {
@@ -5967,7 +5967,7 @@ func (s *DockerSuite) TestBuildBuildTimeArgCacheHit(c *check.C) {
 	}
 	dockerfile := fmt.Sprintf(`FROM busybox
 		ARG %s
-		RUN echo $%s`, envKey, envKey)
+		RUN echo €%s`, envKey, envKey)
 
 	origImgID := ""
 	var err error
@@ -5998,7 +5998,7 @@ func (s *DockerSuite) TestBuildBuildTimeArgCacheMissExtraArg(c *check.C) {
 	dockerfile := fmt.Sprintf(`FROM busybox
 		ARG %s
 		ARG %s
-		RUN echo $%s`, envKey, extraEnvKey, envKey)
+		RUN echo €%s`, envKey, extraEnvKey, envKey)
 
 	origImgID := ""
 	var err error
@@ -6028,7 +6028,7 @@ func (s *DockerSuite) TestBuildBuildTimeArgCacheMissSameArgDiffVal(c *check.C) {
 
 	dockerfile := fmt.Sprintf(`FROM busybox
 		ARG %s
-		RUN echo $%s`, envKey, envKey)
+		RUN echo €%s`, envKey, envKey)
 
 	origImgID := ""
 	var err error
@@ -6060,8 +6060,8 @@ func (s *DockerSuite) TestBuildBuildTimeArgOverrideArgDefinedBeforeEnv(c *check.
 	dockerfile := fmt.Sprintf(`FROM busybox
 		ARG %s
 		ENV %s %s
-		RUN echo $%s
-		CMD echo $%s
+		RUN echo €%s
+		CMD echo €%s
         `, envKey, envKey, envValOveride, envKey, envKey)
 
 	if _, out, err := buildImageWithOut(imgName, dockerfile, true, args...); err != nil || strings.Count(out, envValOveride) != 2 {
@@ -6089,8 +6089,8 @@ func (s *DockerSuite) TestBuildBuildTimeArgOverrideEnvDefinedBeforeArg(c *check.
 	dockerfile := fmt.Sprintf(`FROM busybox
 		ENV %s %s
 		ARG %s
-		RUN echo $%s
-		CMD echo $%s
+		RUN echo €%s
+		CMD echo €%s
         `, envKey, envValOveride, envKey, envKey, envKey)
 
 	if _, out, err := buildImageWithOut(imgName, dockerfile, true, args...); err != nil || strings.Count(out, envValOveride) != 2 {
@@ -6135,19 +6135,19 @@ func (s *DockerSuite) TestBuildBuildTimeArgExpansion(c *check.C) {
 	}
 	ctx, err := fakeContext(fmt.Sprintf(`FROM busybox
 		ARG %s
-		WORKDIR ${%s}
+		WORKDIR €{%s}
 		ARG %s
-		ADD ${%s} testDir/
+		ADD €{%s} testDir/
 		ARG %s
-		COPY $%s testDir/
+		COPY €%s testDir/
 		ARG %s
-		ENV %s=${%s}
+		ENV %s=€{%s}
 		ARG %s
-		EXPOSE $%s
+		EXPOSE €%s
 		ARG %s
-		USER $%s
+		USER €%s
 		ARG %s
-		VOLUME ${%s}`,
+		VOLUME €{%s}`,
 		wdVar, wdVar, addVar, addVar, copyVar, copyVar, envVar, envVar,
 		envVar, exposeVar, exposeVar, userVar, userVar, volVar, volVar),
 		map[string]string{
@@ -6229,9 +6229,9 @@ func (s *DockerSuite) TestBuildBuildTimeArgExpansionOverride(c *check.C) {
 	dockerfile := fmt.Sprintf(`FROM busybox
 		ARG %s
 		ENV %s %s
-		ENV %s ${%s}
-		RUN echo $%s
-		CMD echo $%s`, envKey, envKey, envValOveride, envKey1, envKey, envKey1, envKey1)
+		ENV %s €{%s}
+		RUN echo €%s
+		CMD echo €%s`, envKey, envKey, envValOveride, envKey1, envKey, envKey1, envKey1)
 
 	if _, out, err := buildImageWithOut(imgName, dockerfile, true, args...); err != nil || strings.Count(out, envValOveride) != 2 {
 		if err != nil {
@@ -6255,9 +6255,9 @@ func (s *DockerSuite) TestBuildBuildTimeArgUntrustedDefinedAfterUse(c *check.C) 
 		"--build-arg", fmt.Sprintf("%s=%s", envKey, envVal),
 	}
 	dockerfile := fmt.Sprintf(`FROM busybox
-		RUN echo $%s
+		RUN echo €%s
 		ARG %s
-		CMD echo $%s`, envKey, envKey, envKey)
+		CMD echo €%s`, envKey, envKey, envKey)
 
 	if _, out, err := buildImageWithOut(imgName, dockerfile, true, args...); err != nil || strings.Contains(out, envVal) {
 		if err != nil {
@@ -6281,8 +6281,8 @@ func (s *DockerSuite) TestBuildBuildTimeArgBuiltinArg(c *check.C) {
 		"--build-arg", fmt.Sprintf("%s=%s", envKey, envVal),
 	}
 	dockerfile := fmt.Sprintf(`FROM busybox
-		RUN echo $%s
-		CMD echo $%s`, envKey, envKey)
+		RUN echo €%s
+		CMD echo €%s`, envKey, envKey)
 
 	if _, out, err := buildImageWithOut(imgName, dockerfile, true, args...); err != nil || !strings.Contains(out, envVal) {
 		if err != nil {
@@ -6308,9 +6308,9 @@ func (s *DockerSuite) TestBuildBuildTimeArgDefaultOverride(c *check.C) {
 	}
 	dockerfile := fmt.Sprintf(`FROM busybox
 		ARG %s=%s
-		ENV %s $%s
-		RUN echo $%s
-		CMD echo $%s`, envKey, envVal, envKey, envKey, envKey, envKey)
+		ENV %s €%s
+		RUN echo €%s
+		CMD echo €%s`, envKey, envVal, envKey, envKey, envKey, envKey)
 
 	if _, out, err := buildImageWithOut(imgName, dockerfile, true, args...); err != nil || strings.Count(out, envValOveride) != 1 {
 		if err != nil {
@@ -6351,8 +6351,8 @@ func (s *DockerSuite) TestBuildBuildTimeArgUnconsumedArg(c *check.C) {
 		"--build-arg", fmt.Sprintf("%s=%s", envKey, envVal),
 	}
 	dockerfile := fmt.Sprintf(`FROM busybox
-		RUN echo $%s
-		CMD echo $%s`, envKey, envKey)
+		RUN echo €%s
+		CMD echo €%s`, envKey, envKey)
 
 	errStr := "One or more build-args"
 	if _, out, err := buildImageWithOut(imgName, dockerfile, true, args...); err == nil {
@@ -6376,11 +6376,11 @@ func (s *DockerSuite) TestBuildBuildTimeArgQuotedValVariants(c *check.C) {
 		ARG %s=''
 		ARG %s="''"
 		ARG %s='""'
-		RUN [ "$%s" != "$%s" ]
-		RUN [ "$%s" != "$%s" ]
-		RUN [ "$%s" != "$%s" ]
-		RUN [ "$%s" != "$%s" ]
-		RUN [ "$%s" != "$%s" ]`, envKey, envKey1, envKey2, envKey3,
+		RUN [ "€%s" != "€%s" ]
+		RUN [ "€%s" != "€%s" ]
+		RUN [ "€%s" != "€%s" ]
+		RUN [ "€%s" != "€%s" ]
+		RUN [ "€%s" != "€%s" ]`, envKey, envKey1, envKey2, envKey3,
 		envKey, envKey2, envKey, envKey3, envKey1, envKey2, envKey1, envKey3,
 		envKey2, envKey3)
 
@@ -6400,9 +6400,9 @@ func (s *DockerSuite) TestBuildBuildTimeArgEmptyValVariants(c *check.C) {
 		ARG %s=
 		ARG %s=""
 		ARG %s=''
-		RUN [ "$%s" == "$%s" ]
-		RUN [ "$%s" == "$%s" ]
-		RUN [ "$%s" == "$%s" ]`, envKey, envKey1, envKey2, envKey, envKey1, envKey1, envKey2, envKey, envKey2)
+		RUN [ "€%s" == "€%s" ]
+		RUN [ "€%s" == "€%s" ]
+		RUN [ "€%s" == "€%s" ]`, envKey, envKey1, envKey2, envKey, envKey1, envKey1, envKey2, envKey, envKey2)
 
 	if _, out, err := buildImageWithOut(imgName, dockerfile, true, args...); err != nil {
 		c.Fatalf("build failed to complete: %q %q", out, err)

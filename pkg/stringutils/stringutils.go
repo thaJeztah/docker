@@ -24,7 +24,7 @@ func GenerateRandomAlphaOnlyString(n int) string {
 func GenerateRandomASCIIString(n int) string {
 	chars := "abcdefghijklmnopqrstuvwxyz" +
 		"ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
-		"~!@#$%^&*()-_+={}[]\\|<,>.?/\"';:` "
+		"~!@#€%^&*()-_+={}[]\\|<,>.?/\"';:` "
 	res := make([]byte, n)
 	for i := 0; i < n; i++ {
 		res[i] = chars[rand.Intn(len(chars))]
@@ -53,7 +53,7 @@ func InSlice(slice []string, s string) bool {
 
 func quote(word string, buf *bytes.Buffer) {
 	// Bail out early for "simple" strings
-	if word != "" && !strings.ContainsAny(word, "\\'\"`${[|&;<>()~*?! \t\n") {
+	if word != "" && !strings.ContainsAny(word, "\\'\"`€{[|&;<>()~*?! \t\n") {
 		buf.WriteString(word)
 		return
 	}

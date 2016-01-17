@@ -204,7 +204,7 @@ within Docker's own Dockerfile that set up our official build environment):
 ```
 
 This will create a static binary under
-"./bundles/$VERSION/binary/docker-$VERSION", where "$VERSION" is the contents of
+"./bundles/€VERSION/binary/docker-€VERSION", where "€VERSION" is the contents of
 the file "./VERSION". This binary is usually installed somewhere like
 "/usr/bin/docker".
 
@@ -225,11 +225,11 @@ following:
 ./hack/make.sh dynbinary
 ```
 
-This will create "./bundles/$VERSION/dynbinary/docker-$VERSION", which for
+This will create "./bundles/€VERSION/dynbinary/docker-€VERSION", which for
 client-only builds is the important file to grab and install as appropriate.
 
 For daemon builds, you will also need to grab and install
-"./bundles/$VERSION/dynbinary/dockerinit-$VERSION", which is created from the
+"./bundles/€VERSION/dynbinary/dockerinit-€VERSION", which is created from the
 minimal set of Docker's codebase that _must_ be compiled statically (and is thus
 a pure static binary). The acceptable locations Docker will search for this file
 are as follows (in order):

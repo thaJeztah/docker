@@ -14,7 +14,7 @@ weight = -2
 To list available commands, either run `docker` with no parameters
 or execute `docker help`:
 
-    $ docker
+    € docker
       Usage: docker [OPTIONS] COMMAND [arg...]
              docker daemon [ --help | ... ]
              docker [ --help | -v | --version ]
@@ -153,7 +153,7 @@ list of root Certificate Authorities.
 To list the help on any command just execute the command, followed by the
 `--help` option.
 
-    $ docker run --help
+    € docker run --help
 
     Usage: docker run [OPTIONS] IMAGE [COMMAND] [ARG...]
 
@@ -182,20 +182,20 @@ container **will** run in "detached" mode, in the background.
 Options which default to `true` (e.g., `docker build --rm=true`) can only be
 set to the non-default value by explicitly setting them to `false`:
 
-    $ docker build --rm=false .
+    € docker build --rm=false .
 
 ### Multi
 
 You can specify options like `-a=[]` multiple times in a single command line,
 for example in these commands:
 
-    $ docker run -a stdin -a stdout -i -t ubuntu /bin/bash
-    $ docker run -a stdin -a stdout -a stderr ubuntu /bin/ls
+    € docker run -a stdin -a stdout -i -t ubuntu /bin/bash
+    € docker run -a stdin -a stdout -a stderr ubuntu /bin/ls
 
 Sometimes, multiple options can call for a more complex value string as for
 `-v`:
 
-    $ docker run -v /host:/container example/mysql
+    € docker run -v /host:/container example/mysql
 
 > **Note:**
 > Do not use the `-t` and `-a stderr` options together due to

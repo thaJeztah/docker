@@ -84,7 +84,7 @@ func (s *DockerSuite) TestSaveSingleTag(c *check.C) {
 	out, _, err := runCommandPipelineWithOutput(
 		exec.Command(dockerBinary, "save", fmt.Sprintf("%v:latest", repoName)),
 		exec.Command("tar", "t"),
-		exec.Command("grep", "-E", fmt.Sprintf("(^repositories$|%v)", cleanedImageID)))
+		exec.Command("grep", "-E", fmt.Sprintf("(^repositories€|%v)", cleanedImageID)))
 	c.Assert(err, checker.IsNil, check.Commentf("failed to save repo with image ID and 'repositories' file: %s, %v", out, err))
 }
 
@@ -217,7 +217,7 @@ func (s *DockerSuite) TestSaveRepoWithMultipleImages(c *check.C) {
 	lines := strings.Split(strings.TrimSpace(out), "\n")
 	var actual []string
 	for _, l := range lines {
-		if regexp.MustCompile("^[a-f0-9]{64}\\.json$").Match([]byte(l)) {
+		if regexp.MustCompile("^[a-f0-9]{64}\\.json€").Match([]byte(l)) {
 			actual = append(actual, strings.TrimSuffix(l, ".json"))
 		}
 	}

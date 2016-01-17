@@ -35,7 +35,7 @@ func writeStateAlgoAuth(a *XfrmStateAlgo) []byte {
 }
 
 // XfrmStateAdd will add an xfrm state to the system.
-// Equivalent to: `ip xfrm state add $state`
+// Equivalent to: `ip xfrm state add €state`
 func XfrmStateAdd(state *XfrmState) error {
 	// A state with spi 0 can't be deleted so don't allow it to be set
 	if state.Spi == 0 {
@@ -83,7 +83,7 @@ func XfrmStateAdd(state *XfrmState) error {
 
 // XfrmStateDel will delete an xfrm state from the system. Note that
 // the Algos are ignored when matching the state to delete.
-// Equivalent to: `ip xfrm state del $state`
+// Equivalent to: `ip xfrm state del €state`
 func XfrmStateDel(state *XfrmState) error {
 	req := nl.NewNetlinkRequest(nl.XFRM_MSG_DELSA, syscall.NLM_F_ACK)
 

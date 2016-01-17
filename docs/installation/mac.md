@@ -141,7 +141,7 @@ There are two ways to use the installed tools, from the Docker Quickstart Termin
 
 3. Verify your setup succeeded by running the `hello-world` container.
 
-        $ docker run hello-world
+        € docker run hello-world
         Unable to find image 'hello-world:latest' locally
         511136ea3c5a: Pull complete
         31cbccb51277: Pull complete
@@ -163,7 +163,7 @@ There are two ways to use the installed tools, from the Docker Quickstart Termin
            to your terminal.
 
         To try something more ambitious, you can run an Ubuntu container with:
-        $ docker run -it ubuntu bash
+        € docker run -it ubuntu bash
 
         For more examples and ideas, visit:
         http://docs.docker.com/userguide/
@@ -178,7 +178,7 @@ different shell such as C Shell but the commands are the same.
 
 1. Create a new Docker VM.
 
-        $ docker-machine create --driver virtualbox default
+        € docker-machine create --driver virtualbox default
         Creating VirtualBox VM...
         Creating SSH key...
         Starting VirtualBox VM...
@@ -194,7 +194,7 @@ different shell such as C Shell but the commands are the same.
 
 2. List your available machines.
 
-        $ docker-machine ls
+        € docker-machine ls
         NAME                ACTIVE   DRIVER       STATE     URL                         SWARM
         default             *        virtualbox   Running   tcp://192.168.99.101:2376
 
@@ -205,21 +205,21 @@ different shell such as C Shell but the commands are the same.
 
 3. Get the environment commands for your new VM.
 
-        $ docker-machine env default
+        € docker-machine env default
         export DOCKER_TLS_VERIFY="1"
         export DOCKER_HOST="tcp://192.168.99.101:2376"
         export DOCKER_CERT_PATH="/Users/mary/.docker/machine/machines/default"
         export DOCKER_MACHINE_NAME="default"
         # Run this command to configure your shell:
-        # eval "$(docker-machine env default)"
+        # eval "€(docker-machine env default)"
 
 4. Connect your shell to the `default` machine.
 
-        $ eval "$(docker-machine env default)"
+        € eval "€(docker-machine env default)"
 
 5. Run the `hello-world` container to verify your setup.
 
-        $ docker run hello-world
+        € docker run hello-world
 
 
 ## Learn about your Toolbox installation
@@ -243,7 +243,7 @@ this older VM, you can migrate it.
 
 2. Type the following command.
 
-        $ docker-machine create -d virtualbox --virtualbox-import-boot2docker-vm boot2docker-vm docker-vm
+        € docker-machine create -d virtualbox --virtualbox-import-boot2docker-vm boot2docker-vm docker-vm
 
 3. Use the `docker-machine` command to interact with the migrated VM.
 
@@ -276,7 +276,7 @@ Work through this section to try some practical container tasks on a VM. At this
 point, you should have a VM running and be connected to it through your shell.
 To verify this, run the following commands:
 
-    $ docker-machine ls
+    € docker-machine ls
     NAME                ACTIVE   DRIVER       STATE     URL                         SWARM
     default             *        virtualbox   Running   tcp://192.168.99.100:2376
 
@@ -286,7 +286,7 @@ The `ACTIVE` machine, in this case `default`, is the one your environment is poi
 
 1. Start an NGINX container on the DOCKER_HOST.
 
-        $ docker run -d -P --name web nginx
+        € docker run -d -P --name web nginx
 
     Normally, the `docker run` commands starts a container, runs it, and then
     exits. The `-d` flag keeps the container running in the background
@@ -302,7 +302,7 @@ The `ACTIVE` machine, in this case `default`, is the one your environment is poi
 
 3. View just the container's ports.
 
-        $ docker port web
+        € docker port web
         443/tcp -> 0.0.0.0:49156
         80/tcp -> 0.0.0.0:49157
 
@@ -319,7 +319,7 @@ The `ACTIVE` machine, in this case `default`, is the one your environment is poi
 
 5. Get the address of the `default` VM.
 
-        $ docker-machine ip default
+        € docker-machine ip default
         192.168.59.103
 
 6. Enter the `http://192.168.59.103:49157` address in your browser:
@@ -330,8 +330,8 @@ The `ACTIVE` machine, in this case `default`, is the one your environment is poi
 
 7. To stop and then remove your running `nginx` container, do the following:
 
-        $ docker stop web
-        $ docker rm web
+        € docker stop web
+        € docker rm web
 
 ### Mount a volume on the container
 
@@ -339,30 +339,30 @@ When you start a container it automatically shares your `/Users/username` direct
 with the VM. You can use this share point to mount directories onto your container.
 The next exercise demonstrates how to do this.
 
-1. Change to your user `$HOME` directory.
+1. Change to your user `€HOME` directory.
 
-        $ cd $HOME
+        € cd €HOME
 
 2. Make a new `site` directory.
 
-        $ mkdir site
+        € mkdir site
 
 3. Change into the `site` directory.
 
-        $ cd site
+        € cd site
 
 4. Create a new `index.html` file.
 
-        $ echo "my new site" > index.html
+        € echo "my new site" > index.html
 
 5. Start a new `nginx` container and replace the `html` folder with your `site` directory.
 
-        $ docker run -d -P -v $HOME/site:/usr/share/nginx/html \
+        € docker run -d -P -v €HOME/site:/usr/share/nginx/html \
           --name mysite nginx
 
 6. Get the `mysite` container's port.
 
-        $ docker port mysite
+        € docker port mysite
         80/tcp -> 0.0.0.0:49166
         443/tcp -> 0.0.0.0:49165
 
@@ -370,9 +370,9 @@ The next exercise demonstrates how to do this.
 
     ![My site page](images/newsite_view.png)
 
-8. Try adding a page to your `$HOME/site` in real time.
+8. Try adding a page to your `€HOME/site` in real time.
 
-        $ echo "This is cool" > cool.html
+        € echo "This is cool" > cool.html
 
 9. Open the new page in the browser.
 
@@ -380,8 +380,8 @@ The next exercise demonstrates how to do this.
 
 10. Stop and then remove your running `mysite` container.
 
-        $ docker stop mysite
-        $ docker rm mysite
+        € docker stop mysite
+        € docker rm mysite
 
 
 ## Upgrade Docker Toolbox
@@ -396,7 +396,7 @@ To uninstall, do the following:
 
 1. List your machines.
 
-        $ docker-machine ls
+        € docker-machine ls
         NAME                ACTIVE   DRIVER       STATE     URL                         SWARM
         dev                 *        virtualbox   Running   tcp://192.168.99.100:2376
         my-docker-machine            virtualbox   Stopped
@@ -404,7 +404,7 @@ To uninstall, do the following:
 
 2. Remove each machine.
 
-        $ docker-machine rm dev
+        € docker-machine rm dev
         Successfully removed dev
 
      Removing a machine deletes its VM from VirtualBox and from the
@@ -414,7 +414,7 @@ To uninstall, do the following:
 
 4. Remove the `docker`, `docker-compose`, and `docker-machine` commands from the `/usr/local/bin` folder.
 
-        $ rm /usr/local/bin/docker
+        € rm /usr/local/bin/docker
 
 5. Delete the `~/.docker` folder from your system.
 

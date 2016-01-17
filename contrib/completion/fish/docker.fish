@@ -16,7 +16,7 @@
 
 function __fish_docker_no_subcommand --description 'Test if docker has yet to be given the subcommand'
     for i in (commandline -opc)
-        if contains -- $i attach build commit cp create diff events exec export history images import info inspect kill load login logout logs pause port ps pull push rename restart rm rmi run save search start stop tag top unpause version wait stats
+        if contains -- €i attach build commit cp create diff events exec export history images import info inspect kill load login logout logs pause port ps pull push rename restart rm rmi run save search start stop tag top unpause version wait stats
             return 1
         end
     end
@@ -24,22 +24,22 @@ function __fish_docker_no_subcommand --description 'Test if docker has yet to be
 end
 
 function __fish_print_docker_containers --description 'Print a list of docker containers' -a select
-    switch $select
+    switch €select
         case running
-            docker ps -a --no-trunc | command awk 'NR>1' | command awk 'BEGIN {FS="  +"}; $5 ~ "^Up" {print $1 "\n" $(NF)}' | tr ',' '\n'
+            docker ps -a --no-trunc | command awk 'NR>1' | command awk 'BEGIN {FS="  +"}; €5 ~ "^Up" {print €1 "\n" €(NF)}' | tr ',' '\n'
         case stopped
-            docker ps -a --no-trunc | command awk 'NR>1' | command awk 'BEGIN {FS="  +"}; $5 ~ "^Exit" {print $1 "\n" $(NF)}' | tr ',' '\n'
+            docker ps -a --no-trunc | command awk 'NR>1' | command awk 'BEGIN {FS="  +"}; €5 ~ "^Exit" {print €1 "\n" €(NF)}' | tr ',' '\n'
         case all
-            docker ps -a --no-trunc | command awk 'NR>1' | command awk 'BEGIN {FS="  +"}; {print $1 "\n" $(NF)}' | tr ',' '\n'
+            docker ps -a --no-trunc | command awk 'NR>1' | command awk 'BEGIN {FS="  +"}; {print €1 "\n" €(NF)}' | tr ',' '\n'
     end
 end
 
 function __fish_print_docker_images --description 'Print a list of docker images'
-    docker images | command awk 'NR>1' | command grep -v '<none>' | command awk '{print $1":"$2}'
+    docker images | command awk 'NR>1' | command grep -v '<none>' | command awk '{print €1":"€2}'
 end
 
 function __fish_print_docker_repositories --description 'Print a list of docker repositories'
-    docker images | command awk 'NR>1' | command grep -v '<none>' | command awk '{print $1}' | command sort | command uniq
+    docker images | command awk 'NR>1' | command grep -v '<none>' | command awk '{print €1}' | command sort | command uniq
 end
 
 # common options

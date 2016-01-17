@@ -35,9 +35,9 @@ relied on. In addition to this network, you can create your own `bridge` or `ove
 A `bridge` network resides on a single host running an instance of Docker Engine.  An `overlay` network can span multiple hosts running their own engines. If you run `docker network create` and supply only a network name, it creates a bridge network for you.
 
 ```bash
-$ docker network create simple-network
+€ docker network create simple-network
 69568e6336d8c96bbf57869030919f7c69524f71183b44d80948bd3927c87f6a
-$ docker network inspect simple-network
+€ docker network inspect simple-network
 [
     {
         "Name": "simple-network",
@@ -84,7 +84,7 @@ create a single subnet. An `overlay` network supports multiple subnets.
 In addition to the `--subnetwork` option, you also specify the `--gateway` `--ip-range` and `--aux-address` options.
 
 ```bash
-$ docker network create -d overlay
+€ docker network create -d overlay
   --subnet=192.168.0.0/16 --subnet=192.170.0.0/16
   --gateway=192.168.0.100 --gateway=192.170.0.100
   --ip-range=192.168.1.0/24
@@ -108,25 +108,25 @@ from different hosts can also communicate in this way.
 Create two containers for this example:
 
 ```bash
-$ docker run -itd --name=container1 busybox
+€ docker run -itd --name=container1 busybox
 18c062ef45ac0c026ee48a83afa39d25635ee5f02b58de4abc8f467bcaa28731
 
-$ docker run -itd --name=container2 busybox
+€ docker run -itd --name=container2 busybox
 498eaaaf328e1018042c04b2de04036fc04719a6e39a097a4f4866043a2c2152
 ```
 
 Then create an isolated, `bridge` network to test with.
 
 ```bash
-$ docker network create -d bridge --subnet 172.25.0.0/16 isolated_nw
+€ docker network create -d bridge --subnet 172.25.0.0/16 isolated_nw
 06a62f1c73c4e3107c0f555b7a5f163309827bfbbf999840166065a8f35455a8
 ```
 
 Connect `container2` to the network and then `inspect` the network to verify the connection:
 
 ```
-$ docker network connect isolated_nw container2
-$ docker network inspect isolated_nw
+€ docker network connect isolated_nw container2
+€ docker network inspect isolated_nw
 [
     {
         "Name": "isolated_nw",
@@ -162,7 +162,7 @@ an address from that same subnet. Now, start a third container and connect it to
 the network on launch using the `docker run` command's `--net` option:
 
 ```bash
-$ docker run --net=isolated_nw --ip=172.25.3.3 -itd --name=container3 busybox
+€ docker run --net=isolated_nw --ip=172.25.3.3 -itd --name=container3 busybox
 467a7863c3f0277ef8e661b38427737f28099b61fa55622d6c30fb288d88c551
 ```
 
@@ -177,14 +177,14 @@ because they guarantee their subnets configuration does not change across daemon
 Now, inspect the network resources used by `container3`.
 
 ```bash
-$ docker inspect --format='{{json .NetworkSettings.Networks}}'  container3
+€ docker inspect --format='{{json .NetworkSettings.Networks}}'  container3
 {"isolated_nw":{"IPAMConfig":{"IPv4Address":"172.25.3.3"},"NetworkID":"1196a4c5af43a21ae38ef34515b6af19236a3fc48122cf585e3f3054d509679b",
 "EndpointID":"dffc7ec2915af58cc827d995e6ebdc897342be0420123277103c40ae35579103","Gateway":"172.25.0.1","IPAddress":"172.25.3.3","IPPrefixLen":16,"IPv6Gateway":"","GlobalIPv6Address":"","GlobalIPv6PrefixLen":0,"MacAddress":"02:42:ac:19:03:03"}}
 ```
 Repeat this command for `container2`. If you have Python installed, you can pretty print the output.
 
 ```bash
-$ docker inspect --format='{{json .NetworkSettings.Networks}}'  container2 | python -m json.tool
+€ docker inspect --format='{{json .NetworkSettings.Networks}}'  container2 | python -m json.tool
 {
     "bridge": {
         "NetworkID":"7ea29fc1412292a2d7bba362f9253545fecdfa8ce9a6e37dd10ba8bee7129812",
@@ -226,7 +226,7 @@ Use the `docker attach` command to connect to the running `container2` and
 examine its networking stack:
 
 ```bash
-$ docker attach container2
+€ docker attach container2
 ```
 
 If you look a the container's network stack you should see two Ethernet interfaces, one for the default bridge network and one for the `isolated_nw` network.
@@ -309,7 +309,7 @@ same network and cannot communicate. Test, this now by attaching to
 `container3` and attempting to ping `container1` by IP address.
 
 ```bash
-$ docker attach container3
+€ docker attach container3
 / # ping 172.17.0.2
 PING 172.17.0.2 (172.17.0.2): 56 data bytes
 ^C
@@ -348,7 +348,7 @@ with `--link` to provide additional name resolution using alias for other contai
 the same network.
 
 ```bash
-$ docker run --net=isolated_nw -itd --name=container4 --link container5:c5 busybox
+€ docker run --net=isolated_nw -itd --name=container4 --link container5:c5 busybox
 01b5df970834b77a9eadbaff39051f237957bd35c4c56f11193e0594cfd5117c
 ```
 
@@ -366,7 +366,7 @@ including tolerating ip-address changes on the linked container.
 Now let us launch another container named `container5` linking container4 to c4.
 
 ```bash
-$ docker run --net=isolated_nw -itd --name=container5 --link container4:c4 busybox
+€ docker run --net=isolated_nw -itd --name=container5 --link container4:c4 busybox
 72eccf2208336f31e9e33ba327734125af00d1e1d2657878e2ee8154fbb23c7a
 ```
 
@@ -375,7 +375,7 @@ its alias c5 and container5 will be able to reach container4 by its container na
 its alias c4.
 
 ```bash
-$ docker attach container4
+€ docker attach container4
 / # ping -w 4 c5
 PING c5 (172.25.0.5): 56 data bytes
 64 bytes from 172.25.0.5: seq=0 ttl=64 time=0.070 ms
@@ -400,7 +400,7 @@ round-trip min/avg/max = 0.070/0.081/0.097 ms
 ```
 
 ```bash
-$ docker attach container5
+€ docker attach container5
 / # ping -w 4 c4
 PING c4 (172.25.0.4): 56 data bytes
 64 bytes from 172.25.0.4: seq=0 ttl=64 time=0.065 ms
@@ -434,19 +434,19 @@ different aliases in different networks.
 Extending the example, let us create another network named `local_alias`
 
 ```bash
-$ docker network create -d bridge --subnet 172.26.0.0/24 local_alias
+€ docker network create -d bridge --subnet 172.26.0.0/24 local_alias
 76b7dc932e037589e6553f59f76008e5b76fa069638cd39776b890607f567aaa
 ```
 
 let us connect container4 and container5 to the new network `local_alias`
 
 ```
-$ docker network connect --link container5:foo local_alias container4
-$ docker network connect --link container4:bar local_alias container5
+€ docker network connect --link container5:foo local_alias container4
+€ docker network connect --link container4:bar local_alias container5
 ```
 
 ```bash
-$ docker attach container4
+€ docker attach container4
 
 / # ping -w 4 foo
 PING foo (172.26.0.3): 56 data bytes
@@ -476,9 +476,9 @@ Let us conclude this section by disconnecting container5 from the `isolated_nw`
 and observe the results
 
 ```
-$ docker network disconnect isolated_nw container5
+€ docker network disconnect isolated_nw container5
 
-$ docker attach container4
+€ docker attach container4
 
 / # ping -w 4 c5
 ping: bad address 'c5'
@@ -519,12 +519,12 @@ Continuing with the above example, create another container in `isolated_nw` wit
 network alias.
 
 ```bash
-$ docker run --net=isolated_nw -itd --name=container6 --net-alias app busybox
+€ docker run --net=isolated_nw -itd --name=container6 --net-alias app busybox
 8ebe6767c1e0361f27433090060b33200aac054a68476c3be87ef4005eb1df17
 ```
 
 ```bash
-$ docker attach container4
+€ docker attach container4
 / # ping -w 4 app
 PING app (172.25.0.6): 56 data bytes
 64 bytes from 172.25.0.6: seq=0 ttl=64 time=0.070 ms
@@ -552,7 +552,7 @@ Now let us connect `container6` to the `local_alias` network with a different ne
 alias.
 
 ```
-$ docker network connect --alias scoped-app local_alias container6
+€ docker network connect --alias scoped-app local_alias container6
 ```
 
 `container6` in this example now is aliased as `app` in network `isolated_nw` and
@@ -562,7 +562,7 @@ Let's try to reach these aliases from `container4` (which is connected to both t
 and `container5` (which is connected only to `isolated_nw`).
 
 ```bash
-$ docker attach container4
+€ docker attach container4
 
 / # ping -w 4 scoped-app
 PING foo (172.26.0.5): 56 data bytes
@@ -575,7 +575,7 @@ PING foo (172.26.0.5): 56 data bytes
 4 packets transmitted, 4 packets received, 0% packet loss
 round-trip min/avg/max = 0.070/0.081/0.097 ms
 
-$ docker attach container5
+€ docker attach container5
 
 / # ping -w 4 scoped-app
 ping: bad address 'scoped-app'
@@ -590,7 +590,7 @@ alias within the same network. For example, let's launch `container7` in `isolat
 the same alias as `container6`
 
 ```bash
-$ docker run --net=isolated_nw -itd --name=container7 --net-alias app busybox
+€ docker run --net=isolated_nw -itd --name=container7 --net-alias app busybox
 3138c678c123b8799f4c7cc6a0cecc595acbdfa8bf81f621834103cd4f504554
 ```
 
@@ -603,7 +603,7 @@ Let us ping the alias `app` from `container4` and bring down `container6` to ver
 `container7` is resolving the `app` alias.
 
 ```bash
-$ docker attach container4
+€ docker attach container4
 / # ping -w 4 app
 PING app (172.25.0.6): 56 data bytes
 64 bytes from 172.25.0.6: seq=0 ttl=64 time=0.070 ms
@@ -615,9 +615,9 @@ PING app (172.25.0.6): 56 data bytes
 4 packets transmitted, 4 packets received, 0% packet loss
 round-trip min/avg/max = 0.070/0.081/0.097 ms
 
-$ docker stop container6
+€ docker stop container6
 
-$ docker attach container4
+€ docker attach container4
 / # ping -w 4 app
 PING app (172.25.0.7): 56 data bytes
 64 bytes from 172.25.0.7: seq=0 ttl=64 time=0.095 ms
@@ -637,7 +637,7 @@ You can disconnect a container from a network using the `docker network
 disconnect` command.
 
 ```
-$ docker network disconnect isolated_nw container2
+€ docker network disconnect isolated_nw container2
 
 docker inspect --format='{{json .NetworkSettings.Networks}}'  container2 | python -m json.tool
 {
@@ -655,7 +655,7 @@ docker inspect --format='{{json .NetworkSettings.Networks}}'  container2 | pytho
 }
 
 
-$ docker network inspect isolated_nw
+€ docker network inspect isolated_nw
 [
     {
         "Name": "isolated_nw",
@@ -689,7 +689,7 @@ Once a container is disconnected from a network, it cannot communicate with
 other containers connected to that network. In this example, `container2` can no longer  talk to `container3` on the `isolated_nw` network.
 
 ```
-$ docker attach container2
+€ docker attach container2
 
 / # ifconfig
 eth0      Link encap:Ethernet  HWaddr 02:42:AC:11:00:03  
@@ -736,7 +736,7 @@ round-trip min/avg/max = 0.119/0.146/0.174 ms
 When all the containers in a network are stopped or disconnected, you can remove a network.
 
 ```bash
-$ docker network disconnect isolated_nw container3
+€ docker network disconnect isolated_nw container3
 ```
 
 ```bash
@@ -761,13 +761,13 @@ docker network inspect isolated_nw
     }
 ]
 
-$ docker network rm isolated_nw
+€ docker network rm isolated_nw
 ```
 
 List all your networks to verify the `isolated_nw` was removed:
 
 ```
-$ docker network ls
+€ docker network ls
 NETWORK ID          NAME                DRIVER
 72314fa53006        host                host                
 f7ab26d71dbd        bridge              bridge              

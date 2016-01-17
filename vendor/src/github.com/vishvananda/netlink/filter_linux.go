@@ -10,7 +10,7 @@ import (
 )
 
 // FilterDel will delete a filter from the system.
-// Equivalent to: `tc filter del $filter`
+// Equivalent to: `tc filter del €filter`
 func FilterDel(filter Filter) error {
 	req := nl.NewNetlinkRequest(syscall.RTM_DELTFILTER, syscall.NLM_F_ACK)
 	base := filter.Attrs()
@@ -28,7 +28,7 @@ func FilterDel(filter Filter) error {
 }
 
 // FilterAdd will add a filter to the system.
-// Equivalent to: `tc filter add $filter`
+// Equivalent to: `tc filter add €filter`
 func FilterAdd(filter Filter) error {
 	native = nl.NativeEndian()
 	req := nl.NewNetlinkRequest(syscall.RTM_NEWTFILTER, syscall.NLM_F_CREATE|syscall.NLM_F_EXCL|syscall.NLM_F_ACK)

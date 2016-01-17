@@ -39,7 +39,7 @@ uses up the `VIRTUAL SIZE` listed only once.
 
 ### Listing the most recently created images
 
-    $ docker images
+    € docker images
     REPOSITORY                TAG                 IMAGE ID            CREATED             VIRTUAL SIZE
     <none>                    <none>              77af4d6b9913        19 hours ago        1.089 GB
     committ                   latest              b6fa739cedf5        19 hours ago        1.089 GB
@@ -60,7 +60,7 @@ given repository.
 
 For example, to list all images in the "java" repository, run this command :
 
-    $ docker images java
+    € docker images java
     REPOSITORY          TAG                 IMAGE ID            CREATED             VIRTUAL SIZE
     java                8                   308e519aac60        6 days ago          824.5 MB
     java                7                   493d82594c15        3 months ago        656.3 MB
@@ -73,18 +73,18 @@ If both `REPOSITORY` and `TAG` are provided, only images matching that
 repository and tag are listed.  To find all local images in the "java"
 repository with tag "8" you can use:
 
-    $ docker images java:8
+    € docker images java:8
     REPOSITORY          TAG                 IMAGE ID            CREATED             VIRTUAL SIZE
     java                8                   308e519aac60        6 days ago          824.5 MB
 
 If nothing matches `REPOSITORY[:TAG]`, the list is empty.
 
-    $ docker images java:0
+    € docker images java:0
     REPOSITORY          TAG                 IMAGE ID            CREATED             VIRTUAL SIZE
 
 ## Listing the full length image IDs
 
-    $ docker images --no-trunc
+    € docker images --no-trunc
     REPOSITORY                    TAG                 IMAGE ID                                                           CREATED             VIRTUAL SIZE
     <none>                        <none>              77af4d6b9913e693e8d0b4b294fa62ade6054e6b2f1ffb617ac955dd63fb0182   19 hours ago        1.089 GB
     committest                    latest              b6fa739cedf5ea12a620a439402b6004d057da800f91c7524b5086a5e4749c9f   19 hours ago        1.089 GB
@@ -103,7 +103,7 @@ called a `digest`. As long as the input used to generate the image is
 unchanged, the digest value is predictable. To list image digest values, use
 the `--digests` flag:
 
-    $ docker images --digests
+    € docker images --digests
     REPOSITORY                         TAG                 DIGEST                                                                    IMAGE ID            CREATED             VIRTUAL SIZE
     localhost:5000/test/busybox        <none>              sha256:cbbf2f9a99b47fc460d422812b6a5adff7dfee951d8fa2e4a98caa0382cfbdbf   4986bf8c1536        9 weeks ago         2.43 MB
 
@@ -124,7 +124,7 @@ The currently supported filters are:
 
 ##### Untagged images (dangling)
 
-    $ docker images --filter "dangling=true"
+    € docker images --filter "dangling=true"
 
     REPOSITORY          TAG                 IMAGE ID            CREATED             VIRTUAL SIZE
     <none>              <none>              8abc22fbb042        4 weeks ago         0 B
@@ -142,7 +142,7 @@ using it. By having this flag it allows for batch cleanup.
 
 Ready for use by `docker rmi ...`, like:
 
-    $ docker rmi $(docker images -f "dangling=true" -q)
+    € docker rmi €(docker images -f "dangling=true" -q)
 
     8abc22fbb042
     48e5f45168b9
@@ -161,7 +161,7 @@ value.
 
 The following filter matches images with the `com.example.version` label regardless of its value.
 
-    $ docker images --filter "label=com.example.version"
+    € docker images --filter "label=com.example.version"
 
     REPOSITORY          TAG                 IMAGE ID            CREATED              VIRTUAL SIZE
     match-me-1          latest              eeae25ada2aa        About a minute ago   188.3 MB
@@ -169,13 +169,13 @@ The following filter matches images with the `com.example.version` label regardl
 
 The following filter matches images with the `com.example.version` label with the `1.0` value.
 
-    $ docker images --filter "label=com.example.version=1.0"
+    € docker images --filter "label=com.example.version=1.0"
     REPOSITORY          TAG                 IMAGE ID            CREATED              VIRTUAL SIZE
     match-me            latest              eeae25ada2aa        About a minute ago   188.3 MB
 
 In this example, with the `0.1` value, it returns an empty set because no matches were found.
 
-    $ docker images --filter "label=com.example.version=0.1"
+    € docker images --filter "label=com.example.version=0.1"
     REPOSITORY          TAG                 IMAGE ID            CREATED              VIRTUAL SIZE
 
 ## Formatting
@@ -202,7 +202,7 @@ output the data exactly as the template declares or, when using the
 The following example uses a template without headers and outputs the
 `ID` and `Repository` entries separated by a colon for all images:
 
-    $ docker images --format "{{.ID}}: {{.Repository}}"
+    € docker images --format "{{.ID}}: {{.Repository}}"
     77af4d6b9913: <none>
     b6fa739cedf5: committ
     78a85c484f71: <none>
@@ -216,7 +216,7 @@ The following example uses a template without headers and outputs the
 To list all images with their repository and tag in a table format you
 can use:
 
-    $ docker images --format "table {{.ID}}\t{{.Repository}}\t{{.Tag}}"
+    € docker images --format "table {{.ID}}\t{{.Repository}}\t{{.Tag}}"
     IMAGE ID            REPOSITORY                TAG
     77af4d6b9913        <none>                    <none>
     b6fa739cedf5        committ                   latest

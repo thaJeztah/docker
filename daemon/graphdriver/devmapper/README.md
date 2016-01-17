@@ -44,7 +44,7 @@ eventually containers.
 As of docker-1.4.1, `docker info` when using the `devicemapper` storage driver
 will display something like:
 
-	$ sudo docker info
+	€ sudo docker info
 	[...]
 	Storage Driver: devicemapper
 	 Pool Name: docker-253:1-17538953-pool

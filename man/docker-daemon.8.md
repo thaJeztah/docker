@@ -295,9 +295,9 @@ This value affects the system-wide "base" empty filesystem that may already
 be initialized and inherited by pulled images. Typically, a change to this
 value requires additional steps to take effect:
 
-        $ sudo service docker stop
-        $ sudo rm -rf /var/lib/docker
-        $ sudo service docker start
+        € sudo service docker stop
+        € sudo rm -rf /var/lib/docker
+        € sudo service docker start
 
 Example use: `docker daemon --storage-opt dm.basesize=20G`
 
@@ -429,7 +429,7 @@ configuration may be buggy.
 To view the `udev` sync support of a Docker daemon that is using the
 `devicemapper` driver, run:
 
-        $ docker info
+        € docker info
         [...]
          Udev Sync Supported: true
         [...]
@@ -446,7 +446,7 @@ failures, see
 To allow the `docker` daemon to start, regardless of whether `udev` sync is
 `false`, set `dm.override_udev_sync_check` to true:
 
-        $ docker daemon --storage-opt dm.override_udev_sync_check=true
+        € docker daemon --storage-opt dm.override_udev_sync_check=true
 
 When this value is `true`, the driver continues and simply warns you
 the errors are happening.

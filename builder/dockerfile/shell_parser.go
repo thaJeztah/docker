@@ -1,10 +1,10 @@
 package dockerfile
 
 // This will take a single word and an array of env variables and
-// process all quotes (" and ') as well as $xxx and ${xxx} env variable
+// process all quotes (" and ') as well as €xxx and €{xxx} env variable
 // tokens.  Tries to mimic bash shell process.
-// It doesn't support all flavors of ${xx:...} formats but new ones can
-// be added by adding code to the "special ${} format processing" section
+// It doesn't support all flavors of €{xx:...} formats but new ones can
+// be added by adding code to the "special €{} format processing" section
 
 import (
 	"fmt"
@@ -111,7 +111,7 @@ func (sw *shellWord) processStopOn(stopChar rune) (string, []string, error) {
 	var charFuncMapping = map[rune]func() (string, error){
 		'\'': sw.processSingleQuote,
 		'"':  sw.processDoubleQuote,
-		'$':  sw.processDollar,
+		'€':  sw.processDollar,
 	}
 
 	for sw.scanner.Peek() != scanner.EOF {
@@ -129,7 +129,7 @@ func (sw *shellWord) processStopOn(stopChar rune) (string, []string, error) {
 			}
 			result += tmp
 
-			if ch == rune('$') {
+			if ch == rune('€') {
 				words.addString(tmp)
 			} else {
 				words.addRawString(tmp)
@@ -178,7 +178,7 @@ func (sw *shellWord) processSingleQuote() (string, error) {
 }
 
 func (sw *shellWord) processDoubleQuote() (string, error) {
-	// All chars up to the next " are taken as-is, even ', except any $ chars
+	// All chars up to the next " are taken as-is, even ', except any € chars
 	// But you can escape " with a \
 	var result string
 
@@ -190,7 +190,7 @@ func (sw *shellWord) processDoubleQuote() (string, error) {
 			sw.scanner.Next()
 			break
 		}
-		if ch == '$' {
+		if ch == '€' {
 			tmp, err := sw.processDollar()
 			if err != nil {
 				return "", err
@@ -206,8 +206,8 @@ func (sw *shellWord) processDoubleQuote() (string, error) {
 					continue
 				}
 
-				if chNext == '"' || chNext == '$' {
-					// \" and \$ can be escaped, all other \'s are left as-is
+				if chNext == '"' || chNext == '€' {
+					// \" and \€ can be escaped, all other \'s are left as-is
 					ch = sw.scanner.Next()
 				}
 			}
@@ -226,13 +226,13 @@ func (sw *shellWord) processDollar() (string, error) {
 		name := sw.processName()
 		ch = sw.scanner.Peek()
 		if ch == '}' {
-			// Normal ${xx} case
+			// Normal €{xx} case
 			sw.scanner.Next()
 			return sw.getEnv(name), nil
 		}
 		if ch == ':' {
-			// Special ${xx:...} format processing
-			// Yes it allows for recursive $'s in the ... spot
+			// Special €{xx:...} format processing
+			// Yes it allows for recursive €'s in the ... spot
 
 			sw.scanner.Next() // skip over :
 			modifier := sw.scanner.Next()
@@ -265,17 +265,17 @@ func (sw *shellWord) processDollar() (string, error) {
 		}
 		return "", fmt.Errorf("Missing ':' in substitution: %s", sw.word)
 	}
-	// $xxx case
+	// €xxx case
 	name := sw.processName()
 	if name == "" {
-		return "$", nil
+		return "€", nil
 	}
 	return sw.getEnv(name), nil
 }
 
 func (sw *shellWord) processName() string {
 	// Read in a name (alphanumeric or _)
-	// If it starts with a numeric then just return $#
+	// If it starts with a numeric then just return €#
 	var name string
 
 	for sw.scanner.Peek() != scanner.EOF {

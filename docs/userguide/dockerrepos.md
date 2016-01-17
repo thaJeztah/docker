@@ -34,7 +34,7 @@ Typically, you'll want to start by creating an account on Docker Hub (if you hav
 already) and logging in. You can create your account directly on
 [Docker Hub](https://hub.docker.com/account/signup/), or by running:
 
-    $ docker login
+    € docker login
 
 This will prompt you for a user name, which will become the public namespace for your
 public repositories.
@@ -52,7 +52,7 @@ You can search the [Docker Hub](https://hub.docker.com) registry via its search
 interface or by using the command line interface. Searching can find images by image
 name, user name, or description:
 
-    $ docker search centos
+    € docker search centos
     NAME           DESCRIPTION                                     STARS     OFFICIAL   AUTOMATED
     centos         The official build of CentOS                    1223      [OK]
     tianon/centos  CentOS 5 and 6, created using rinse instea...   33
@@ -67,7 +67,7 @@ a user's repository from the image name.
 
 Once you've found the image you want, you can download it with `docker pull <imagename>`:
 
-    $ docker pull centos
+    € docker pull centos
     Using default tag: latest
     latest: Pulling from library/centos
     f1b10cd84249: Pull complete
@@ -104,7 +104,7 @@ or committed your container to a named image as we saw
 
 Now you can push this repository to the registry designated by its name or tag.
 
-    $ docker push yourname/newimage
+    € docker push yourname/newimage
 
 The image will then be uploaded and available for use by your team-mates and/or the
 community.

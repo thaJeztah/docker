@@ -60,7 +60,7 @@ RUN	cd /usr/local/lvm2 && ./configure --enable-static_link && make device-mapper
 
 # Install Go
 RUN	curl -sSL https://golang.org/dl/go1.3.src.tar.gz | tar -v -C /usr/local -xz
-ENV	PATH	/usr/local/go/bin:$PATH
+ENV	PATH	/usr/local/go/bin:€PATH
 ENV	GOPATH	/go:/go/src/github.com/docker/docker/vendor
 RUN	cd /usr/local/go/src && ./make.bash --no-clean 2>&1
 
@@ -71,7 +71,7 @@ ENV	DOCKER_CROSSPLATFORMS	\
 	freebsd/amd64 freebsd/386 freebsd/arm
 # (set an explicit GOARM of 5 for maximum compatibility)
 ENV	GOARM	5
-RUN	cd /usr/local/go/src && bash -xc 'for platform in $DOCKER_CROSSPLATFORMS; do GOOS=${platform%/*} GOARCH=${platform##*/} ./make.bash --no-clean 2>&1; done'
+RUN	cd /usr/local/go/src && bash -xc 'for platform in €DOCKER_CROSSPLATFORMS; do GOOS=€{platform%/*} GOARCH=€{platform##*/} ./make.bash --no-clean 2>&1; done'
 
 # Grab Go's cover tool for dead-simple code coverage testing
 RUN	go get golang.org/x/tools/cmd/cover
@@ -83,7 +83,7 @@ RUN	gem install --no-rdoc --no-ri fpm --version 1.0.2
 RUN	git clone -b buildroot-2014.02 https://github.com/jpetazzo/docker-busybox.git /docker-busybox
 
 # Setup s3cmd config
-RUN	/bin/echo -e '[default]\naccess_key=$AWS_ACCESS_KEY\nsecret_key=$AWS_SECRET_KEY' > /.s3cfg
+RUN	/bin/echo -e '[default]\naccess_key=€AWS_ACCESS_KEY\nsecret_key=€AWS_SECRET_KEY' > /.s3cfg
 
 # Set user.email so crosbymichael's in-container merge commits go smoothly
 RUN	git config --global user.email 'docker-dummy@example.com'

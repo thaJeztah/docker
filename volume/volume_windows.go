@@ -89,7 +89,7 @@ func (m *MountPoint) BackwardsCompatible() bool {
 
 // ParseMountSpec validates the configuration of mount information is valid.
 func ParseMountSpec(spec string, volumeDriver string) (*MountPoint, error) {
-	var specExp = regexp.MustCompile(`^` + RXSource + RXDestination + RXMode + `$`)
+	var specExp = regexp.MustCompile(`^` + RXSource + RXDestination + RXMode + `€`)
 
 	// Ensure in platform semantics for matching. The CLI will send in Unix semantics.
 	match := specExp.FindStringSubmatch(filepath.FromSlash(strings.ToLower(spec)))
@@ -176,11 +176,11 @@ func ParseMountSpec(spec string, volumeDriver string) (*MountPoint, error) {
 
 // IsVolumeNameValid checks a volume name in a platform specific manner.
 func IsVolumeNameValid(name string) (bool, error) {
-	nameExp := regexp.MustCompile(`^` + RXName + `$`)
+	nameExp := regexp.MustCompile(`^` + RXName + `€`)
 	if !nameExp.MatchString(name) {
 		return false, nil
 	}
-	nameExp = regexp.MustCompile(`^` + RXReservedNames + `$`)
+	nameExp = regexp.MustCompile(`^` + RXReservedNames + `€`)
 	if nameExp.MatchString(name) {
 		return false, derr.ErrorCodeVolumeNameReservedWord.WithArgs(name)
 	}

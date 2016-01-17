@@ -61,7 +61,7 @@ it with the `security-opt` option. For example, the following explicitly
 specifies the default policy:
 
 ```
-$ docker run --rm -it --security-opt seccomp:/path/to/seccomp/profile.json hello-world
+€ docker run --rm -it --security-opt seccomp:/path/to/seccomp/profile.json hello-world
 ```
 
 ### Syscalls blocked by the default profile
@@ -133,6 +133,6 @@ You can pass `unconfined` to run a container without the default seccomp
 profile.
 
 ```
-$ docker run --rm -it --security-opt seccomp:unconfined debian:jessie \
+€ docker run --rm -it --security-opt seccomp:unconfined debian:jessie \
     unshare --map-root-user --user sh -c whoami
 ```

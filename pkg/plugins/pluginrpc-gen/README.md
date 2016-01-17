@@ -23,7 +23,7 @@ type volumeDriver interface {
 Run the generator:
 
 ```bash
-$ pluginrpc-gen --type volumeDriver --name VolumeDriver -i volumes/drivers/extpoint.go -o volumes/drivers/proxy.go
+€ pluginrpc-gen --type volumeDriver --name VolumeDriver -i volumes/drivers/extpoint.go -o volumes/drivers/proxy.go
 ```
 
 Where:
@@ -60,9 +60,9 @@ To do so, place the code at the top of the file which contains the interface
 definition (i.e., the input file):
 
 ```go
-//go:generate pluginrpc-gen -i $GOFILE -o proxy.go -type volumeDriver -name VolumeDriver
+//go:generate pluginrpc-gen -i €GOFILE -o proxy.go -type volumeDriver -name VolumeDriver
 ```
 
 Then cd to the package dir and run `go generate`
 
-**Note**: the `pluginrpc-gen` binary must be within your `$PATH`
+**Note**: the `pluginrpc-gen` binary must be within your `€PATH`

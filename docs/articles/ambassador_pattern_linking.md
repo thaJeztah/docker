@@ -41,23 +41,23 @@ controlled entirely from the `docker run` parameters.
 
 Start actual Redis server on one Docker host
 
-    big-server $ docker run -d --name redis crosbymichael/redis
+    big-server € docker run -d --name redis crosbymichael/redis
 
 Then add an ambassador linked to the Redis server, mapping a port to the
 outside world
 
-    big-server $ docker run -d --link redis:redis --name redis_ambassador -p 6379:6379 svendowideit/ambassador
+    big-server € docker run -d --link redis:redis --name redis_ambassador -p 6379:6379 svendowideit/ambassador
 
 On the other host, you can set up another ambassador setting environment
 variables for each remote port we want to proxy to the `big-server`
 
-    client-server $ docker run -d --name redis_ambassador --expose 6379 -e REDIS_PORT_6379_TCP=tcp://192.168.1.52:6379 svendowideit/ambassador
+    client-server € docker run -d --name redis_ambassador --expose 6379 -e REDIS_PORT_6379_TCP=tcp://192.168.1.52:6379 svendowideit/ambassador
 
 Then on the `client-server` host, you can use a Redis client container
 to talk to the remote Redis server, just by linking to the local Redis
 ambassador.
 
-    client-server $ docker run -i -t --rm --link redis_ambassador:redis relateiq/redis-cli
+    client-server € docker run -i -t --rm --link redis_ambassador:redis relateiq/redis-cli
     redis 172.17.0.160:6379> ping
     PONG
 
@@ -69,19 +69,19 @@ does automatically (with a tiny amount of `sed`)
 On the Docker host (192.168.1.52) that Redis will run on:
 
     # start actual redis server
-    $ docker run -d --name redis crosbymichael/redis
+    € docker run -d --name redis crosbymichael/redis
 
     # get a redis-cli container for connection testing
-    $ docker pull relateiq/redis-cli
+    € docker pull relateiq/redis-cli
 
     # test the redis server by talking to it directly
-    $ docker run -t -i --rm --link redis:redis relateiq/redis-cli
+    € docker run -t -i --rm --link redis:redis relateiq/redis-cli
     redis 172.17.0.136:6379> ping
     PONG
     ^D
 
     # add redis ambassador
-    $ docker run -t -i --link redis:redis --name redis_ambassador -p 6379:6379 alpine:3.2 sh
+    € docker run -t -i --link redis:redis --name redis_ambassador -p 6379:6379 alpine:3.2 sh
 
 In the `redis_ambassador` container, you can see the linked Redis
 containers `env`:
@@ -104,9 +104,9 @@ containers `env`:
 This environment is used by the ambassador `socat` script to expose Redis
 to the world (via the `-p 6379:6379` port mapping):
 
-    $ docker rm redis_ambassador
-    $ CMD="apk update && apk add socat && sh"
-    $ docker run -t -i --link redis:redis --name redis_ambassador -p 6379:6379 alpine:3.2 sh -c "$CMD"
+    € docker rm redis_ambassador
+    € CMD="apk update && apk add socat && sh"
+    € docker run -t -i --link redis:redis --name redis_ambassador -p 6379:6379 alpine:3.2 sh -c "€CMD"
     [...]
     / # socat -t 100000000 TCP4-LISTEN:6379,fork,reuseaddr TCP4:172.17.0.136:6379
 
@@ -114,15 +114,15 @@ Now ping the Redis server via the ambassador:
 
 Now go to a different server:
 
-    $ CMD="apk update && apk add socat && sh"
-    $ docker run -t -i --expose 6379 --name redis_ambassador alpine:3.2 sh -c "$CMD"
+    € CMD="apk update && apk add socat && sh"
+    € docker run -t -i --expose 6379 --name redis_ambassador alpine:3.2 sh -c "€CMD"
     [...]
     / # socat -t 100000000 TCP4-LISTEN:6379,fork,reuseaddr TCP4:192.168.1.52:6379
 
 And get the `redis-cli` image so we can talk over the ambassador bridge.
 
-    $ docker pull relateiq/redis-cli
-    $ docker run -i -t --rm --link redis_ambassador:redis relateiq/redis-cli
+    € docker pull relateiq/redis-cli
+    € docker run -i -t --rm --link redis_ambassador:redis relateiq/redis-cli
     redis 172.17.0.160:6379> ping
     PONG
 

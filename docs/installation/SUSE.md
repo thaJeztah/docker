@@ -37,7 +37,7 @@ Docker is officially supported on SUSE Linux Enterprise 12 and later. You can fi
 
 Otherwise execute the following command:
 
-    $ sudo SUSEConnect -p sle-module-containers/12/x86_64 -r ''
+    € sudo SUSEConnect -p sle-module-containers/12/x86_64 -r ''
 
     >**Note:** currently the `-r ''` flag is required to avoid a known limitation of `SUSEConnect`.
 
@@ -50,21 +50,21 @@ edge Docker packages for SUSE Linux Enterprise. However these packages are
 
 1. Install the Docker package:
 
-        $ sudo zypper in docker
+        € sudo zypper in docker
 
 2. Start the Docker daemon.
 
-        $ sudo systemctl start docker
+        € sudo systemctl start docker
 
 3. Test the Docker installation.
 
-        $ sudo docker run hello-world
+        € sudo docker run hello-world
 
 ## Configure Docker boot options
 
 You can use these steps on openSUSE or SUSE Linux Enterprise. To start the `docker daemon` at boot, set the following:
 
-    $ sudo systemctl enable docker
+    € sudo systemctl enable docker
 
 The `docker` package creates a new group named `docker`. Users, other than
 `root` user, must be part of this group to interact with the
@@ -97,13 +97,13 @@ learn how to [customize your systemd Docker daemon options](../articles/systemd.
 
 To uninstall the Docker package:
 
-    $ sudo zypper rm docker
+    € sudo zypper rm docker
 
 The above command does not remove images, containers, volumes, or user created
 configuration files on your host. If you wish to delete all images, containers,
 and volumes run the following command:
 
-    $ rm -rf /var/lib/docker
+    € rm -rf /var/lib/docker
 
 You must delete the user created configuration files manually.
 

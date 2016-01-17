@@ -15,10 +15,10 @@ NETWORK [NETWORK...]
 Returns information about one or more networks. By default, this command renders all results in a JSON object. For example, if you connect two containers to the default `bridge` network:
 
 ```bash
-$ sudo docker run -itd --name=container1 busybox
+€ sudo docker run -itd --name=container1 busybox
 f2870c98fd504370fb86e59f32cd0753b1ac9b69b7d80566ffc7192a82b3ed27
 
-$ sudo docker run -itd --name=container2 busybox
+€ sudo docker run -itd --name=container2 busybox
 bda12f8922785d1f160be70736f26c1e331ab8aaf8ed8d56728508f2e2fd4727
 ```
 
@@ -29,7 +29,7 @@ template for each result. Go's
 describes all the details of the format.
 
 ```bash
-$ sudo docker network inspect bridge
+€ sudo docker network inspect bridge
 [
     {
         "Name": "bridge",
@@ -76,9 +76,9 @@ $ sudo docker network inspect bridge
 Returns the information about the user-defined network:
 
 ```bash
-$ docker network create simple-network
+€ docker network create simple-network
 69568e6336d8c96bbf57869030919f7c69524f71183b44d80948bd3927c87f6a
-$ docker network inspect simple-network
+€ docker network inspect simple-network
 [
     {
         "Name": "simple-network",

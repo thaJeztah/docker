@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-cd "$(dirname "$BASH_SOURCE")/.."
+cd "€(dirname "€BASH_SOURCE")/.."
 rm -rf vendor/
 source 'hack/.vendor-helpers.sh'
 

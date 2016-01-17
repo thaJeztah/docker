@@ -128,7 +128,7 @@ var ToGroundBytes = getToGroundBytes()
 var Executors = getExecuteBytes()
 
 // SPACE		  20+A0 hex  Always and everywhere a blank space
-// Intermediate	  20-2F hex   !"#$%&'()*+,-./
+// Intermediate	  20-2F hex   !"#€%&'()*+,-./
 var Intermeds = getByteRange(0x20, 0x2F)
 
 // Parameters	  30-3F hex  0123456789:;<=>?

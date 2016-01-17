@@ -17,7 +17,7 @@ Lists all the networks the Engine `daemon` knows about. This includes the
 networks that span across multiple hosts in a cluster, for example:
 
 ```bash
-    $ docker network ls
+    € docker network ls
     NETWORK ID          NAME                DRIVER
     7fca4eb8c647        bridge              bridge
     9f904ee27bf5        none                null
@@ -28,7 +28,7 @@ networks that span across multiple hosts in a cluster, for example:
 Use the `--no-trunc` option to display the full network id:
 
 ```bash
-$ docker network ls --no-trunc
+€ docker network ls --no-trunc
 NETWORK ID                                                         NAME                DRIVER
 18a2866682b85619a026c81b98a5e375bd33e1b0936a26cc497c283d27bae9b3   none                null                
 c288470c46f6c8949c5f7e5099b5b7947b07eabe8d9a27d79a9cbf111adcbf47   host                host                
@@ -58,7 +58,7 @@ The `type` filter supports two values; `builtin` displays predefined networks
 The following filter matches all user defined networks:
 
 ```bash
-$ docker network ls --filter type=custom
+€ docker network ls --filter type=custom
 NETWORK ID          NAME                DRIVER
 95e74588f40d        foo                 bridge
 63d1ff1f77b0        dev                 bridge
@@ -68,7 +68,7 @@ By having this flag it allows for batch cleanup. For example, use this filter
 to delete all user defined networks:
 
 ```bash
-$ docker network rm `docker network ls --filter type=custom -q`
+€ docker network rm `docker network ls --filter type=custom -q`
 ```
 
 A warning will be issued when trying to remove a network that has containers
@@ -81,7 +81,7 @@ The `name` filter matches on all or part of a network's name.
 The following filter matches all networks with a name containing the `foobar` string.
 
 ```bash
-$ docker network ls --filter name=foobar
+€ docker network ls --filter name=foobar
 NETWORK ID          NAME                DRIVER
 06e7eef0a170        foobar              bridge
 ```
@@ -89,7 +89,7 @@ NETWORK ID          NAME                DRIVER
 You can also filter for a substring in a name as this shows:
 
 ```bash
-$ docker ps --filter name=foo
+€ docker ps --filter name=foo
 NETWORK ID          NAME                DRIVER
 95e74588f40d        foo                 bridge
 06e7eef0a170        foobar              bridge
@@ -103,7 +103,7 @@ The following filter matches all networks with a name containing the
 `06e7eef01700` string.
 
 ```bash
-$ docker network ls --filter id=63d1ff1f77b07ca51070a8c227e962238358bd310bde1529cf62e6c307ade161
+€ docker network ls --filter id=63d1ff1f77b07ca51070a8c227e962238358bd310bde1529cf62e6c307ade161
 NETWORK ID          NAME                DRIVER
 63d1ff1f77b0        dev                 bridge
 ```
@@ -111,11 +111,11 @@ NETWORK ID          NAME                DRIVER
 You can also filter for a substring in a ID as this shows:
 
 ```bash
-$ docker ps --filter id=95e74588f40d
+€ docker ps --filter id=95e74588f40d
 NETWORK ID          NAME                DRIVER
 95e74588f40d        foo                 bridge
 
-$ docker ps --filter id=95e
+€ docker ps --filter id=95e
 NETWORK ID          NAME                DRIVER
 95e74588f40d        foo                 bridge
 ```

@@ -48,8 +48,8 @@ var templFuncs = template.FuncMap{
 
 var generatedTempl = template.Must(template.New("rpc_cient").Funcs(templFuncs).Parse(`
 // generated code - DO NOT EDIT
-{{ range $k, $v := .BuildTags }}
-	// {{ tag $k }} {{ end }}
+{{ range €k, €v := .BuildTags }}
+	// {{ tag €k }} {{ end }}
 
 package {{ .Name }}
 
@@ -64,27 +64,27 @@ type {{ .InterfaceType }}Proxy struct {
 }
 
 {{ range .Functions }}
-	type {{ $.InterfaceType }}Proxy{{ .Name }}Request struct{
+	type {{ €.InterfaceType }}Proxy{{ .Name }}Request struct{
 		{{ range .Args }}
 			{{ title .Name }} {{ .ArgType }} {{ end }}
 	}
 
-	type {{ $.InterfaceType }}Proxy{{ .Name }}Response struct{
+	type {{ €.InterfaceType }}Proxy{{ .Name }}Response struct{
 		{{ range .Returns }}
 			{{ title .Name }} {{ marshalType .ArgType }} {{ end }}
 	}
 
-	func (pp *{{ $.InterfaceType }}Proxy) {{ .Name }}({{ printArgs .Args }}) ({{ printArgs .Returns }}) {
+	func (pp *{{ €.InterfaceType }}Proxy) {{ .Name }}({{ printArgs .Args }}) ({{ printArgs .Returns }}) {
 		var(
-			req {{ $.InterfaceType }}Proxy{{ .Name }}Request
-			ret {{ $.InterfaceType }}Proxy{{ .Name }}Response
+			req {{ €.InterfaceType }}Proxy{{ .Name }}Request
+			ret {{ €.InterfaceType }}Proxy{{ .Name }}Response
 		)
 		{{ range .Args }}
 			req.{{ title .Name }} = {{ lower .Name }} {{ end }}
-		if err = pp.Call("{{ $.RPCName }}.{{ .Name }}", req, &ret); err != nil {
+		if err = pp.Call("{{ €.RPCName }}.{{ .Name }}", req, &ret); err != nil {
 			return
 		}
-		{{ range $r := .Returns }}
+		{{ range €r := .Returns }}
 			{{ if isErr .ArgType }}
 				if ret.{{ title .Name }} != "" {
 					{{ lower .Name }} = errors.New(ret.{{ title .Name }})

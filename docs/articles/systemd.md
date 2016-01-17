@@ -18,15 +18,15 @@ shows a few examples of how to customize Docker's settings.
 
 Once Docker is installed, you will need to start the Docker daemon.
 
-    $ sudo systemctl start docker
+    € sudo systemctl start docker
     # or on older distributions, you may need to use
-    $ sudo service docker start
+    € sudo service docker start
 
 If you want Docker to start at boot, you should also:
 
-    $ sudo systemctl enable docker
+    € sudo systemctl enable docker
     # or on older distributions, you may need to use
-    $ sudo chkconfig docker on
+    € sudo chkconfig docker on
 
 ## Custom Docker daemon options
 
@@ -48,22 +48,22 @@ directory including the following:
     EnvironmentFile=-/etc/sysconfig/docker-storage
     EnvironmentFile=-/etc/sysconfig/docker-network
     ExecStart=
-    ExecStart=/usr/bin/docker daemon -H fd:// $OPTIONS \
-              $DOCKER_STORAGE_OPTIONS \
-              $DOCKER_NETWORK_OPTIONS \
-              $BLOCK_REGISTRY \
-              $INSECURE_REGISTRY
+    ExecStart=/usr/bin/docker daemon -H fd:// €OPTIONS \
+              €DOCKER_STORAGE_OPTIONS \
+              €DOCKER_NETWORK_OPTIONS \
+              €BLOCK_REGISTRY \
+              €INSECURE_REGISTRY
 
 To check if the `docker.service` uses an `EnvironmentFile`:
 
-    $ sudo systemctl show docker | grep EnvironmentFile
+    € sudo systemctl show docker | grep EnvironmentFile
     EnvironmentFile=-/etc/sysconfig/docker (ignore_errors=yes)
 
 Alternatively, find out where the service file is located:
 
-    $ sudo systemctl status docker | grep Loaded
+    € sudo systemctl status docker | grep Loaded
        Loaded: loaded (/usr/lib/systemd/system/docker.service; enabled)
-    $ sudo grep EnvironmentFile /usr/lib/systemd/system/docker.service
+    € sudo grep EnvironmentFile /usr/lib/systemd/system/docker.service
     EnvironmentFile=-/etc/sysconfig/docker
 
 You can customize the Docker daemon options using override files as explained in the
@@ -138,16 +138,16 @@ proxying you can specify them via the `NO_PROXY` environment variable:
 
 Flush changes:
 
-    $ sudo systemctl daemon-reload
+    € sudo systemctl daemon-reload
 
 Verify that the configuration has been loaded:
 
-    $ sudo systemctl show docker --property Environment
+    € sudo systemctl show docker --property Environment
     Environment=HTTP_PROXY=http://proxy.example.com:80/
 
 Restart Docker:
 
-    $ sudo systemctl restart docker
+    € sudo systemctl restart docker
 
 ## Manually creating the systemd unit files
 

@@ -35,7 +35,7 @@ instances will bring several benefits, such as:
 
 Let's create our `Dockerfile` and start building it:
 
-    $ nano Dockerfile
+    € nano Dockerfile
 
 Although optional, it is handy to have comments at the beginning of a
 `Dockerfile` explaining its purpose:
@@ -69,7 +69,7 @@ a MongoDB repository file for the package manager.
     # Installation:
     # Import MongoDB public GPG key AND create a MongoDB list file
     RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10
-    RUN echo "deb http://repo.mongodb.org/apt/ubuntu "$(lsb_release -sc)"/mongodb-org/3.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-3.0.list
+    RUN echo "deb http://repo.mongodb.org/apt/ubuntu "€(lsb_release -sc)"/mongodb-org/3.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-3.0.list
 
 After this initial preparation we can update our packages and install MongoDB.
 
@@ -111,7 +111,7 @@ experimenting, it is always a good practice to tag Docker images by passing the
 
     # Format: docker build --tag/-t <user-name>/<repository> .
     # Example:
-    $ docker build --tag my/repo .
+    € docker build --tag my/repo .
 
 Once this command is issued, Docker will go through the `Dockerfile` and build
 the image. The final image will be tagged `my/repo`.
@@ -123,13 +123,13 @@ All Docker image repositories can be hosted and shared on
 you need to be logged-in.
 
     # Log-in
-    $ docker login
+    € docker login
     Username:
     ..
 
     # Push the image
     # Format: docker push <user-name>/<repository>
-    $ docker push my/repo
+    € docker push my/repo
     The push refers to a repository [my/repo] (len: 1)
     Sending image list
     Pushing repository my/repo (1 tags)
@@ -142,35 +142,35 @@ as daemon process(es).
 
     # Basic way
     # Usage: docker run --name <name for container> -d <user-name>/<repository>
-    $ docker run -p 27017:27017 --name mongo_instance_001 -d my/repo
+    € docker run -p 27017:27017 --name mongo_instance_001 -d my/repo
 
     # Dockerized MongoDB, lean and mean!
     # Usage: docker run --name <name for container> -d <user-name>/<repository> --noprealloc --smallfiles
-    $ docker run -p 27017:27017 --name mongo_instance_001 -d my/repo --smallfiles
+    € docker run -p 27017:27017 --name mongo_instance_001 -d my/repo --smallfiles
 
     # Checking out the logs of a MongoDB container
     # Usage: docker logs <name for container>
-    $ docker logs mongo_instance_001
+    € docker logs mongo_instance_001
 
     # Playing with MongoDB
     # Usage: mongo --port <port you get from `docker ps`>
-    $ mongo --port 27017
+    € mongo --port 27017
 
     # If using docker-machine
     # Usage: mongo --port <port you get from `docker ps`>  --host <ip address from `docker-machine ip VM_NAME`>
-    $ mongo --port 27017 --host 192.168.59.103
+    € mongo --port 27017 --host 192.168.59.103
 
 > **Tip:**
 If you want to run two containers on the same engine, then you will need to map
 the exposed port to two different ports on the host
 
     # Start two containers and map the ports
-    $ docker run -p 28001:27017 --name mongo_instance_001 -d my/repo
-    $ docker run -p 28002:27017 --name mongo_instance_002 -d my/repo
+    € docker run -p 28001:27017 --name mongo_instance_001 -d my/repo
+    € docker run -p 28002:27017 --name mongo_instance_002 -d my/repo
 
     # Now you can connect to each MongoDB instance on the two ports
-    $ mongo --port 28001
-    $ mongo --port 28002
+    € mongo --port 28001
+    € mongo --port 28002
 
  - [Linking containers](../userguide/networking/default_network/dockerlinks.md)
  - [Cross-host linking containers](../articles/ambassador_pattern_linking.md)

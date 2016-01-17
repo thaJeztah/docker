@@ -32,7 +32,7 @@ installation and init scripts along with more detailed installation information.
 The DSC configuration example source is available in the following repository:
 [https://github.com/anweiss/DockerClientDSC](https://github.com/anweiss/DockerClientDSC). It can be cloned with:
 
-    $ git clone https://github.com/anweiss/DockerClientDSC.git
+    € git clone https://github.com/anweiss/DockerClientDSC.git
 
 ## Usage
 
@@ -113,8 +113,8 @@ DockerClient -Hostname "myhost" -Image "node","mongo"
 To remove images, use a hashtable as follows:
 
 ```powershell
-DockerClient -Hostname "myhost" -Image @{Name="node"; Remove=$true}
-.\RunDockerClientConfig.ps1 -Hostname $hostname
+DockerClient -Hostname "myhost" -Image @{Name="node"; Remove=€true}
+.\RunDockerClientConfig.ps1 -Hostname €hostname
 ```
 
 ### Containers
@@ -135,7 +135,7 @@ or more hashtables. The hashtable(s) passed to this parameter can have the
 following properties:
 
 - Name (required)
-- Image (required unless Remove property is set to `$true`)
+- Image (required unless Remove property is set to `€true`)
 - Port
 - Env
 - Link
@@ -145,22 +145,22 @@ following properties:
 For example, create a hashtable with the settings for your container:
 
 ```powershell
-$webContainer = @{Name="web"; Image="anweiss/docker-platynem"; Port="80:80"}
+€webContainer = @{Name="web"; Image="anweiss/docker-platynem"; Port="80:80"}
 ```
 
 Then, using the same steps defined above, execute
 `DockerClient` with the `-Image` and `-Container` parameters:
 
 ```powershell
-DockerClient -Hostname "myhost" -Image node -Container $webContainer
+DockerClient -Hostname "myhost" -Image node -Container €webContainer
 .\RunDockerClientConfig.ps1 -Hostname "myhost"
 ```
 
 Existing containers can also be removed as follows:
 
 ```powershell
-$containerToRemove = @{Name="web"; Remove=$true}
-DockerClient -Hostname "myhost" -Container $containerToRemove
+€containerToRemove = @{Name="web"; Remove=€true}
+DockerClient -Hostname "myhost" -Container €containerToRemove
 .\RunDockerClientConfig.ps1 -Hostname "myhost"
 ```
 
@@ -168,6 +168,6 @@ Here is a hashtable with all of the properties that can be used to create a
 container:
 
 ```powershell
-$containerProps = @{Name="web"; Image="node:latest"; Port="80:80"; `
+€containerProps = @{Name="web"; Image="node:latest"; Port="80:80"; `
 Env="PORT=80"; Link="db:db"; Command="grunt"}
 ```

@@ -128,7 +128,7 @@ is because each `LABEL` instruction in a Dockerfile produces a new IMAGE layer.
 
 You can view the labels via the `docker inspect` command:
 
-    $ docker inspect 4fa6e0f0c678
+    € docker inspect 4fa6e0f0c678
 
     ...
     "Labels": {
@@ -141,12 +141,12 @@ You can view the labels via the `docker inspect` command:
     ...
 
     # Inspect labels on container
-    $ docker inspect -f "{{json .Config.Labels }}" 4fa6e0f0c678
+    € docker inspect -f "{{json .Config.Labels }}" 4fa6e0f0c678
 
     {"Vendor":"ACME Incorporated","com.example.is-beta":"", "com.example.is-production":"", "com.example.version":"0.0.1-beta","com.example.release-date":"2015-02-12"}
 
     # Inspect labels on images
-    $ docker inspect -f "{{json .ContainerConfig.Labels }}" myimage
+    € docker inspect -f "{{json .ContainerConfig.Labels }}" myimage
 
 
 ## Query labels
@@ -155,15 +155,15 @@ Besides storing metadata, you can filter images and containers by label. To list
 running containers that have the `com.example.is-beta` label:
 
     # List all running containers that have a `com.example.is-beta` label
-    $ docker ps --filter "label=com.example.is-beta"
+    € docker ps --filter "label=com.example.is-beta"
 
 List all running containers with the label `color` that have a value `blue`:
 
-    $ docker ps --filter "label=color=blue"
+    € docker ps --filter "label=color=blue"
 
 List all images with the label `vendor` that have the value `ACME`:
 
-    $ docker images --filter "label=vendor=ACME"
+    € docker images --filter "label=vendor=ACME"
 
 
 ## Container labels
@@ -190,7 +190,7 @@ on how to query labels set on a container.
 
 These labels appear as part of the `docker info` output for the daemon:
 
-    $ docker -D info
+    € docker -D info
     Containers: 12
      Running: 5
      Paused: 2

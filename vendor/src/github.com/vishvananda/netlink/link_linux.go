@@ -34,7 +34,7 @@ func ensureIndex(link *LinkAttrs) {
 }
 
 // LinkSetUp enables the link device.
-// Equivalent to: `ip link set $link up`
+// Equivalent to: `ip link set €link up`
 func LinkSetUp(link Link) error {
 	base := link.Attrs()
 	ensureIndex(base)
@@ -51,7 +51,7 @@ func LinkSetUp(link Link) error {
 }
 
 // LinkSetDown disables link device.
-// Equivalent to: `ip link set $link down`
+// Equivalent to: `ip link set €link down`
 func LinkSetDown(link Link) error {
 	base := link.Attrs()
 	ensureIndex(base)
@@ -68,7 +68,7 @@ func LinkSetDown(link Link) error {
 }
 
 // LinkSetMTU sets the mtu of the link device.
-// Equivalent to: `ip link set $link mtu $mtu`
+// Equivalent to: `ip link set €link mtu €mtu`
 func LinkSetMTU(link Link, mtu int) error {
 	base := link.Attrs()
 	ensureIndex(base)
@@ -89,7 +89,7 @@ func LinkSetMTU(link Link, mtu int) error {
 }
 
 // LinkSetName sets the name of the link device.
-// Equivalent to: `ip link set $link name $name`
+// Equivalent to: `ip link set €link name €name`
 func LinkSetName(link Link, name string) error {
 	base := link.Attrs()
 	ensureIndex(base)
@@ -107,7 +107,7 @@ func LinkSetName(link Link, name string) error {
 }
 
 // LinkSetAlias sets the alias of the link device.
-// Equivalent to: `ip link set dev $link alias $name`
+// Equivalent to: `ip link set dev €link alias €name`
 func LinkSetAlias(link Link, name string) error {
 	base := link.Attrs()
 	ensureIndex(base)
@@ -125,7 +125,7 @@ func LinkSetAlias(link Link, name string) error {
 }
 
 // LinkSetHardwareAddr sets the hardware address of the link device.
-// Equivalent to: `ip link set $link address $hwaddr`
+// Equivalent to: `ip link set €link address €hwaddr`
 func LinkSetHardwareAddr(link Link, hwaddr net.HardwareAddr) error {
 	base := link.Attrs()
 	ensureIndex(base)
@@ -143,7 +143,7 @@ func LinkSetHardwareAddr(link Link, hwaddr net.HardwareAddr) error {
 }
 
 // LinkSetMaster sets the master of the link device.
-// Equivalent to: `ip link set $link master $master`
+// Equivalent to: `ip link set €link master €master`
 func LinkSetMaster(link Link, master *Bridge) error {
 	index := 0
 	if master != nil {
@@ -158,13 +158,13 @@ func LinkSetMaster(link Link, master *Bridge) error {
 }
 
 // LinkSetNoMaster removes the master of the link device.
-// Equivalent to: `ip link set $link nomaster`
+// Equivalent to: `ip link set €link nomaster`
 func LinkSetNoMaster(link Link) error {
 	return LinkSetMasterByIndex(link, 0)
 }
 
 // LinkSetMasterByIndex sets the master of the link device.
-// Equivalent to: `ip link set $link master $master`
+// Equivalent to: `ip link set €link master €master`
 func LinkSetMasterByIndex(link Link, masterIndex int) error {
 	base := link.Attrs()
 	ensureIndex(base)
@@ -186,7 +186,7 @@ func LinkSetMasterByIndex(link Link, masterIndex int) error {
 
 // LinkSetNsPid puts the device into a new network namespace. The
 // pid must be a pid of a running process.
-// Equivalent to: `ip link set $link netns $pid`
+// Equivalent to: `ip link set €link netns €pid`
 func LinkSetNsPid(link Link, nspid int) error {
 	base := link.Attrs()
 	ensureIndex(base)
@@ -208,7 +208,7 @@ func LinkSetNsPid(link Link, nspid int) error {
 
 // LinkSetNsFd puts the device into a new network namespace. The
 // fd must be an open file descriptor to a network namespace.
-// Similar to: `ip link set $link netns $ns`
+// Similar to: `ip link set €link netns €ns`
 func LinkSetNsFd(link Link, fd int) error {
 	base := link.Attrs()
 	ensureIndex(base)
@@ -385,7 +385,7 @@ func addBondAttrs(bond *Bond, linkInfo *nl.RtAttr) {
 
 // LinkAdd adds a new link device. The type and features of the device
 // are taken fromt the parameters in the link object.
-// Equivalent to: `ip link add $link`
+// Equivalent to: `ip link add €link`
 func LinkAdd(link Link) error {
 	// TODO: set mtu and hardware address
 	// TODO: support extra data for macvlan
@@ -550,7 +550,7 @@ func LinkAdd(link Link) error {
 
 // LinkDel deletes link device. Either Index or Name must be set in
 // the link object for it to be deleted. The other values are ignored.
-// Equivalent to: `ip link del $link`
+// Equivalent to: `ip link del €link`
 func LinkDel(link Link) error {
 	base := link.Attrs()
 

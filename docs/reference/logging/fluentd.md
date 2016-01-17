@@ -104,8 +104,8 @@ aggregate store.
 
 2. Launch Fluentd container with this configuration file:
 
-        $ docker run -it -p 24224:24224 -v /path/to/conf/test.conf:/fluentd/etc -e FLUENTD_CONF=test.conf fluent/fluentd:latest
+        € docker run -it -p 24224:24224 -v /path/to/conf/test.conf:/fluentd/etc -e FLUENTD_CONF=test.conf fluent/fluentd:latest
 
 3. Start one or more containers with the `fluentd` logging driver:
 
-        $ docker run --log-driver=fluentd your/application
+        € docker run --log-driver=fluentd your/application

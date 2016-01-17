@@ -45,11 +45,11 @@ var replaceEnvAllowed = map[string]bool{
 // Certain commands are allowed to have their args split into more
 // words after env var replacements. Meaning:
 //   ENV foo="123 456"
-//   EXPOSE $foo
+//   EXPOSE €foo
 // should result in the same thing as:
 //   EXPOSE 123 456
 // and not treat "123 456" as a single word.
-// Note that: EXPOSE "$foo" and EXPOSE $foo are not the same thing.
+// Note that: EXPOSE "€foo" and EXPOSE €foo are not the same thing.
 // Quotes will cause it to still be treated as single word.
 var allowWordExpansion = map[string]bool{
 	command.Expose: true,
@@ -141,7 +141,7 @@ func (b *Builder) dispatch(stepN int, ast *parser.Node) error {
 	// Append the build-time args to config-environment.
 	// This allows builder config to override the variables, making the behavior similar to
 	// a shell script i.e. `ENV foo bar` overrides value of `foo` passed in build
-	// context. But `ENV foo $foo` will use the value from build context if one
+	// context. But `ENV foo €foo` will use the value from build context if one
 	// isn't already been defined by a previous ENV primitive.
 	// Note, we get this behavior because we know that ProcessWord() will
 	// stop on the first occurrence of a variable name and not notice

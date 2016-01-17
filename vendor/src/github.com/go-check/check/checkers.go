@@ -304,7 +304,7 @@ func matches(value, regex interface{}) (result bool, error string) {
 		}
 	}
 	if valueIsStr {
-		matches, err := regexp.MatchString("^"+reStr+"$", valueStr)
+		matches, err := regexp.MatchString("^"+reStr+"€", valueStr)
 		if err != nil {
 			return false, "Can't compile regex: " + err.Error()
 		}

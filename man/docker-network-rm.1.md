@@ -16,7 +16,7 @@ you must first disconnect any containers connected to it.
 To remove the network named 'my-network':
 
 ```bash
-  $ docker network rm my-network
+  € docker network rm my-network
 ```
 
 To delete multiple networks in a single `docker network rm` command, provide
@@ -24,7 +24,7 @@ multiple network names or id's. The following example deletes a network with id
 `3695c422697f` and a network named `my-network`:
 
 ```bash
-  $ docker network rm 3695c422697f my-network
+  € docker network rm 3695c422697f my-network
 ```
 
 When you specify multiple networks, the command attempts to delete each in turn.

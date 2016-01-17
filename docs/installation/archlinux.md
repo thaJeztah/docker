@@ -35,13 +35,13 @@ in the packages. The core dependencies are:
 
 For the normal package a simple
 
-    $ sudo pacman -S docker
+    € sudo pacman -S docker
 
 is all that is needed.
 
 For the AUR package execute:
 
-    $ yaourt -S docker-git
+    € yaourt -S docker-git
 
 The instructions here assume **yaourt** is installed. See [Arch User
 Repository](https://wiki.archlinux.org/index.php/Arch_User_Repository#Installing_packages)
@@ -53,11 +53,11 @@ have not done so before.
 There is a systemd service unit created for docker. To start the docker
 service:
 
-    $ sudo systemctl start docker
+    € sudo systemctl start docker
 
 To start on system boot:
 
-    $ sudo systemctl enable docker
+    € sudo systemctl enable docker
 
 ## Custom daemon options
 
@@ -89,16 +89,16 @@ This configuration allows IP forwarding from the container as expected.
 
 To uninstall the Docker package:
 
-    $ sudo pacman -R docker
+    € sudo pacman -R docker
 
 To uninstall the Docker package and dependencies that are no longer needed:
 
-    $ sudo pacman -Rns docker
+    € sudo pacman -Rns docker
 
 The above commands will not remove images, containers, volumes, or user created
 configuration files on your host. If you wish to delete all images, containers,
 and volumes run the following command:
 
-    $ rm -rf /var/lib/docker
+    € rm -rf /var/lib/docker
 
 You must delete the user created configuration files manually.

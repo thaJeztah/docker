@@ -47,9 +47,9 @@ routing table. Further IPv6 routing will be enabled (you may prevent this by
 starting Docker daemon with `--ip-forward=false`):
 
 ```
-$ ip -6 route add 2001:db8:1::/64 dev docker0
-$ sysctl net.ipv6.conf.default.forwarding=1
-$ sysctl net.ipv6.conf.all.forwarding=1
+€ ip -6 route add 2001:db8:1::/64 dev docker0
+€ sysctl net.ipv6.conf.default.forwarding=1
+€ sysctl net.ipv6.conf.all.forwarding=1
 ```
 
 All traffic to the subnet `2001:db8:1::/64` will now be routed via the `docker0` interface.
@@ -61,7 +61,7 @@ forwarding will result in rejecting Router Advertisements. E.g., if you want to
 configure `eth0` via Router Advertisements you should set:
 
 ```
-$ sysctl net.ipv6.conf.eth0.accept_ra=2
+€ sysctl net.ipv6.conf.eth0.accept_ra=2
 ```
 
 ![](images/ipv6_basic_host_config.svg)
@@ -112,7 +112,7 @@ part of the subnet `2001:db8::/64` and your IaaS provider allows you to
 configure the IPv6 addresses `2001:db8::c000` to `2001:db8::c00f`:
 
 ```
-$ ip -6 addr show
+€ ip -6 addr show
 1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536
     inet6 ::1/128 scope host
        valid_lft forever preferred_lft forever
@@ -148,13 +148,13 @@ This is done by a Kernel feature called `NDP Proxy`. You can enable it by
 executing
 
 ```
-$ sysctl net.ipv6.conf.eth0.proxy_ndp=1
+€ sysctl net.ipv6.conf.eth0.proxy_ndp=1
 ```
 
 Now you can add the container's IPv6 address to the NDP proxy table:
 
 ```
-$ ip -6 neigh add proxy 2001:db8::c009 dev eth0
+€ ip -6 neigh add proxy 2001:db8::c009 dev eth0
 ```
 
 This command tells the Kernel to answer to incoming neighbor solicitation
@@ -164,7 +164,7 @@ host and it will forward it according to its routing table via the `docker0`
 device to the container network:
 
 ```
-$ ip -6 route show
+€ ip -6 route show
 2001:db8::c008/125 dev docker0  metric 1
 2001:db8::/64 dev eth0  proto kernel  metric 256
 ```

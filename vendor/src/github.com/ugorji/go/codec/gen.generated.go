@@ -19,14 +19,14 @@ if {{var "v"}} == nil {
 if {{var "l"}} > 0  {
 for {{var "j"}} := 0; {{var "j"}} < {{var "l"}}; {{var "j"}}++ {
 	var {{var "mk"}} {{ .KTyp }} 
-	{{ $x := printf "%vmk%v" .TempVar .Rand }}{{ decLineVarK $x }}
+	{{ €x := printf "%vmk%v" .TempVar .Rand }}{{ decLineVarK €x }}
 {{ if eq .KTyp "interface{}" }}// special case if a byte array.
 	if {{var "bv"}}, {{var "bok"}} := {{var "mk"}}.([]byte); {{var "bok"}} {
 		{{var "mk"}} = string({{var "bv"}})
 	}
 {{ end }}
 	{{var "mv"}} := {{var "v"}}[{{var "mk"}}]
-	{{ $x := printf "%vmv%v" .TempVar .Rand }}{{ decLineVar $x }}
+	{{ €x := printf "%vmv%v" .TempVar .Rand }}{{ decLineVar €x }}
 	if {{var "v"}} != nil {
 		{{var "v"}}[{{var "mk"}}] = {{var "mv"}}
 	}
@@ -37,7 +37,7 @@ for {{var "j"}} := 0; !r.CheckBreak(); {{var "j"}}++ {
 		r.ReadMapEntrySeparator()
 	}
 	var {{var "mk"}} {{ .KTyp }} 
-	{{ $x := printf "%vmk%v" .TempVar .Rand }}{{ decLineVarK $x }}
+	{{ €x := printf "%vmk%v" .TempVar .Rand }}{{ decLineVarK €x }}
 {{ if eq .KTyp "interface{}" }}// special case if a byte array.
 	if {{var "bv"}}, {{var "bok"}} := {{var "mk"}}.([]byte); {{var "bok"}} {
 		{{var "mk"}} = string({{var "bv"}})
@@ -45,7 +45,7 @@ for {{var "j"}} := 0; !r.CheckBreak(); {{var "j"}}++ {
 {{ end }}
 	r.ReadMapKVSeparator()
 	{{var "mv"}} := {{var "v"}}[{{var "mk"}}]
-	{{ $x := printf "%vmv%v" .TempVar .Rand }}{{ decLineVar $x }}
+	{{ €x := printf "%vmv%v" .TempVar .Rand }}{{ decLineVar €x }}
 	if {{var "v"}} != nil {
 		{{var "v"}}[{{var "mk"}}] = {{var "mv"}}
 	}
@@ -79,7 +79,7 @@ if {{var "l"}} == 0 { {{ if isSlice }}
 	{{ if isChan }}
 	for {{var "r"}} := 0; {{var "r"}} < {{var "l"}}; {{var "r"}}++ {
 		var {{var "t"}} {{ .Typ }}
-		{{ $x := printf "%st%s" .TempVar .Rand }}{{ decLineVar $x }}
+		{{ €x := printf "%st%s" .TempVar .Rand }}{{ decLineVar €x }}
 		{{var "v"}} <- {{var "t"}} 
 	{{ else }} 
 	{{var "n"}} := {{var "l"}} 
@@ -101,7 +101,7 @@ if {{var "l"}} == 0 { {{ if isSlice }}
 	}
 	{{var "j"}} := 0
 	for ; {{var "j"}} < {{var "n"}} ; {{var "j"}}++ {
-		{{ $x := printf "%[1]vv%[2]v[%[1]vj%[2]v]" .TempVar .Rand }}{{ decLineVar $x }}
+		{{ €x := printf "%[1]vv%[2]v[%[1]vj%[2]v]" .TempVar .Rand }}{{ decLineVar €x }}
 	} {{ if isArray }}
 	for ; {{var "j"}} < {{var "l"}} ; {{var "j"}}++ {
 		z.DecSwallow()
@@ -119,11 +119,11 @@ if {{var "l"}} == 0 { {{ if isSlice }}
 		}
 		{{ if isChan}}
 		var {{var "t"}} {{ .Typ }}
-		{{ $x := printf "%st%s" .TempVar .Rand }}{{ decLineVar $x }}
+		{{ €x := printf "%st%s" .TempVar .Rand }}{{ decLineVar €x }}
 		{{var "v"}} <- {{var "t"}} 
 		{{ else }}
 		if {{var "j"}} < len({{var "v"}}) {
-			{{ $x := printf "%[1]vv%[2]v[%[1]vj%[2]v]" .TempVar .Rand }}{{ decLineVar $x }}
+			{{ €x := printf "%[1]vv%[2]v[%[1]vj%[2]v]" .TempVar .Rand }}{{ decLineVar €x }}
 		} else {
 			z.DecSwallow()
 		}

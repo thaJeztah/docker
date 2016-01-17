@@ -80,7 +80,7 @@ func newRouteRegexp(tpl string, matchHost, matchPrefix, matchQuery, strictSlash 
 		fmt.Fprintf(reverse, "%s%%s", raw)
 		// Append variable name and compiled pattern.
 		varsN[i/2] = name
-		varsR[i/2], err = regexp.Compile(fmt.Sprintf("^%s$", patt))
+		varsR[i/2], err = regexp.Compile(fmt.Sprintf("^%s€", patt))
 		if err != nil {
 			return nil, err
 		}
@@ -92,7 +92,7 @@ func newRouteRegexp(tpl string, matchHost, matchPrefix, matchQuery, strictSlash 
 		pattern.WriteString("[/]?")
 	}
 	if !matchPrefix {
-		pattern.WriteByte('$')
+		pattern.WriteByte('€')
 	}
 	reverse.WriteString(raw)
 	if endSlash {

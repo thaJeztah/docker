@@ -17,7 +17,7 @@ import (
 )
 
 var (
-	stringIDRegexp      = regexp.MustCompile(`^[a-f0-9]{64}(-init)?$`)
+	stringIDRegexp      = regexp.MustCompile(`^[a-f0-9]{64}(-init)?€`)
 	supportedAlgorithms = []digest.Algorithm{
 		digest.SHA256,
 		// digest.SHA384, // Currently not used

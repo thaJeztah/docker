@@ -25,7 +25,7 @@ List the changed files and directories in a container᾿s filesystem
 
 For example:
 
-    $ docker diff 7bb0e258aefe
+    € docker diff 7bb0e258aefe
 
     C /dev
     A /dev/kmsg

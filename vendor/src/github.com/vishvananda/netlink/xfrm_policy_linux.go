@@ -17,7 +17,7 @@ func selFromPolicy(sel *nl.XfrmSelector, policy *XfrmPolicy) {
 }
 
 // XfrmPolicyAdd will add an xfrm policy to the system.
-// Equivalent to: `ip xfrm policy add $policy`
+// Equivalent to: `ip xfrm policy add €policy`
 func XfrmPolicyAdd(policy *XfrmPolicy) error {
 	req := nl.NewNetlinkRequest(nl.XFRM_MSG_NEWPOLICY, syscall.NLM_F_CREATE|syscall.NLM_F_EXCL|syscall.NLM_F_ACK)
 
@@ -56,7 +56,7 @@ func XfrmPolicyAdd(policy *XfrmPolicy) error {
 
 // XfrmPolicyDel will delete an xfrm policy from the system. Note that
 // the Tmpls are ignored when matching the policy to delete.
-// Equivalent to: `ip xfrm policy del $policy`
+// Equivalent to: `ip xfrm policy del €policy`
 func XfrmPolicyDel(policy *XfrmPolicy) error {
 	req := nl.NewNetlinkRequest(nl.XFRM_MSG_DELPOLICY, syscall.NLM_F_ACK)
 

@@ -19,7 +19,7 @@ for more information.
 
 A volume plugin makes use of the `-v`and `--volume-driver` flag on the `docker run` command.  The `-v` flag accepts a volume name and the `--volume-driver` flag a driver type, for example: 
 
-    $ docker run -ti -v volumename:/data --volume-driver=flocker   busybox sh
+    € docker run -ti -v volumename:/data --volume-driver=flocker   busybox sh
 
 This command passes the `volumename` through to the volume plugin as a
 user-given name for the volume. The `volumename` must not begin with a `/`. 
