@@ -1,14 +1,17 @@
 package image
 
 import (
-	"golang.org/x/net/context"
+	"fmt"
 
+	"github.com/docker/distribution/reference"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/cli"
 	"github.com/docker/docker/cli/command"
 	"github.com/docker/docker/cli/command/formatter"
 	"github.com/docker/docker/opts"
 	"github.com/spf13/cobra"
+	"golang.org/x/net/context"
+	"github.com/docker/docker/api/types/filters"
 )
 
 type imagesOptions struct {
@@ -84,6 +87,96 @@ func runImages(dockerCli *command.DockerCli, opts imagesOptions) error {
 		}
 	}
 
+	// Images returned by the API have all references (tags, digests) included.
+	// When _displaying_ those images, each reference is printed on a new line,
+	// so what is seen by the user as "image" is actually an image _reference_.
+	//
+	// When filtering by reference ("repo:tag", or "repo@digest"), the API matches
+	// images on those criteria, but always returns all references that are present
+	// for an image.
+	//
+	// The code below filters
+	// returns
+	//
+
+	// problem here is that all _tags_ that match should be printed
+	// and the RepoDigest should only be printed if it matches that tag/image
+	// if searching by _digest_, only images with that digest should be shown
+	// but we should preserve the tag (and not print <none>)
+	// if the _name_ of the image matches, the digest should be shown if the name in the digest matches a name
+	// if the digest _itself_ was matched, it should be shown separately
+	if filters.Include("reference") {
+		for i, img := range images {
+			tagsByName := map[string][]string{}
+			tagMatches := map[string][]string{}
+			tags := []string{}
+			digests := []string{}
+
+			for _, refString := range img.RepoTags {
+				ref, err := reference.ParseNamed(refString)
+				if err != nil {
+					continue
+				}
+				if _, ok := ref.(reference.NamedTagged); !ok {
+					continue
+				}
+				tagsByName[ref.Name()] = append(tagsByName[ref.Name()], ref.String())
+
+				for _, pattern := range filters.Get("reference") {
+					found, matchErr := reference.Match(pattern, ref)
+					if matchErr != nil || !found {
+						continue
+					}
+					// Matched by name/tag
+					tags = append(tags, ref.String())
+					tagMatches[ref.Name()] = append(tagMatches[ref.Name()], ref.String())
+				}
+			}
+			for _, refString := range img.RepoDigests {
+				ref, err := reference.ParseNamed(refString)
+				if err != nil {
+					continue
+				}
+				if _, ok := ref.(reference.Canonical); !ok {
+					continue
+				}
+				if _, ok := tagMatches[ref.Name()]; ok {
+					// Reference by tag found. Store the corresponding digest for presentation
+					digests = append(digests, ref.String())
+					continue
+				}
+
+				for _, pattern := range filters.Get("reference") {
+					found, matchErr := reference.Match(pattern, ref)
+					if matchErr != nil || !found {
+						continue
+					}
+					// Matched by digest
+					digests = append(digests, ref.String())
+
+					// Also append any tag associated with this digest (but only for the same image name)
+					tags = append(tags, tagsByName[ref.Name()]...)
+				}
+			}
+
+			// Now, include in the image;
+			// - any tag that was matched
+			// - any digest that was matched
+			// - anny tag for images that were matched by digest
+			// - anny digest that matches an image-name that was matched
+			// don't worry about duplicates; they are de-duplicated during printing
+			img.RepoTags = nil
+			img.RepoDigests = nil
+			img.RepoTags = append(img.RepoTags, tags...)
+			img.RepoDigests = append(img.RepoDigests, digests...)
+			images[i] = img
+		}
+	}
+
+
+	fmt.Println("IMAGES", images)
+
+
 	imageCtx := formatter.ImageContext{
 		Context: formatter.Context{
 			Output: dockerCli.Out(),
@@ -93,4 +186,62 @@ func runImages(dockerCli *command.DockerCli, opts imagesOptions) error {
 		Digest: opts.showDigests,
 	}
 	return formatter.ImageWrite(imageCtx, images)
+}
+
+// getFilteredImages materializes the specified images
+//
+// Images returned by the API have all references (tags, digests) included.
+// When _displaying_ those images, each reference is printed on a new line,
+// so what is seen by the user as "image" is actually an image _reference_.
+//
+// When filtering by reference ("repo:tag", or "repo@digest"), the API matches
+// images on those criteria, but always returns all references that are present
+// for an image.
+//
+// The code below filters
+// returns
+//
+
+// problem here is that all _tags_ that match should be printed
+// and the RepoDigest should only be printed if it matches that tag/image
+// if searching by _digest_, only images with that digest should be shown
+// but we should preserve the tag (and not print <none>)
+// if the _name_ of the image matches, the digest should be shown if the name in the digest matches a name
+// if the digest _itself_ was matched, it should be shown separately
+
+func getFilteredImages(images []types.ImageSummary, references []string) ([]types.imageContext, error) {
+
+}
+
+func materializeImage(img types.ImageSummary) ([]types.imageContext) {
+	tagsByName := map[string][]string{}
+	digestsByName := map[string][]string{}
+	images := []types.imageContext{}
+
+	for _, refString := range append(img.RepoTags, img.RepoDigests...) {
+		ref, err := reference.ParseNamed(refString)
+		if err != nil {
+			continue
+		}
+		if _, ok := ref.(reference.NamedTagged); ok {
+			tagsByName[ref.Name()] = append(tagsByName[ref.Name()], ref.String())
+			continue
+		}
+		if _, ok := ref.(reference.Canonical); !ok {
+			digestsByName[ref.Name()] = append(digestsByName[ref.Name()], ref.String())
+			continue
+		}
+	}
+
+	for reponame, tags := range tagsByName {
+		images = append(images, &imageContext{
+			trunc:  ctx.Trunc,
+			i:      image,
+			repo:   repo,
+			tag:    tag,
+			digest: "<none>",
+		})
+
+	}
+
 }

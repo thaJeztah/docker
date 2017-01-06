@@ -9,6 +9,7 @@ import (
 	"text/template"
 
 	"github.com/docker/docker/pkg/templates"
+	"github.com/pkg/errors"
 )
 
 // Format keys used to specify certain kinds of output formats
@@ -63,18 +64,15 @@ func (c *Context) preFormat() {
 
 func (c *Context) parseFormat() (*template.Template, error) {
 	tmpl, err := templates.Parse(c.finalFormat)
-	if err != nil {
-		return tmpl, fmt.Errorf("Template parsing error: %v\n", err)
-	}
-	return tmpl, err
+	return tmpl, errors.Wrap(err, "Template parsing error:")
 }
 
-func (c *Context) postFormat(tmpl *template.Template, subContext subContext) {
+func (c *Context) postFormat(tmpl *template.Template, sc subContext) {
 	if c.Format.IsTable() {
 		if len(c.header) == 0 {
 			// if we still don't have a header, we didn't have any containers so we need to fake it to get the right headers from the template
-			tmpl.Execute(bytes.NewBufferString(""), subContext)
-			c.header = subContext.FullHeader()
+			tmpl.Execute(bytes.NewBufferString(""), sc)
+			c.header = sc.FullHeader()
 		}
 
 		t := tabwriter.NewWriter(c.Output, 20, 1, 3, ' ', 0)
@@ -87,12 +85,12 @@ func (c *Context) postFormat(tmpl *template.Template, subContext subContext) {
 	}
 }
 
-func (c *Context) contextFormat(tmpl *template.Template, subContext subContext) error {
-	if err := tmpl.Execute(c.buffer, subContext); err != nil {
+func (c *Context) contextFormat(tmpl *template.Template, sc subContext) error {
+	if err := tmpl.Execute(c.buffer, sc); err != nil {
 		return fmt.Errorf("Template parsing error: %v\n", err)
 	}
 	if c.Format.IsTable() && len(c.header) == 0 {
-		c.header = subContext.FullHeader()
+		c.header = sc.FullHeader()
 	}
 	c.buffer.WriteString("\n")
 	return nil
@@ -111,8 +109,8 @@ func (c *Context) Write(sub subContext, f SubFormat) error {
 		return err
 	}
 
-	subFormat := func(subContext subContext) error {
-		return c.contextFormat(tmpl, subContext)
+	subFormat := func(sc subContext) error {
+		return c.contextFormat(tmpl, sc)
 	}
 	if err := f(subFormat); err != nil {
 		return err

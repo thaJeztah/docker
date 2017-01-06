@@ -20,7 +20,7 @@ const (
 	digestHeader     = "DIGEST"
 )
 
-// ImageContext contains image specific information required by the formater, encapsulate a Context struct.
+// ImageContext contains image specific information required by the formatter, encapsulate a Context struct.
 type ImageContext struct {
 	Context
 	Digest bool
@@ -73,13 +73,13 @@ virtual_size: {{.Size}}
 
 // ImageWrite writes the formatter images using the ImageContext
 func ImageWrite(ctx ImageContext, images []types.ImageSummary) error {
-	render := func(format func(subContext subContext) error) error {
+	render := func(format func(sc subContext) error) error {
 		return imageFormat(ctx, images, format)
 	}
 	return ctx.Write(&imageContext{}, render)
 }
 
-func imageFormat(ctx ImageContext, images []types.ImageSummary, format func(subContext subContext) error) error {
+func imageFormat(ctx ImageContext, images []types.ImageSummary, format func(sc subContext) error) error {
 	for _, image := range images {
 		images := []*imageContext{}
 		if isDangling(image) {
@@ -94,7 +94,7 @@ func imageFormat(ctx ImageContext, images []types.ImageSummary, format func(subC
 			repoTags := map[string][]string{}
 			repoDigests := map[string][]string{}
 
-			for _, refString := range append(image.RepoTags) {
+			for _, refString := range image.RepoTags {
 				ref, err := reference.ParseNamed(refString)
 				if err != nil {
 					continue
@@ -103,7 +103,7 @@ func imageFormat(ctx ImageContext, images []types.ImageSummary, format func(subC
 					repoTags[ref.Name()] = append(repoTags[ref.Name()], nt.Tag())
 				}
 			}
-			for _, refString := range append(image.RepoDigests) {
+			for _, refString := range image.RepoDigests {
 				ref, err := reference.ParseNamed(refString)
 				if err != nil {
 					continue
