@@ -73,9 +73,13 @@ func (daemon *Daemon) getCgroupDriver() string {
 	return ""
 }
 
+func (daemon *Daemon) adjustCpuShares(hostConfig *containertypes.HostConfig) {
+	// adjusting CPU-shares is for backward compatibility with docker 1.6, and not needed on this platform
+}
+
 // adaptContainerSettings is called during container creation to modify any
 // settings necessary in the HostConfig structure.
-func (daemon *Daemon) adaptContainerSettings(hostConfig *containertypes.HostConfig, adjustCPUShares bool) error {
+func (daemon *Daemon) adaptContainerSettings(hostConfig *containertypes.HostConfig) error {
 	if hostConfig == nil {
 		return nil
 	}

@@ -34,8 +34,6 @@ import "C"
 const (
 	defaultVirtualSwitch = "Virtual Switch"
 	platformSupported    = true
-	solarisMinCPUShares  = 1
-	solarisMaxCPUShares  = 65535
 )
 
 func getMemoryResources(config containertypes.Resources) specs.CappedMemory {
@@ -105,15 +103,11 @@ func (daemon *Daemon) getCgroupDriver() string {
 	return ""
 }
 
-func (daemon *Daemon) adaptContainerSettings(hostConfig *containertypes.HostConfig, adjustCPUShares bool) error {
-	if hostConfig.CPUShares < 0 {
-		logrus.Warnf("Changing requested CPUShares of %d to minimum allowed of %d", hostConfig.CPUShares, solarisMinCPUShares)
-		hostConfig.CPUShares = solarisMinCPUShares
-	} else if hostConfig.CPUShares > solarisMaxCPUShares {
-		logrus.Warnf("Changing requested CPUShares of %d to maximum allowed of %d", hostConfig.CPUShares, solarisMaxCPUShares)
-		hostConfig.CPUShares = solarisMaxCPUShares
-	}
+func (daemon *Daemon) adjustCpuShares(hostConfig *containertypes.HostConfig) {
+	// adjusting CPU-shares is for backward compatibility with docker 1.6, and not needed on this platform
+}
 
+func (daemon *Daemon) adaptContainerSettings(hostConfig *containertypes.HostConfig) error {
 	if hostConfig.Memory > 0 && hostConfig.MemorySwap == 0 {
 		// By default, MemorySwap is set to twice the size of Memory.
 		hostConfig.MemorySwap = hostConfig.Memory * 2

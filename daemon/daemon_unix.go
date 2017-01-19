@@ -236,19 +236,27 @@ func checkKernel() error {
 	return nil
 }
 
+// adjustCpuShares provides backward-compatibility with client 1.6 (API 1.18)
+// and older. The runtime in Docker 1.7 performs a strict check on CPUShares,
+// and errors out if the provided value is outside the accepted range. Older
+// versions of the runtime left this check as a responsibility of the kernel,
+// which would silently adjust invalid values.
+//
+// This function mimics the kernel behavior, and adjusts values that are
+// outside of the accepted range.
+func (daemon *Daemon) adjustCpuShares(hostConfig *containertypes.HostConfig) {
+	if hostConfig.CPUShares > 0 && hostConfig.CPUShares < linuxMinCPUShares {
+		logrus.Warnf("Changing requested CPUShares of %d to minimum allowed of %d", hostConfig.CPUShares, linuxMinCPUShares)
+		hostConfig.CPUShares = linuxMinCPUShares
+	} else if hostConfig.CPUShares > linuxMaxCPUShares {
+		logrus.Warnf("Changing requested CPUShares of %d to maximum allowed of %d", hostConfig.CPUShares, linuxMaxCPUShares)
+		hostConfig.CPUShares = linuxMaxCPUShares
+	}
+}
+
 // adaptContainerSettings is called during container creation to modify any
 // settings necessary in the HostConfig structure.
-func (daemon *Daemon) adaptContainerSettings(hostConfig *containertypes.HostConfig, adjustCPUShares bool) error {
-	if adjustCPUShares && hostConfig.CPUShares > 0 {
-		// Handle unsupported CPUShares
-		if hostConfig.CPUShares < linuxMinCPUShares {
-			logrus.Warnf("Changing requested CPUShares of %d to minimum allowed of %d", hostConfig.CPUShares, linuxMinCPUShares)
-			hostConfig.CPUShares = linuxMinCPUShares
-		} else if hostConfig.CPUShares > linuxMaxCPUShares {
-			logrus.Warnf("Changing requested CPUShares of %d to maximum allowed of %d", hostConfig.CPUShares, linuxMaxCPUShares)
-			hostConfig.CPUShares = linuxMaxCPUShares
-		}
-	}
+func (daemon *Daemon) adaptContainerSettings(hostConfig *containertypes.HostConfig) error {
 	if hostConfig.Memory > 0 && hostConfig.MemorySwap == 0 {
 		// By default, MemorySwap is set to twice the size of Memory.
 		hostConfig.MemorySwap = hostConfig.Memory * 2

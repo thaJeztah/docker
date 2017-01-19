@@ -31,64 +31,26 @@ func TestAdjustCPUShares(t *testing.T) {
 	hostConfig := &containertypes.HostConfig{
 		Resources: containertypes.Resources{CPUShares: linuxMinCPUShares - 1},
 	}
-	daemon.adaptContainerSettings(hostConfig, true)
+
+	daemon.adjustCpuShares(hostConfig)
 	if hostConfig.CPUShares != linuxMinCPUShares {
 		t.Errorf("Expected CPUShares to be %d", linuxMinCPUShares)
 	}
 
 	hostConfig.CPUShares = linuxMaxCPUShares + 1
-	daemon.adaptContainerSettings(hostConfig, true)
+	daemon.adjustCpuShares(hostConfig)
 	if hostConfig.CPUShares != linuxMaxCPUShares {
 		t.Errorf("Expected CPUShares to be %d", linuxMaxCPUShares)
 	}
 
 	hostConfig.CPUShares = 0
-	daemon.adaptContainerSettings(hostConfig, true)
+	daemon.adjustCpuShares(hostConfig)
 	if hostConfig.CPUShares != 0 {
 		t.Error("Expected CPUShares to be unchanged")
 	}
 
 	hostConfig.CPUShares = 1024
-	daemon.adaptContainerSettings(hostConfig, true)
-	if hostConfig.CPUShares != 1024 {
-		t.Error("Expected CPUShares to be unchanged")
-	}
-}
-
-// Unix test as uses settings which are not available on Windows
-func TestAdjustCPUSharesNoAdjustment(t *testing.T) {
-	tmp, err := ioutil.TempDir("", "docker-daemon-unix-test-")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(tmp)
-	daemon := &Daemon{
-		repository: tmp,
-		root:       tmp,
-	}
-
-	hostConfig := &containertypes.HostConfig{
-		Resources: containertypes.Resources{CPUShares: linuxMinCPUShares - 1},
-	}
-	daemon.adaptContainerSettings(hostConfig, false)
-	if hostConfig.CPUShares != linuxMinCPUShares-1 {
-		t.Errorf("Expected CPUShares to be %d", linuxMinCPUShares-1)
-	}
-
-	hostConfig.CPUShares = linuxMaxCPUShares + 1
-	daemon.adaptContainerSettings(hostConfig, false)
-	if hostConfig.CPUShares != linuxMaxCPUShares+1 {
-		t.Errorf("Expected CPUShares to be %d", linuxMaxCPUShares+1)
-	}
-
-	hostConfig.CPUShares = 0
-	daemon.adaptContainerSettings(hostConfig, false)
-	if hostConfig.CPUShares != 0 {
-		t.Error("Expected CPUShares to be unchanged")
-	}
-
-	hostConfig.CPUShares = 1024
-	daemon.adaptContainerSettings(hostConfig, false)
+	daemon.adjustCpuShares(hostConfig)
 	if hostConfig.CPUShares != 1024 {
 		t.Error("Expected CPUShares to be unchanged")
 	}

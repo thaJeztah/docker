@@ -367,7 +367,12 @@ func (s *containerRouter) postContainersCreate(ctx context.Context, w http.Respo
 		return err
 	}
 	version := httputils.VersionFromContext(ctx)
-	adjustCPUShares := versions.LessThan(version, "1.19")
+
+
+	// Support for CPUShares adjustment was added in API 1.19
+	if hostConfig != nil && versions.LessThan(version, "1.19") {
+		hostConfig.CPUShares = 0
+	}
 
 	// When using API 1.24 and under, the client is responsible for removing the container
 	if hostConfig != nil && versions.LessThan(version, "1.25") {

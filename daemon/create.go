@@ -53,7 +53,12 @@ func (daemon *Daemon) containerCreate(params types.ContainerCreateConfig, manage
 	if params.HostConfig == nil {
 		params.HostConfig = &containertypes.HostConfig{}
 	}
-	err = daemon.adaptContainerSettings(params.HostConfig, params.AdjustCPUShares)
+
+	if params.AdjustCPUShares {
+		daemon.adjustCpuShares(params.HostConfig)
+	}
+
+	err = daemon.adaptContainerSettings(params.HostConfig)
 	if err != nil {
 		return containertypes.ContainerCreateCreatedBody{Warnings: warnings}, err
 	}
