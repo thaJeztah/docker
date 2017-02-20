@@ -11,5 +11,5 @@ const defaultNetwork = network.NetworkBridge
 
 func isPreDefined(network string) bool {
 	n := container.NetworkMode(network)
-	return n.IsBridge() || n.IsHost() || n.IsNone() || n.IsDefault()
+	return n.IsBridge() || n.IsHost() || n.IsNone() || n.IsDefault() || network == "docker_gwbridge"
 }

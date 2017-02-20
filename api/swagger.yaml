@@ -4218,6 +4218,7 @@ definitions:
                 type: "array"
                 items:
                   type: "string"
+          SecretReference:
           Secrets:
             description: |
               Secrets contains references to zero or more secrets that will be
