@@ -102,6 +102,7 @@ func (daemon *Daemon) SystemInfo() (*types.Info, error) {
 		ContainersPaused:   int(cPaused),
 		ContainersStopped:  int(cStopped),
 		Images:             imageCount,
+		DataRoot:      		daemon.configStore.Root,
 		Driver:             drivers,
 		DriverStatus:       daemon.stores[p].layerStore.DriverStatus(),
 		Plugins:            daemon.showPluginsInfo(),

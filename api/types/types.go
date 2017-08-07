@@ -138,6 +138,7 @@ type Info struct {
 	ContainersPaused   int
 	ContainersStopped  int
 	Images             int
+	DataRoot           string
 	Driver             string
 	DriverStatus       [][2]string
 	SystemStatus       [][2]string
@@ -169,19 +170,22 @@ type Info struct {
 	NCPU               int
 	MemTotal           int64
 	GenericResources   []swarm.GenericResource
-	DockerRootDir      string
-	HTTPProxy          string `json:"HttpProxy"`
-	HTTPSProxy         string `json:"HttpsProxy"`
-	NoProxy            string
-	Name               string
-	Labels             []string
-	ExperimentalBuild  bool
-	ServerVersion      string
-	ClusterStore       string
-	ClusterAdvertise   string
-	Runtimes           map[string]Runtime
-	DefaultRuntime     string
-	Swarm              swarm.Info
+	// Deprecated: Use DataRoot instead. DockerRootDir is deprecated,
+	// and only present for backward compatibility. If both DataRoot
+	// and DockerRootDir are set, DataRoot should be used.
+	DockerRootDir     string `json:",omitempty"`
+	HTTPProxy         string `json:"HttpProxy"`
+	HTTPSProxy        string `json:"HttpsProxy"`
+	NoProxy           string
+	Name              string
+	Labels            []string
+	ExperimentalBuild bool
+	ServerVersion     string
+	ClusterStore      string
+	ClusterAdvertise  string
+	Runtimes          map[string]Runtime
+	DefaultRuntime    string
+	Swarm             swarm.Info
 	// LiveRestoreEnabled determines whether containers should be kept
 	// running when the daemon is shutdown or upon daemon start if
 	// running containers are detected
