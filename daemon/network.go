@@ -35,12 +35,13 @@ func (daemon *Daemon) NetworkControllerEnabled() bool {
 // 3. Partial ID
 // as long as there is no ambiguity
 func (daemon *Daemon) FindUniqueNetwork(term string) (libnetwork.Network, error) {
-	listByFullName := []libnetwork.Network{}
-	listByPartialID := []libnetwork.Network{}
-	for _, nw := range daemon.GetNetworks() {
-		if nw.ID() == term {
-			return nw, nil
-		}
+	if nw, err := daemon.GetNetworkByID(term); err == nil {
+		return nw, nil
+	}
+
+	var listByFullName []libnetwork.Network
+	var listByPartialID []libnetwork.Network
+	for _, nw := range daemon.getAllNetworks() {
 		if nw.Name() == term {
 			listByFullName = append(listByFullName, nw)
 		}
@@ -90,7 +91,7 @@ func (daemon *Daemon) GetNetworksByIDPrefix(partialID string) []libnetwork.Netwo
 	if c == nil {
 		return nil
 	}
-	list := []libnetwork.Network{}
+	var list []libnetwork.Network
 	l := func(nw libnetwork.Network) bool {
 		if strings.HasPrefix(nw.ID(), partialID) {
 			list = append(list, nw)
