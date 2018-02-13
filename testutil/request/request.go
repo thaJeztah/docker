@@ -173,9 +173,10 @@ func getTLSConfig() (*tls.Config, error) {
 	}
 
 	option := &tlsconfig.Options{
-		CAFile:   filepath.Join(dockerCertPath, "ca.pem"),
-		CertFile: filepath.Join(dockerCertPath, "cert.pem"),
-		KeyFile:  filepath.Join(dockerCertPath, "key.pem"),
+		CAFile:     filepath.Join(dockerCertPath, "ca.pem"),
+		CertFile:   filepath.Join(dockerCertPath, "cert.pem"),
+		KeyFile:    filepath.Join(dockerCertPath, "key.pem"),
+		MinVersion: tls.VersionTLS12,
 	}
 	tlsConfig, err := tlsconfig.Client(*option)
 	if err != nil {

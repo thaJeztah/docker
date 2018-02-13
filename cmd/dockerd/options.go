@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -113,7 +114,9 @@ func (o *daemonOptions) installFlags(flags *pflag.FlagSet) {
 	flags.BoolVar(&o.TLSVerify, FlagTLSVerify, dockerTLSVerify || DefaultTLSValue, "Use TLS and verify the remote")
 
 	// TODO(thaJeztah): set default TLSOptions in config.New()
-	o.TLSOptions = &tlsconfig.Options{}
+	o.TLSOptions = &tlsconfig.Options{
+		MinVersion: tls.VersionTLS12,
+	}
 	tlsOptions := o.TLSOptions
 	flags.StringVar(&tlsOptions.CAFile, "tlscacert", filepath.Join(dockerCertPath, DefaultCaFile), "Trust certs signed only by this CA")
 	flags.StringVar(&tlsOptions.CertFile, "tlscert", filepath.Join(dockerCertPath, DefaultCertFile), "Path to TLS certificate file")

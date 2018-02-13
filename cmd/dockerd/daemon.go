@@ -809,6 +809,7 @@ func newAPIServerTLSConfig(cfg *config.Config) (*tls.Config, error) {
 			CertFile:           cfg.TLSOptions.CertFile,
 			KeyFile:            cfg.TLSOptions.KeyFile,
 			ExclusiveRootPools: true,
+			MinVersion:         tls.VersionTLS12,
 			ClientAuth:         clientAuth,
 		})
 		if err != nil {

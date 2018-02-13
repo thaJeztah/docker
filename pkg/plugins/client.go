@@ -3,6 +3,7 @@ package plugins // import "github.com/docker/docker/pkg/plugins"
 import (
 	"bytes"
 	"context"
+	"crypto/tls"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -33,6 +34,9 @@ func newTransport(addr string, tlsConfig *tlsconfig.Options) (*transport.HTTPTra
 	tr := &http.Transport{}
 
 	if tlsConfig != nil {
+		tlsConfigOptions := *tlsConfig
+		tlsConfigOptions.MinVersion = tls.VersionTLS12
+
 		c, err := tlsconfig.Client(*tlsConfig)
 		if err != nil {
 			return nil, err

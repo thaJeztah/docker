@@ -31,7 +31,9 @@ func hostCertsDir(hostname string) string {
 // newTLSConfig constructs a client TLS configuration based on server defaults
 func newTLSConfig(ctx context.Context, hostname string, isSecure bool) (*tls.Config, error) {
 	// PreferredServerCipherSuites should have no effect
-	tlsConfig := tlsconfig.ServerDefault()
+	tlsConfig := tlsconfig.ServerDefault(func(c *tls.Config) {
+		c.MinVersion = tls.VersionTLS12
+	})
 	tlsConfig.InsecureSkipVerify = !isSecure
 
 	if isSecure {
@@ -135,7 +137,9 @@ func Headers(userAgent string, metaHeaders http.Header) []transport.RequestModif
 // default TLS configuration.
 func newTransport(tlsConfig *tls.Config) http.RoundTripper {
 	if tlsConfig == nil {
-		tlsConfig = tlsconfig.ServerDefault()
+		tlsConfig = tlsconfig.ServerDefault(func(c *tls.Config) {
+			c.MinVersion = tls.VersionTLS12
+		})
 	}
 
 	return otelhttp.NewTransport(

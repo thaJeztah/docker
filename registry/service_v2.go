@@ -2,6 +2,7 @@ package registry // import "github.com/docker/docker/registry"
 
 import (
 	"context"
+	"crypto/tls"
 	"net/url"
 	"strings"
 
@@ -36,9 +37,11 @@ func (s *Service) lookupV2Endpoints(ctx context.Context, hostname string, includ
 			}
 		}
 		endpoints = append(endpoints, APIEndpoint{
-			URL:       DefaultV2Registry,
-			Official:  true,
-			TLSConfig: tlsconfig.ServerDefault(),
+			URL:      DefaultV2Registry,
+			Official: true,
+			TLSConfig: tlsconfig.ServerDefault(func(c *tls.Config) {
+				c.MinVersion = tls.VersionTLS12
+			}),
 		})
 
 		return endpoints, nil

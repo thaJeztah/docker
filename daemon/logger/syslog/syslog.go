@@ -241,6 +241,7 @@ func parseTLSConfig(cfg map[string]string) (*tls.Config, error) {
 		CertFile:           cfg["syslog-tls-cert"],
 		KeyFile:            cfg["syslog-tls-key"],
 		InsecureSkipVerify: skipVerify,
+		MinVersion:         tls.VersionTLS12,
 	}
 
 	return tlsconfig.Client(opts)

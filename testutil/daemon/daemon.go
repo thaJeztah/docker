@@ -6,6 +6,7 @@ package daemon // import "github.com/docker/docker/testutil/daemon"
 import (
 	"bufio"
 	"context"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -155,7 +156,7 @@ func NewDaemon(workingDir string, ops ...Option) (*Daemon, error) {
 
 	if len(d.resolvConfContent) > 0 {
 		path := filepath.Join(d.Folder, "resolv.conf")
-		if err := os.WriteFile(path, []byte(d.resolvConfContent), 0644); err != nil {
+		if err := os.WriteFile(path, []byte(d.resolvConfContent), 0o644); err != nil {
 			return nil, fmt.Errorf("failed to write docker resolv.conf to %q: %v", path, err)
 		}
 		d.extraEnv = append(d.extraEnv, "DOCKER_TEST_RESOLV_CONF_PATH="+path)
@@ -889,9 +890,10 @@ func (d *Daemon) getClientConfig() (*clientConfig, error) {
 	)
 	if d.UseDefaultTLSHost {
 		option := &tlsconfig.Options{
-			CAFile:   "fixtures/https/ca.pem",
-			CertFile: "fixtures/https/client-cert.pem",
-			KeyFile:  "fixtures/https/client-key.pem",
+			CAFile:     "fixtures/https/ca.pem",
+			CertFile:   "fixtures/https/client-cert.pem",
+			KeyFile:    "fixtures/https/client-key.pem",
+			MinVersion: tls.VersionTLS12,
 		}
 		tlsConfig, err := tlsconfig.Client(*option)
 		if err != nil {

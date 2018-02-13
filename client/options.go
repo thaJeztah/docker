@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"crypto/tls"
 	"net"
 	"net/http"
 	"os"
@@ -147,6 +148,7 @@ func WithTLSClientConfig(cacertPath, certPath, keyPath string) Opt {
 			CertFile:           certPath,
 			KeyFile:            keyPath,
 			ExclusiveRootPools: true,
+			MinVersion:         tls.VersionTLS12,
 		})
 		if err != nil {
 			return errors.Wrap(err, "failed to create tls config")
@@ -178,6 +180,7 @@ func WithTLSClientConfigFromEnv() Opt {
 			CertFile:           filepath.Join(dockerCertPath, "cert.pem"),
 			KeyFile:            filepath.Join(dockerCertPath, "key.pem"),
 			InsecureSkipVerify: os.Getenv(EnvTLSVerify) == "",
+			MinVersion:         tls.VersionTLS12,
 		})
 		if err != nil {
 			return err
