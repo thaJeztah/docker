@@ -201,10 +201,7 @@ func (daemon *Daemon) reloadClusterDiscovery(conf *config.Config, attributes map
 // reloadLabels updates configuration with engine labels
 // and updates the passed attributes
 func (daemon *Daemon) reloadLabels(conf *config.Config, attributes map[string]string) error {
-	// update corresponding configuration
-	if conf.IsValueSet("labels") {
-		daemon.configStore.Labels = conf.Labels
-	}
+	daemon.configStore.Labels = conf.Labels
 
 	// prepare reload event attributes with updatable configurations
 	if daemon.configStore.Labels != nil {

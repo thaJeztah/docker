@@ -20,29 +20,28 @@ func TestDaemonReloadLabels(t *testing.T) {
 	daemon := &Daemon{
 		configStore: &config.Config{
 			CommonConfig: config.CommonConfig{
-				Labels: []string{"foo:bar"},
+				Labels: []string{"foo=bar"},
 			},
 		},
 		imageService: images.NewImageService(images.ImageServiceConfig{}),
 	}
 
 	valuesSets := make(map[string]interface{})
-	valuesSets["labels"] = "foo:baz"
+	valuesSets["labels"] = "foo=baz"
 	newConfig := &config.Config{
 		CommonConfig: config.CommonConfig{
-			Labels:    []string{"foo:baz"},
+			Labels:    []string{"foo=baz"},
 			ValuesSet: valuesSets,
 		},
 	}
 
-	if err := daemon.Reload(newConfig); err != nil {
-		t.Fatal(err)
-	}
+	err := daemon.Reload(newConfig)
+	assert.NilError(t, err)
+	assert.Check(t, daemon.configStore.Labels[0] == "foo=baz")
 
-	label := daemon.configStore.Labels[0]
-	if label != "foo:baz" {
-		t.Fatalf("Expected daemon label `foo:baz`, got %s", label)
-	}
+	err = daemon.Reload(&config.Config{})
+	assert.NilError(t, err)
+	assert.Check(t, len(daemon.configStore.Labels) == 0)
 }
 
 func TestDaemonReloadAllowNondistributableArtifacts(t *testing.T) {
@@ -304,32 +303,24 @@ func TestDaemonReloadNotAffectOthers(t *testing.T) {
 	}
 	daemon.configStore = &config.Config{
 		CommonConfig: config.CommonConfig{
-			Labels: []string{"foo:bar"},
+			Labels: []string{"foo=bar"},
 			Debug:  true,
 		},
 	}
 
 	valuesSets := make(map[string]interface{})
-	valuesSets["labels"] = "foo:baz"
+	valuesSets["labels"] = "foo=baz"
 	newConfig := &config.Config{
 		CommonConfig: config.CommonConfig{
-			Labels:    []string{"foo:baz"},
+			Labels:    []string{"foo=baz"},
 			ValuesSet: valuesSets,
 		},
 	}
 
-	if err := daemon.Reload(newConfig); err != nil {
-		t.Fatal(err)
-	}
-
-	label := daemon.configStore.Labels[0]
-	if label != "foo:baz" {
-		t.Fatalf("Expected daemon label `foo:baz`, got %s", label)
-	}
-	debug := daemon.configStore.Debug
-	if !debug {
-		t.Fatal("Expected debug 'enabled', got 'disabled'")
-	}
+	err := daemon.Reload(newConfig)
+	assert.NilError(t, err)
+	assert.Check(t, daemon.configStore.Labels[0] == "foo=baz")
+	assert.Check(t, daemon.configStore.Debug == true)
 }
 
 func TestDaemonDiscoveryReload(t *testing.T) {
