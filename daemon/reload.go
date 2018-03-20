@@ -246,13 +246,13 @@ func (daemon *Daemon) reloadAllowNondistributableArtifacts(conf *config.Config, 
 // reloadInsecureRegistries updates configuration with insecure registry option
 // and updates the passed attributes
 func (daemon *Daemon) reloadInsecureRegistries(conf *config.Config, attributes map[string]string) error {
-	// update corresponding configuration
-	if conf.IsValueSet("insecure-registries") {
-		daemon.configStore.InsecureRegistries = conf.InsecureRegistries
-		if err := daemon.RegistryService.LoadInsecureRegistries(conf.InsecureRegistries); err != nil {
-			return err
-		}
+	if daemon.RegistryService == nil {
+		return nil
 	}
+	if err := daemon.RegistryService.LoadInsecureRegistries(conf.InsecureRegistries); err != nil {
+		return err
+	}
+	daemon.configStore.InsecureRegistries = conf.InsecureRegistries
 
 	// prepare reload event attributes with updatable configurations
 	if daemon.configStore.InsecureRegistries != nil {

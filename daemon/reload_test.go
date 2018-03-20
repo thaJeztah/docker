@@ -283,6 +283,16 @@ func TestDaemonReloadInsecureRegistries(t *testing.T) {
 	if value, ok := dataMap["docker2.com"]; ok {
 		t.Fatalf("Expected no insecure registry of docker2.com, got %d", value)
 	}
+
+	// Reloading an empty configuration should reset insecure registries to
+	// the default (only the default docker.io registry)
+	err = daemon.Reload(&config.Config{})
+	assert.NilError(t, err)
+
+	registries = daemon.RegistryService.ServiceConfig()
+	_, ok := registries.IndexConfigs["docker.io"]
+	assert.Check(t, ok)
+	assert.Check(t, len(registries.IndexConfigs) == 1)
 }
 
 func TestDaemonReloadNotAffectOthers(t *testing.T) {
