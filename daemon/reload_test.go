@@ -85,11 +85,10 @@ func TestDaemonReloadAllowNondistributableArtifacts(t *testing.T) {
 		},
 	}
 
-	if err := daemon.Reload(newConfig); err != nil {
-		t.Fatal(err)
-	}
+	err = daemon.Reload(newConfig)
+	assert.NilError(t, err)
 
-	actual := []string{}
+	var actual []string
 	serviceConfig := daemon.RegistryService.ServiceConfig()
 	for _, value := range serviceConfig.AllowNondistributableArtifactsCIDRs {
 		actual = append(actual, value.String())
@@ -99,6 +98,10 @@ func TestDaemonReloadAllowNondistributableArtifacts(t *testing.T) {
 	sort.Strings(registries)
 	sort.Strings(actual)
 	assert.Check(t, is.DeepEqual(registries, actual))
+
+	err = daemon.Reload(&config.Config{})
+	assert.NilError(t, err)
+	assert.Check(t, len(daemon.configStore.AllowNondistributableArtifacts) == 0)
 }
 
 func TestDaemonReloadMirrors(t *testing.T) {

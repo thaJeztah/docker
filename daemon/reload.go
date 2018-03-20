@@ -223,12 +223,12 @@ func (daemon *Daemon) reloadLabels(conf *config.Config, attributes map[string]st
 // reloadAllowNondistributableArtifacts updates the configuration with allow-nondistributable-artifacts options
 // and updates the passed attributes.
 func (daemon *Daemon) reloadAllowNondistributableArtifacts(conf *config.Config, attributes map[string]string) error {
-	// Update corresponding configuration.
-	if conf.IsValueSet("allow-nondistributable-artifacts") {
-		daemon.configStore.AllowNondistributableArtifacts = conf.AllowNondistributableArtifacts
-		if err := daemon.RegistryService.LoadAllowNondistributableArtifacts(conf.AllowNondistributableArtifacts); err != nil {
-			return err
-		}
+	if daemon.RegistryService == nil {
+		return nil
+	}
+	daemon.configStore.AllowNondistributableArtifacts = conf.AllowNondistributableArtifacts
+	if err := daemon.RegistryService.LoadAllowNondistributableArtifacts(conf.AllowNondistributableArtifacts); err != nil {
+		return err
 	}
 
 	// Prepare reload event attributes with updatable configurations.
