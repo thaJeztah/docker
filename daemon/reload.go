@@ -114,8 +114,10 @@ func (daemon *Daemon) reloadShutdownTimeout(conf *config.Config, attributes map[
 	// update corresponding configuration
 	if conf.IsValueSet("shutdown-timeout") {
 		daemon.configStore.ShutdownTimeout = conf.ShutdownTimeout
-		logrus.Debugf("Reset Shutdown Timeout: %d", daemon.configStore.ShutdownTimeout)
+	} else {
+		daemon.configStore.ShutdownTimeout = config.DefaultShutdownTimeout
 	}
+	logrus.Debugf("Reset Shutdown Timeout: %d", daemon.configStore.ShutdownTimeout)
 
 	// prepare reload event attributes with updatable configurations
 	attributes["shutdown-timeout"] = fmt.Sprintf("%d", daemon.configStore.ShutdownTimeout)

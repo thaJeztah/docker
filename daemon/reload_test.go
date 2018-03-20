@@ -570,3 +570,28 @@ func TestDaemonReloadNetworkDiagnosticPort(t *testing.T) {
 	}
 
 }
+
+func TestDaemonReloadShutdownTimeout(t *testing.T) {
+	daemon := &Daemon{
+		configStore:  &config.Config{},
+		imageService: images.NewImageService(images.ImageServiceConfig{}),
+	}
+
+	valuesSet := make(map[string]interface{})
+	valuesSet["shutdown-timeout"] = "I am set"
+
+	newConfig := &config.Config{
+		CommonConfig: config.CommonConfig{
+			ShutdownTimeout: 12345,
+			ValuesSet:       valuesSet,
+		},
+	}
+
+	err := daemon.Reload(newConfig)
+	assert.NilError(t, err)
+	assert.Check(t, daemon.configStore.ShutdownTimeout == 12345)
+
+	err = daemon.Reload(&config.Config{})
+	assert.NilError(t, err)
+	assert.Check(t, daemon.configStore.ShutdownTimeout == config.DefaultShutdownTimeout)
+}

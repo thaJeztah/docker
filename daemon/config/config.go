@@ -32,6 +32,8 @@ const (
 	// maximum number of uploads that
 	// may take place at a time for each push.
 	DefaultMaxConcurrentUploads = 5
+	// DefaultShutdownTimeout is the default shutdown timeout for the daemon
+	DefaultShutdownTimeout = 15
 	// StockRuntimeName is the reserved name/alias used to represent the
 	// OCI runtime being shipped with the docker daemon package.
 	StockRuntimeName = "runc"
