@@ -271,13 +271,13 @@ func (daemon *Daemon) reloadInsecureRegistries(conf *config.Config, attributes m
 // reloadRegistryMirrors updates configuration with registry mirror options
 // and updates the passed attributes
 func (daemon *Daemon) reloadRegistryMirrors(conf *config.Config, attributes map[string]string) error {
-	// update corresponding configuration
-	if conf.IsValueSet("registry-mirrors") {
-		daemon.configStore.Mirrors = conf.Mirrors
-		if err := daemon.RegistryService.LoadMirrors(conf.Mirrors); err != nil {
-			return err
-		}
+	if daemon.RegistryService == nil {
+		return nil
 	}
+	if err := daemon.RegistryService.LoadMirrors(conf.Mirrors); err != nil {
+		return err
+	}
+	daemon.configStore.Mirrors = conf.Mirrors
 
 	// prepare reload event attributes with updatable configurations
 	if daemon.configStore.Mirrors != nil {

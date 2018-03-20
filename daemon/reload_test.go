@@ -147,12 +147,29 @@ func TestDaemonReloadMirrors(t *testing.T) {
 			mirrors: []string{"https://mirror.test1.com", "https://mirror.test4.com"},
 			after:   []string{"https://mirror.test1.com/", "https://mirror.test4.com/"},
 		},
+		{
+			valid:   true,
+			mirrors: []string{}, // value set, but empty
+			after:   []string{},
+		},
+		// Set mirrors before resetting them in the next iteration
+		{
+			valid:   true,
+			mirrors: []string{"https://mirror.test1.com"},
+			after:   []string{"https://mirror.test1.com/"},
+		},
+		{
+			valid:   true,
+			mirrors: nil, // no value set
+			after:   []string{},
+		},
 	}
 
 	for _, value := range loadMirrors {
 		valuesSets := make(map[string]interface{})
-		valuesSets["registry-mirrors"] = value.mirrors
-
+		if value.mirrors != nil {
+			valuesSets["registry-mirrors"] = value.mirrors
+		}
 		newConfig := &config.Config{
 			CommonConfig: config.CommonConfig{
 				ServiceOptions: registry.ServiceOptions{
@@ -169,33 +186,9 @@ func TestDaemonReloadMirrors(t *testing.T) {
 		}
 
 		if value.valid {
-			if err != nil {
-				// mirrors should be valid, should be no error
-				t.Fatal(err)
-			}
+			assert.NilError(t, err) // mirrors should be valid, should be no error
 			registryService := daemon.RegistryService.ServiceConfig()
-
-			if len(registryService.Mirrors) != len(value.after) {
-				t.Fatalf("Expected %d daemon mirrors %s while get %d with %s",
-					len(value.after),
-					value.after,
-					len(registryService.Mirrors),
-					registryService.Mirrors)
-			}
-
-			dataMap := map[string]struct{}{}
-
-			for _, mirror := range registryService.Mirrors {
-				if _, exist := dataMap[mirror]; !exist {
-					dataMap[mirror] = struct{}{}
-				}
-			}
-
-			for _, address := range value.after {
-				if _, exist := dataMap[address]; !exist {
-					t.Fatalf("Expected %s in daemon mirrors, while get none", address)
-				}
-			}
+			assert.DeepEqual(t, value.after, registryService.Mirrors)
 		}
 	}
 }
