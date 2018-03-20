@@ -295,10 +295,7 @@ func (daemon *Daemon) reloadRegistryMirrors(conf *config.Config, attributes map[
 // reloadLiveRestore updates configuration with live retore option
 // and updates the passed attributes
 func (daemon *Daemon) reloadLiveRestore(conf *config.Config, attributes map[string]string) error {
-	// update corresponding configuration
-	if conf.IsValueSet("live-restore") {
-		daemon.configStore.LiveRestoreEnabled = conf.LiveRestoreEnabled
-	}
+	daemon.configStore.LiveRestoreEnabled = conf.LiveRestoreEnabled
 
 	// prepare reload event attributes with updatable configurations
 	attributes["live-restore"] = fmt.Sprintf("%t", daemon.configStore.LiveRestoreEnabled)

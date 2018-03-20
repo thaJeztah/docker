@@ -589,3 +589,24 @@ func TestDaemonReloadShutdownTimeout(t *testing.T) {
 	assert.NilError(t, err)
 	assert.Check(t, daemon.configStore.ShutdownTimeout == config.DefaultShutdownTimeout)
 }
+
+func TestDaemonReloadLiveRestore(t *testing.T) {
+	daemon := &Daemon{
+		configStore:  &config.Config{},
+		imageService: images.NewImageService(images.ImageServiceConfig{}),
+	}
+
+	newConfig := &config.Config{
+		CommonConfig: config.CommonConfig{
+			LiveRestoreEnabled: true,
+		},
+	}
+
+	err := daemon.Reload(newConfig)
+	assert.NilError(t, err)
+	assert.Check(t, daemon.configStore.LiveRestoreEnabled == true)
+
+	err = daemon.Reload(&config.Config{})
+	assert.NilError(t, err)
+	assert.Check(t, daemon.configStore.LiveRestoreEnabled == false)
+}
