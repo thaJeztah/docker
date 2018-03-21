@@ -70,10 +70,8 @@ func (daemon *Daemon) Reload(conf *config.Config) (err error) {
 // reloadDebug updates configuration with Debug option
 // and updates the passed attributes
 func (daemon *Daemon) reloadDebug(conf *config.Config, attributes map[string]string) {
-	// update corresponding configuration
-	if conf.IsValueSet("debug") {
-		daemon.configStore.Debug = conf.Debug
-	}
+
+	daemon.configStore.Debug = conf.Debug
 	// prepare reload event attributes with updatable configurations
 	attributes["debug"] = fmt.Sprintf("%t", daemon.configStore.Debug)
 }

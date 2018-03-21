@@ -379,15 +379,12 @@ func (cli *DaemonCli) reloadConfig() {
 			return
 		}
 
-		if config.IsValueSet("debug") {
-			debugEnabled := debug.IsEnabled()
-			switch {
-			case debugEnabled && !config.Debug: // disable debug
-				debug.Disable()
-			case config.Debug && !debugEnabled: // enable debug
-				debug.Enable()
-			}
-
+		debugEnabled := debug.IsEnabled()
+		switch {
+		case debugEnabled && !config.Debug: // disable debug
+			debug.Disable()
+		case config.Debug && !debugEnabled: // enable debug
+			debug.Enable()
 		}
 	}
 

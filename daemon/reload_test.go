@@ -610,3 +610,24 @@ func TestDaemonReloadLiveRestore(t *testing.T) {
 	assert.NilError(t, err)
 	assert.Check(t, daemon.configStore.LiveRestoreEnabled == false)
 }
+
+func TestDaemonReloadDebug(t *testing.T) {
+	daemon := &Daemon{
+		configStore:  &config.Config{},
+		imageService: images.NewImageService(images.ImageServiceConfig{}),
+	}
+
+	newConfig := &config.Config{
+		CommonConfig: config.CommonConfig{
+			Debug: true,
+		},
+	}
+
+	err := daemon.Reload(newConfig)
+	assert.NilError(t, err)
+	assert.Check(t, daemon.configStore.Debug == true)
+
+	err = daemon.Reload(&config.Config{})
+	assert.NilError(t, err)
+	assert.Check(t, daemon.configStore.LiveRestoreEnabled == false)
+}
