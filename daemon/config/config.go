@@ -249,13 +249,49 @@ func GetConflictFreeLabels(labels []string) ([]string, error) {
 // Reload reads the configuration in the host and reloads the daemon and server.
 func Reload(configFile string, flags *pflag.FlagSet, reload func(*Config)) error {
 	logrus.Infof("Got signal to reload configuration, reloading from: %s", configFile)
-	newConfig, err := getConflictFreeConfiguration(configFile, flags)
+	newConfig := New()
+	//conf.Debug = opts.Debug
+	//conf.Hosts = opts.Hosts
+	//conf.LogLevel = opts.LogLevel
+	//conf.TLS = opts.TLS
+	//conf.TLSVerify = opts.TLSVerify
+	//conf.CommonTLSOptions = config.CommonTLSOptions{}
+	//
+	//if opts.TLSOptions != nil {
+	//	conf.CommonTLSOptions.CAFile = opts.TLSOptions.CAFile
+	//	conf.CommonTLSOptions.CertFile = opts.TLSOptions.CertFile
+	//	conf.CommonTLSOptions.KeyFile = opts.TLSOptions.KeyFile
+	//}
+	//
+	//if conf.TrustKeyPath == "" {
+	//	conf.TrustKeyPath = filepath.Join(
+	//		getDaemonConfDir(conf.Root),
+	//		defaultTrustKeyFile)
+	//}
+
+	//if flags.Changed("graph") && flags.Changed("data-root") {
+	//	return nil, fmt.Errorf(`cannot specify both "--graph" and "--data-root" option`)
+	//}
+
+	c, err := MergeDaemonConfigurations(newConfig, flags, configFile)
 	if err != nil {
 		if flags.Changed("config-file") || !os.IsNotExist(err) {
 			return fmt.Errorf("unable to configure the Docker daemon with file %s: %v", configFile, err)
 		}
-		newConfig = New()
 	}
+	// the merged configuration can be nil if the config file didn't exist.
+	// leave the current configuration as it is if when that happens.
+	if c != nil {
+		newConfig = c
+	}
+
+	//newConfig, err := getConflictFreeConfiguration(configFile, flags)
+	//if err != nil {
+	//	if flags.Changed("config-file") || !os.IsNotExist(err) {
+	//		return fmt.Errorf("unable to configure the Docker daemon with file %s: %v", configFile, err)
+	//	}
+	//	newConfig = New()
+	//}
 
 	if err := Validate(newConfig); err != nil {
 		return fmt.Errorf("file configuration validation failed (%v)", err)

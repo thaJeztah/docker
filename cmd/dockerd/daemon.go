@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"crypto/tls"
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -422,6 +423,10 @@ func shutdownDaemon(d *daemon.Daemon) {
 
 func loadDaemonCliConfig(opts *daemonOptions) (*config.Config, error) {
 	conf := opts.daemonConfig
+
+	jsonString, _ := json.Marshal(conf)
+	logrus.Infof("Loading configuration: %s", jsonString)
+
 	flags := opts.flags
 	conf.Debug = opts.Debug
 	conf.Hosts = opts.Hosts
