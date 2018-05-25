@@ -43,7 +43,6 @@
 			"tianon",
 			"tibor",
 			"tonistiigi",
-			"unclejack",
 			"vdemeester",
 			"vieux",
 			"yongtang"
@@ -204,6 +203,16 @@
 			# can keep up with Sven on Twitter (@SvenDowideit), his blog http://fosiki.com,
 			# and of course on GitHub.
 			"sven",
+
+			# Cristian Staretu became a contributor as early as April 2013 (Docker v0.1!),
+			# adding xz compressionto greatly reduce the size of images pushed
+			# to a registry. Since then, he contributed many improvements to the
+			# docker engine, related to performance, storage-drivers, image management,
+			# and the builder.
+			#
+			# As a maintainers, Christian was release captain for multiple releases.
+			# You can find Christian tweeting as @unclejack__.
+			"unclejack",
 
 			# Vincent "vbatts!" Batts made his first contribution to the project
 			# in November 2013, to become a maintainer a few months later, on
