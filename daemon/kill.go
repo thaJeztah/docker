@@ -70,17 +70,24 @@ func (daemon *Daemon) killWithSignal(container *containerpkg.Container, sig int)
 		return errNotRunning(container.ID)
 	}
 
-	var unpause bool
-	if container.Config.StopSignal != "" && syscall.Signal(sig) != syscall.SIGKILL {
-		containerStopSignal, err := signal.ParseSignal(container.Config.StopSignal)
+	var (
+		unpause       bool
+		err           error
+		ctrStopSignal = syscall.SIGKILL
+	)
+
+	if container.Config.StopSignal != "" {
+		ctrStopSignal, err = signal.ParseSignal(container.Config.StopSignal)
 		if err != nil {
 			return err
 		}
-		if containerStopSignal == syscall.Signal(sig) {
-			container.ExitOnNext()
-			unpause = container.Paused
-		}
-	} else {
+	}
+
+	// If the custom signal is same as the default signal that was set
+	// on the container, then treat this signal as the regular signal
+	// to use for killing the container. In that case, unpause the container
+	// so that the signal will be handled.
+	if ctrStopSignal == syscall.Signal(sig) {
 		container.ExitOnNext()
 		unpause = container.Paused
 	}
