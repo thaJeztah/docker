@@ -431,20 +431,22 @@ Try {
     Write-Host -ForegroundColor Green "INFO: Location for testing is $env:TEMP"
 
     # CI Integrity check - ensure Dockerfile.windows and Dockerfile go versions match
-    $goVersionDockerfileWindows=$(Get-Content ".\Dockerfile.windows" | Select-String "^ENV GO_VERSION").ToString().Replace("ENV GO_VERSION=","").Replace("\","").Replace("``","").Trim()
-    $goVersionDockerfile=$(Get-Content ".\Dockerfile" | Select-String "^ENV GO_VERSION")
-    
     # As of go 1.11, Dockerfile changed to be in the format like "FROM golang:1.11.0 AS base".
     # If a version number ends with .0 (as in 1.11.0, a convention used in golang docker
     # image versions), it needs to be removed (i.e. "1.11.0" becomes "1.11").
-    if ($goVersionDockerfile -eq $Null) {
-        $goVersionDockerfile=$(Get-Content ".\Dockerfile" | Select-String "^FROM golang:")
-        if ($goVersionDockerfile -ne $Null) {
-            $goVersionDockerfile = $goVersionDockerfile.ToString().Split(" ")[1].Split(":")[1] -replace '\.0$',''
-        }
-    } else {
-        $goVersionDockerfile = $goVersionDockerfile.ToString().Split(" ")[2]
+    $goVersionDockerfileWindows=$(Get-Content ".\Dockerfile.windows" | Select-String "^FROM golang:" | select-object -First 1)
+    if ($goVersionDockerfileWindows -eq $Null) {
+        Throw "ERROR: Failed to extract golang version from Dockerfile"
     }
+    $goVersionDockerfileWindows = $goVersionDockerfileWindows.ToString().Split(" ")[1].Split(":")[1].Split("-")[0] -replace '\.0$',''
+    if ($goVersionDockerfileWindows -eq $Null) {
+        Throw "ERROR: Failed to extract golang version from Dockerfile"
+    }
+    $goVersionDockerfile=$(Get-Content ".\Dockerfile" | Select-String "^FROM golang:" | select-object -First 1)
+    if ($goVersionDockerfile -eq $Null) {
+        Throw "ERROR: Failed to extract golang version from Dockerfile"
+    }
+    $goVersionDockerfile = $goVersionDockerfile.ToString().Split(" ")[1].Split(":")[1] -replace '\.0$',''
     if ($goVersionDockerfile -eq $Null) {
         Throw "ERROR: Failed to extract golang version from Dockerfile"
     }
@@ -469,7 +471,7 @@ Try {
     }
 
     # Following at the moment must be docker\docker as it's dictated by dockerfile.Windows
-    $contPath="$COMMITHASH`:c`:\go\src\github.com\docker\docker\bundles"
+    $contPath="$COMMITHASH`:C`:\gopath\src\github.com\docker\docker\bundles"
 
     # After https://github.com/docker/docker/pull/30290, .git was added to .dockerignore. Therefore
     # we have to calculate unsupported outside of the container, and pass the commit ID in through
@@ -533,17 +535,12 @@ Try {
     # Grab the golang installer out of the built image. That way, we know we are consistent once extracted and paths set,
     # so there's no need to re-deploy on account of an upgrade to the version of GO being used in docker.
     if ($env:SKIP_COPY_GO -eq $null) {
-        Write-Host -ForegroundColor Green "INFO: Copying the golang package from the container to $env:TEMP\installer\go.zip..."
-        docker cp "$COMMITHASH`:c`:\go.zip" $env:TEMP\installer\
+        Write-Host -ForegroundColor Green "INFO: Copying the golang package from the container to $env:TEMP\go..."
+        docker cp "$COMMITHASH`:C`:\go" $env:TEMP
         if (-not($LastExitCode -eq 0)) {
-            Throw "ERROR: Failed to docker cp the golang installer 'go.zip' from container:c:\go.zip to $env:TEMP\installer"
+            Throw "ERROR: Failed to docker cp golang from container:C:\go to $env:TEMP\go"
         }
         $ErrorActionPreference = "Stop"
-
-        # Extract the golang installer
-        Write-Host -ForegroundColor Green "INFO: Extracting go.zip to $env:TEMP\go"
-        $Duration=$(Measure-Command { Expand-Archive $env:TEMP\installer\go.zip $env:TEMP -Force | Out-Null})
-        Write-Host  -ForegroundColor Green "INFO: Extraction ended at $(Get-Date). Duration`:$Duration"    
     } else {
         Write-Host -ForegroundColor Magenta "WARN: Skipping copying and extracting golang from the image"
     }
