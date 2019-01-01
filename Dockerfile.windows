@@ -154,6 +154,7 @@ FROM golang:1.11.4-windowsservercore AS compiler
 ADD https://raw.githubusercontent.com/jhowardmsft/docker-tdmgcc/master/gcc.zip C:\
 ADD https://raw.githubusercontent.com/jhowardmsft/docker-tdmgcc/master/runtime.zip C:\
 ADD https://raw.githubusercontent.com/jhowardmsft/docker-tdmgcc/master/binutils.zip C:\
+ADD http://frippery.org/files/busybox/busybox.exe C:\busybox\
 
 RUN `
   Write-Host INFO: Expanding compiler 1 of 3...; `
@@ -162,6 +163,10 @@ RUN `
   Expand-Archive C:\runtime.zip -DestinationPath C:\gcc -Force; `
   Write-Host INFO: Expanding compiler 3 of 3...; `
   Expand-Archive C:\binutils.zip -DestinationPath C:\gcc -Force;
+
+RUN `
+  Write-Host 'INFO: Including busybox ...'; `
+  c:\busybox\busybox.exe --list ^|ForEach-Object {$nul = cmd /c mklink C:\busybox\$_.exe busybox.exe}
 
 # The number of build steps below are explicitly minimised to improve performance.
 FROM golang:1.11.4-windowsservercore
@@ -174,8 +179,11 @@ RUN `
   Write-Host INFO: Configuring git core.autocrlf...; `
   C:\git\cmd\git config --global core.autocrlf true; `
   `
-  Write-Host 'Updating PATH ...'; `
-  $env:PATH = 'C:\gcc\bin;' + $env:PATH; `
+  Write-Host 'INFO: Creating temp folder for unit tests...'; `
+  New-Item -ItemType Directory -Path C:\tmp; `
+  `
+  Write-Host 'INFO: Updating PATH ...'; `
+  $env:PATH = 'C:\busybox;C:\gcc\bin;' + $env:PATH; `
   [Environment]::SetEnvironmentVariable('PATH', $env:PATH, [EnvironmentVariableTarget]::Machine); `
   `
   Write-Host INFO: Completed;
@@ -186,8 +194,9 @@ ENTRYPOINT ["powershell.exe"]
 # Set the working directory to the location of the sources
 WORKDIR ${GOPATH}\src\github.com\docker\docker
 
-# Copy compiler
+# Copy compiler and busybox
 COPY --from=compiler C:\gcc C:\gcc
+COPY --from=compiler C:\busybox C:\busybox
 
 # Copy the sources into the container
 COPY . .
