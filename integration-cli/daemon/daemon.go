@@ -24,6 +24,7 @@ type Daemon struct {
 func New(t testing.TB, dockerBinary string, dockerdBinary string, ops ...daemon.Option) *Daemon {
 	t.Helper()
 	ops = append(ops, daemon.WithDockerdBinary(dockerdBinary))
+	ops = append(ops, daemon.WithInit)
 	d := daemon.New(t, ops...)
 	return &Daemon{
 		Daemon:       d,

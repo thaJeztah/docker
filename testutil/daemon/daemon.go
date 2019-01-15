@@ -134,6 +134,7 @@ func NewDaemon(workingDir string, ops ...Option) (*Daemon, error) {
 		containerdSocket: defaultContainerdSocket,
 	}
 
+	ops = append(ops, WithInit)
 	for _, op := range ops {
 		op(d)
 	}
@@ -459,7 +460,7 @@ func (d *Daemon) StartWithLogFile(out *os.File, providedArgs ...string) error {
 
 				select {
 				case <-ctx.Done():
-				case <-time.After(500 * time.Millisecond):
+				case <-time.After(100 * time.Millisecond):
 				}
 				continue
 			}
