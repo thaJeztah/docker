@@ -3,6 +3,7 @@ package images // import "github.com/docker/docker/daemon/images"
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strings"
 	"testing"
 
@@ -17,12 +18,19 @@ type FakeService struct {
 	shouldReturnError bool
 
 	term    string
+	limit   int
 	results []registrytypes.SearchResult
 }
 
 func (s *FakeService) Search(ctx context.Context, term string, limit int, authConfig *types.AuthConfig, userAgent string, headers map[string][]string) (*registrytypes.SearchResults, error) {
 	if s.shouldReturnError {
 		return nil, errors.New("Search unknown error")
+	}
+	if s.term != "" && term != s.term {
+		return nil, fmt.Errorf("incorrect term; expected %q, got %q", s.term, term)
+	}
+	if s.limit != 0 && limit != s.limit {
+		return nil, fmt.Errorf("incorrect limit; expected %d, got %d", s.limit, limit)
 	}
 	return &registrytypes.SearchResults{
 		Query:      s.term,
@@ -320,38 +328,42 @@ func TestSearchRegistryForImages(t *testing.T) {
 			},
 		},
 	}
-	for index, s := range successCases {
-		daemon := &ImageService{
-			registryService: &FakeService{
-				term:    term,
-				results: s.registryResults,
-			},
-		}
-		results, err := daemon.SearchRegistryForImages(context.Background(), s.filtersArgs, term, 25, nil, map[string][]string{})
-		if err != nil {
-			t.Errorf("%d: %v", index, err)
-		}
-		if results.Query != term {
-			t.Errorf("%d: expected Query to be %s, got %s", index, term, results.Query)
-		}
-		if results.NumResults != len(s.expectedResults) {
-			t.Errorf("%d: expected NumResults to be %d, got %d", index, len(s.expectedResults), results.NumResults)
-		}
-		for _, result := range results.Results {
-			found := false
-			for _, expectedResult := range s.expectedResults {
-				if expectedResult.Name == result.Name &&
-					expectedResult.Description == result.Description &&
-					expectedResult.IsAutomated == result.IsAutomated &&
-					expectedResult.IsOfficial == result.IsOfficial &&
-					expectedResult.StarCount == result.StarCount {
-					found = true
-					break
+	for i, tc := range successCases {
+		tc := tc
+		t.Run(tc.filtersArgs, func(t *testing.T) {
+			daemon := &ImageService{
+				registryService: &FakeService{
+					term:    term,
+					limit:   25,
+					results: tc.registryResults,
+				},
+			}
+			results, err := daemon.SearchRegistryForImages(context.Background(), tc.filtersArgs, term, 25, nil, map[string][]string{})
+			if err != nil {
+				t.Fatalf("%d: %v", i, err)
+			}
+			if results.Query != term {
+				t.Errorf("%d: expected Query to be %s, got %s", i, term, results.Query)
+			}
+			if results.NumResults != len(tc.expectedResults) {
+				t.Errorf("%d: expected NumResults to be %d, got %d", i, len(tc.expectedResults), results.NumResults)
+			}
+			for _, result := range results.Results {
+				found := false
+				for _, expectedResult := range tc.expectedResults {
+					if expectedResult.Name == result.Name &&
+						expectedResult.Description == result.Description &&
+						expectedResult.IsAutomated == result.IsAutomated &&
+						expectedResult.IsOfficial == result.IsOfficial &&
+						expectedResult.StarCount == result.StarCount {
+						found = true
+						break
+					}
+				}
+				if !found {
+					t.Errorf("%d: expected results %v, got %v", i, tc.expectedResults, results.Results)
 				}
 			}
-			if !found {
-				t.Errorf("%d: expected results %v, got %v", index, s.expectedResults, results.Results)
-			}
-		}
+		})
 	}
 }

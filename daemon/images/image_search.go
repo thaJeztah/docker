@@ -36,16 +36,22 @@ func (i *ImageService) SearchRegistryForImages(ctx context.Context, filtersArgs 
 	var isAutomated, isOfficial bool
 	var hasStarFilter = 0
 	if searchFilters.Contains("is-automated") {
-		if searchFilters.UniqueExactMatch("is-automated", "true") {
+		switch {
+		case searchFilters.UniqueExactMatch("is-automated", "true"):
 			isAutomated = true
-		} else if !searchFilters.UniqueExactMatch("is-automated", "false") {
+		case searchFilters.UniqueExactMatch("is-automated", "false"):
+			isAutomated = false
+		default:
 			return nil, invalidFilter{"is-automated", searchFilters.Get("is-automated")}
 		}
 	}
 	if searchFilters.Contains("is-official") {
-		if searchFilters.UniqueExactMatch("is-official", "true") {
+		switch {
+		case searchFilters.UniqueExactMatch("is-official", "true"):
 			isOfficial = true
-		} else if !searchFilters.UniqueExactMatch("is-official", "false") {
+		case searchFilters.UniqueExactMatch("is-official", "false"):
+			isOfficial = false
+		default:
 			return nil, invalidFilter{"is-official", searchFilters.Get("is-official")}
 		}
 	}
@@ -67,22 +73,16 @@ func (i *ImageService) SearchRegistryForImages(ctx context.Context, filtersArgs 
 		return nil, err
 	}
 
-	filteredResults := []registrytypes.SearchResult{}
+	filteredResults := unfilteredResult.Results[:0]
 	for _, result := range unfilteredResult.Results {
-		if searchFilters.Contains("is-automated") {
-			if isAutomated != result.IsAutomated {
-				continue
-			}
+		if searchFilters.Contains("is-automated") && isAutomated != result.IsAutomated {
+			continue
 		}
-		if searchFilters.Contains("is-official") {
-			if isOfficial != result.IsOfficial {
-				continue
-			}
+		if searchFilters.Contains("is-official") && isOfficial != result.IsOfficial {
+			continue
 		}
-		if searchFilters.Contains("stars") {
-			if result.StarCount < hasStarFilter {
-				continue
-			}
+		if searchFilters.Contains("stars") && result.StarCount < hasStarFilter {
+			continue
 		}
 		filteredResults = append(filteredResults, result)
 	}
