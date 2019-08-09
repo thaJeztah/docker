@@ -174,7 +174,7 @@ func (daemon *Daemon) NewResolveOptionsFunc() resolver.ResolveOptionsFunc {
 				v = uri.Host
 			}
 			m[v] = resolver.RegistryConf{
-				PlainHTTP: true,
+				PlainHTTP: func() *bool { y := true; return &y }(),
 			}
 		}
 		def := docker.ResolverOptions{
@@ -193,12 +193,14 @@ func (daemon *Daemon) NewResolveOptionsFunc() resolver.ResolveOptionsFunc {
 		}
 
 		if len(c.Mirrors) > 0 {
+			// TODO ResolverOptions.Host is deprecated; ResolverOptions.Hosts should be used
 			def.Host = func(string) (string, error) {
 				return c.Mirrors[rand.Intn(len(c.Mirrors))], nil
 			}
 		}
 
-		def.PlainHTTP = c.PlainHTTP
+		// TODO ResolverOptions.PlainHTTP is deprecated; ResolverOptions.Hosts should be used
+		def.PlainHTTP = *c.PlainHTTP
 
 		return def
 	}
