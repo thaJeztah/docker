@@ -14,15 +14,17 @@
    limitations under the License.
 */
 
-package continuity
+package stdio
 
-import "os"
+// Stdio of a process
+type Stdio struct {
+	Stdin    string
+	Stdout   string
+	Stderr   string
+	Terminal bool
+}
 
-// newBaseResource returns a *resource, populated with data from p and fi,
-// where p will be populated directly.
-func newBaseResource(p string, fi os.FileInfo) (*resource, error) {
-	return &resource{
-		paths: []string{p},
-		mode:  fi.Mode(),
-	}, nil
+// IsNull returns true if the stdio is not defined
+func (s Stdio) IsNull() bool {
+	return s.Stdin == "" && s.Stdout == "" && s.Stderr == ""
 }

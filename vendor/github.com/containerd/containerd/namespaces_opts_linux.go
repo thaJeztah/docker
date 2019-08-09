@@ -14,15 +14,23 @@
    limitations under the License.
 */
 
-package continuity
+package containerd
 
-import "os"
+import (
+	"context"
 
-type hardlinkKey struct{}
+	"github.com/containerd/cgroups"
+	"github.com/containerd/containerd/namespaces"
+)
 
-func newHardlinkKey(fi os.FileInfo) (hardlinkKey, error) {
-	// NOTE(stevvooe): Obviously, this is not yet implemented. However, the
-	// makings of an implementation are available in src/os/types_windows.go. More
-	// investigation needs to be done to figure out exactly how to do this.
-	return hardlinkKey{}, errNotAHardLink
+// WithNamespaceCgroupDeletion removes the cgroup directory that was created for the namespace
+func WithNamespaceCgroupDeletion(ctx context.Context, i *namespaces.DeleteInfo) error {
+	cg, err := cgroups.Load(cgroups.V1, cgroups.StaticPath(i.Name))
+	if err != nil {
+		if err == cgroups.ErrCgroupDeleted {
+			return nil
+		}
+		return err
+	}
+	return cg.Delete()
 }
