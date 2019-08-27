@@ -22,6 +22,8 @@ const (
 	VersionDev
 )
 
+const paxSchilyXattr = "SCHILY.xattr."
+
 // WriteV1Header writes a tar header to a writer in V1 tarsum format.
 func WriteV1Header(h *tar.Header, w io.Writer) {
 	for _, elem := range v1TarHeaderSelect(h) {
@@ -119,9 +121,11 @@ func v0TarHeaderSelect(h *tar.Header) (orderedHeaders [][2]string) {
 
 func v1TarHeaderSelect(h *tar.Header) (orderedHeaders [][2]string) {
 	// Get extended attributes.
-	xAttrKeys := make([]string, len(h.Xattrs))
-	for k := range h.Xattrs {
-		xAttrKeys = append(xAttrKeys, k)
+	xAttrKeys := make([]string, 0)
+	for k := range h.PAXRecords {
+		if strings.HasPrefix(k, paxSchilyXattr) {
+			xAttrKeys = append(xAttrKeys, k)
+		}
 	}
 	sort.Strings(xAttrKeys)
 
@@ -136,7 +140,7 @@ func v1TarHeaderSelect(h *tar.Header) (orderedHeaders [][2]string) {
 
 	// Finally, append the sorted xattrs.
 	for _, k := range xAttrKeys {
-		orderedHeaders = append(orderedHeaders, [2]string{k, h.Xattrs[k]})
+		orderedHeaders = append(orderedHeaders, [2]string{k, h.PAXRecords[k]})
 	}
 
 	return

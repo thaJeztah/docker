@@ -27,6 +27,8 @@ import (
 	exec "golang.org/x/sys/execabs"
 )
 
+const paxSchilyXattr = "SCHILY.xattr."
+
 type (
 	// Compression is the state represents if compressed or not.
 	Compression int
@@ -423,8 +425,10 @@ func ReadSecurityXattrToTarHeader(path string, hdr *tar.Header) error {
 			capability[versionOffset] = vfsCapRevision2
 			length = xattrCapsSz2
 		}
-		hdr.Xattrs = make(map[string]string)
-		hdr.Xattrs["security.capability"] = string(capability[:length])
+		if hdr.PAXRecords == nil {
+			hdr.PAXRecords = make(map[string]string)
+		}
+		hdr.PAXRecords[paxSchilyXattr+"security.capability"] = string(capability[:length])
 	}
 	return nil
 }
@@ -677,8 +681,11 @@ func createTarFile(path, extractDir string, hdr *tar.Header, reader io.Reader, L
 	}
 
 	var errors []string
-	for key, value := range hdr.Xattrs {
-		if err := system.Lsetxattr(path, key, []byte(value), 0); err != nil {
+	for key, value := range hdr.PAXRecords {
+		if !strings.HasPrefix(key, paxSchilyXattr) {
+			continue
+		}
+		if err := system.Lsetxattr(path, strings.TrimPrefix(key, paxSchilyXattr), []byte(value), 0); err != nil {
 			if err == syscall.ENOTSUP || err == syscall.EPERM {
 				// We ignore errors here because not all graphdrivers support
 				// xattrs *cough* old versions of AUFS *cough*. However only
