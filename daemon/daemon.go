@@ -174,7 +174,7 @@ func (daemon *Daemon) NewResolveOptionsFunc() resolver.ResolveOptionsFunc {
 				v = uri.Host
 			}
 			m[v] = resolver.RegistryConf{
-				PlainHTTP: func() *bool { y := true; return &y }(),
+				PlainHTTP: true,
 			}
 		}
 		def := docker.ResolverOptions{
@@ -200,7 +200,7 @@ func (daemon *Daemon) NewResolveOptionsFunc() resolver.ResolveOptionsFunc {
 		}
 
 		// TODO ResolverOptions.PlainHTTP is deprecated; ResolverOptions.Hosts should be used
-		def.PlainHTTP = *c.PlainHTTP
+		def.PlainHTTP = c.PlainHTTP
 
 		return def
 	}
