@@ -643,6 +643,9 @@ func (opts routerOptions) Build() []router.Router {
 func initMiddlewares(s *apiserver.Server, cfg *config.Config, pluginStore plugingetter.PluginGetter) *authorization.Middleware {
 	v := dockerversion.Version
 
+	m := middleware.NewMetricsMiddleware()
+	s.UseMiddleware(m)
+
 	exp := middleware.NewExperimentalMiddleware(cfg.Experimental)
 	s.UseMiddleware(exp)
 
