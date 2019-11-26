@@ -520,6 +520,9 @@ func initRouter(opts routerOptions) {
 func (cli *DaemonCli) initMiddlewares(s *apiserver.Server, cfg *apiserver.Config, pluginStore plugingetter.PluginGetter) error {
 	v := cfg.Version
 
+	m := middleware.NewMetricsMiddleware()
+	s.UseMiddleware(m)
+
 	exp := middleware.NewExperimentalMiddleware(cli.Config.Experimental)
 	s.UseMiddleware(exp)
 
