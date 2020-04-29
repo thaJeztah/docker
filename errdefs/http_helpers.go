@@ -1,6 +1,7 @@
 package errdefs // import "github.com/docker/docker/errdefs"
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -58,6 +59,9 @@ func GetHTTPErrorStatusCode(err error) int {
 		}
 		if e, ok := err.(causer); ok {
 			return GetHTTPErrorStatusCode(e.Cause())
+		}
+		if e := errors.Unwrap(err); e != nil {
+			return GetHTTPErrorStatusCode(e)
 		}
 
 		logrus.WithFields(logrus.Fields{

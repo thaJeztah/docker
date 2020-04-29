@@ -1,4 +1,5 @@
 package errdefs // import "github.com/docker/docker/errdefs"
+import "errors"
 
 type causer interface {
 	Cause() error
@@ -24,6 +25,9 @@ func getImplementer(err error) error {
 	case causer:
 		return getImplementer(e.Cause())
 	default:
+		if e2 := errors.Unwrap(e); e2 != nil {
+			return e2
+		}
 		return err
 	}
 }
