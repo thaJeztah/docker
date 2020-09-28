@@ -47,16 +47,8 @@ func newPluginDriver(name string, pl plugingetter.CompatPlugin, config Options) 
 		}
 		proxy = &graphDriverProxy{name, pl, Capabilities{}, client}
 	default:
-		return nil, unKnownPluginType{errors.Errorf("got unknown plugin type %T", pt)}
+		return nil, errors.Errorf("got unknown plugin type %T", pt)
 	}
 
 	return proxy, proxy.Init(filepath.Join(home, name), config.DriverOptions, config.UIDMaps, config.GIDMaps)
-}
-
-type unKnownPluginType struct{ error }
-
-func (unKnownPluginType) System() {}
-
-func (e unKnownPluginType) Cause() error {
-	return e.error
 }
