@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/docker/docker/errdefs"
 	"github.com/docker/docker/pkg/plugingetter"
 	"github.com/docker/docker/pkg/plugins"
 	v2 "github.com/docker/docker/plugin/v2"
@@ -48,8 +47,16 @@ func newPluginDriver(name string, pl plugingetter.CompatPlugin, config Options) 
 		}
 		proxy = &graphDriverProxy{name, pl, Capabilities{}, client}
 	default:
-		return nil, errdefs.System(errors.Errorf("got unknown plugin type %T", pt))
+		return nil, unKnownPluginType{errors.Errorf("got unknown plugin type %T", pt)}
 	}
 
 	return proxy, proxy.Init(filepath.Join(home, name), config.DriverOptions, config.UIDMaps, config.GIDMaps)
+}
+
+type unKnownPluginType struct{ error }
+
+func (unKnownPluginType) System() {}
+
+func (e unKnownPluginType) Cause() error {
+	return e.error
 }

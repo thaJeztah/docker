@@ -7,13 +7,12 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/sirupsen/logrus"
-	"github.com/vbatts/tar-split/tar/storage"
-
 	"github.com/docker/docker/pkg/archive"
 	"github.com/docker/docker/pkg/containerfs"
 	"github.com/docker/docker/pkg/idtools"
 	"github.com/docker/docker/pkg/plugingetter"
+	"github.com/sirupsen/logrus"
+	"github.com/vbatts/tar-split/tar/storage"
 )
 
 // FsMagic unsigned id of the filesystem in use.
