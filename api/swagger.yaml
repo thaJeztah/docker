@@ -8147,11 +8147,69 @@ paths:
 
         Various objects within Docker report events when something happens to them.
 
-        Containers report these events: `attach`, `commit`, `copy`, `create`, `destroy`, `detach`, `die`, `exec_create`, `exec_detach`, `exec_start`, `exec_die`, `export`, `health_status`, `kill`, `oom`, `pause`, `rename`, `resize`, `restart`, `start`, `stop`, `top`, `unpause`, `update`, and `prune`
+        ## Container events
 
-        Images report these events: `delete`, `import`, `load`, `pull`, `push`, `save`, `tag`, `untag`, and `prune`
+        The following events are reported for containers:
 
-        Volumes report these events: `create`, `mount`, `unmount`, `destroy`, and `prune`
+        Name              | Description
+        ------------------|------------------------------------------------------------------
+        `archive-path`    | -
+        `attach`          | Fired after attaching to a container
+        `checkpoint`      | -
+        `commit`          | Fired after a container was committed to an image
+        `copy`            | When starting a copy of files from a container using the deprecated `/copy` endpoint (deprecated: API v1.23 and below)
+        `create`          | -
+        `destroy`         | -
+        `detach`          | -
+        `die`             | -
+        `exec_create`     | - (also on health)
+        `exec_detach`     | -
+        `exec_die`        | -
+        `exec_start`      | -
+        `export`          | -
+        `extract-to-dir`  | -
+        `health_status`   | `health_status: <status>`
+        `kill`            | -
+        `oom`             | -
+        `pause`           | -
+        `prune`           | -
+        `rename`          | -
+        `resize`          | -
+        `restart`         | -
+        `start`           | -
+        `stop`            | -
+        `top`             | -
+        `unpause`         | -
+        `update`          | -
+
+        ## Image events
+
+        The following events are reported for images:
+
+        Name              | Description
+        ------------------|------------------------------------------------------------------
+        `delete`          | -
+        `import`          | -
+        `load`            | -
+        `pull`            | -
+        `push`            | -
+        `save`            | -
+        `tag`             | -
+        `untag`           | -
+        `prune`           | -
+
+        ## Volume events
+
+        The following events are reported for volumes:
+
+        Name              | Description
+        ------------------|------------------------------------------------------------------
+        `create`          | -
+        `mount`           | -
+        `unmount`         | -
+        `destroy`         | -
+        `prune`           | -
+
 
         Networks report these events: `create`, `connect`, `disconnect`, `destroy`, `update`, `remove`, and `prune`
 
