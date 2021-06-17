@@ -84,11 +84,13 @@ func (i *ImageService) Images(imageFilters filters.Args, all bool, withExtraAttr
 		return nil, err
 	}
 
-	images := []*types.ImageSummary{}
-	var imagesMap map[*image.Image]*types.ImageSummary
-	var layerRefs map[layer.ChainID]int
-	var allLayers map[layer.ChainID]layer.Layer
-	var allContainers []*container.Container
+	var (
+		images        = []*types.ImageSummary{}
+		imagesMap     = make(map[*image.Image]*types.ImageSummary)
+		layerRefs     = make(map[layer.ChainID]int)
+		allLayers     = i.layerStore.Map()
+		allContainers []*container.Container
+	)
 
 	for id, img := range allImages {
 		if beforeFilter != nil {
@@ -188,34 +190,29 @@ func (i *ImageService) Images(imageFilters filters.Args, all bool, withExtraAttr
 
 		if withExtraAttrs {
 			// lazily init variables
-			if imagesMap == nil {
+			if allContainers == nil {
 				allContainers = i.containers.List()
-				allLayers = i.layerStore.Map()
-				imagesMap = make(map[*image.Image]*types.ImageSummary)
-				layerRefs = make(map[layer.ChainID]int)
 			}
 
 			// Get container count
-			newImage.Containers = 0
 			for _, c := range allContainers {
 				if c.ImageID == id {
 					newImage.Containers++
 				}
 			}
-
-			// count layer references
-			rootFS := *img.RootFS
-			rootFS.DiffIDs = nil
-			for _, id := range img.RootFS.DiffIDs {
-				rootFS.Append(id)
-				chid := rootFS.ChainID()
-				layerRefs[chid]++
-				if _, ok := allLayers[chid]; !ok {
-					return nil, fmt.Errorf("layer %v was not found (corruption?)", chid)
-				}
-			}
-			imagesMap[img] = newImage
 		}
+
+		// count layer references
+		rootFS := image.RootFS{}
+		for _, diffID := range img.RootFS.DiffIDs {
+			rootFS.Append(diffID)
+			chid := rootFS.ChainID()
+			layerRefs[chid]++
+			if _, ok := allLayers[chid]; !ok {
+				return nil, fmt.Errorf("layer %v was not found (corruption?)", chid)
+			}
+		}
+		imagesMap[img] = newImage
 
 		images = append(images, newImage)
 	}
@@ -223,9 +220,7 @@ func (i *ImageService) Images(imageFilters filters.Args, all bool, withExtraAttr
 	if withExtraAttrs {
 		// Get Shared sizes
 		for img, newImage := range imagesMap {
-			rootFS := *img.RootFS
-			rootFS.DiffIDs = nil
-
+			rootFS := image.RootFS{}
 			newImage.SharedSize = 0
 			for _, id := range img.RootFS.DiffIDs {
 				rootFS.Append(id)
@@ -336,16 +331,21 @@ func (i *ImageService) SquashImage(id, parent string) (string, error) {
 }
 
 func newImage(image *image.Image, size int64) *types.ImageSummary {
-	newImage := new(types.ImageSummary)
-	newImage.ParentID = image.Parent.String()
-	newImage.ID = image.ID().String()
-	newImage.Created = image.Created.Unix()
-	newImage.Size = size
-	newImage.VirtualSize = size
-	newImage.SharedSize = -1
-	newImage.Containers = -1
-	if image.Config != nil {
-		newImage.Labels = image.Config.Labels
+	summary := &types.ImageSummary{
+		ParentID:    image.Parent.String(),
+		ID:          image.ID().String(),
+		Created:     image.Created.Unix(),
+		Size:        size,
+		VirtualSize: size,
+		// -1 indicates that the value has not been set (avoids ambiguity
+		// between 0 (default) and "not set". We cannot use a pointer (nil)
+		// for this, as the JSON representation uses "omitempty", which would
+		// consider both "0" and "nil" to be "empty".
+		SharedSize: -1,
+		Containers: -1,
 	}
-	return newImage
+	if image.Config != nil {
+		summary.Labels = image.Config.Labels
+	}
+	return summary
 }
