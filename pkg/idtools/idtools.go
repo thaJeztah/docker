@@ -33,6 +33,15 @@ const (
 	subgidFileName = "/etc/subgid"
 )
 
+const (
+	SeTakeOwnershipPrivilege = "SeTakeOwnershipPrivilege"
+)
+
+const (
+	ContainerAdministratorSidString = "S-1-5-93-2-1"
+	ContainerUserSidString          = "S-1-5-93-2-2"
+)
+
 // MkdirAllAndChown creates a directory (include any along the path) and then modifies
 // ownership to the requested uid/gid.  If the directory already exists, this
 // function will still change ownership and permissions.
