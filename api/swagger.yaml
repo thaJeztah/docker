@@ -8343,6 +8343,16 @@ paths:
           description: "server error"
           schema:
             $ref: "#/definitions/ErrorResponse"
+      parameters:
+        - name: "types"
+          in: "query"
+          description: |
+            Object types, for which to compute and return data. For example, `containers,images`.
+          type: "array"
+          uniqueItems: true
+          items:
+            type: "string"
+            enum: ["containers", "images", "volumes", "builds"]
       tags: ["System"]
   /images/{name}/get:
     get:
