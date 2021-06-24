@@ -48,6 +48,7 @@ import (
 	"github.com/docker/docker/libnetwork"
 	"github.com/docker/docker/libnetwork/cluster"
 	nwconfig "github.com/docker/docker/libnetwork/config"
+	"github.com/docker/docker/pkg/compute"
 	"github.com/docker/docker/pkg/fileutils"
 	"github.com/docker/docker/pkg/idtools"
 	"github.com/docker/docker/pkg/plugingetter"
@@ -117,10 +118,11 @@ type Daemon struct {
 	seccompProfile     []byte
 	seccompProfilePath string
 
-	diskUsageRunning int32
-	pruneRunning     int32
-	hosts            map[string]bool // hosts stores the addresses the daemon is listening on
-	startupDone      chan struct{}
+	containerDiskUsageSingleton *compute.Singleton
+
+	pruneRunning int32
+	hosts        map[string]bool // hosts stores the addresses the daemon is listening on
+	startupDone  chan struct{}
 
 	attachmentStore       network.AttachmentStore
 	attachableNetworkLock *locker.Locker
@@ -735,7 +737,7 @@ func (daemon *Daemon) IsSwarmCompatible() error {
 
 // NewDaemon sets up everything for the daemon to be able to service
 // requests from the webserver.
-func NewDaemon(ctx context.Context, config *config.Config, pluginStore *plugin.Store) (daemon *Daemon, err error) {
+func NewDaemon(ctx context.Context, config *config.Config, pluginStore *plugin.Store) (d *Daemon, err error) {
 	setDefaultMtu(config)
 
 	registryService, err := registry.NewService(config.ServiceOptions)
@@ -799,10 +801,13 @@ func NewDaemon(ctx context.Context, config *config.Config, pluginStore *plugin.S
 		os.Setenv("TMPDIR", realTmp)
 	}
 
-	d := &Daemon{
+	d = &Daemon{
 		configStore: config,
 		PluginStore: pluginStore,
 		startupDone: make(chan struct{}),
+		containerDiskUsageSingleton: compute.NewSingleton(func(ctx context.Context) (interface{}, error) {
+			return d.containerDiskUsage(ctx)
+		}),
 	}
 
 	// Ensure the daemon is properly shutdown if there is a failure during

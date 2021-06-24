@@ -2,10 +2,13 @@ package images // import "github.com/docker/docker/daemon/images"
 
 import (
 	"context"
+	"fmt"
 	"os"
 
 	"github.com/containerd/containerd/content"
 	"github.com/containerd/containerd/leases"
+	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/container"
 	daemonevents "github.com/docker/docker/daemon/events"
 	"github.com/docker/docker/distribution"
@@ -13,6 +16,7 @@ import (
 	"github.com/docker/docker/distribution/xfer"
 	"github.com/docker/docker/image"
 	"github.com/docker/docker/layer"
+	"github.com/docker/docker/pkg/compute"
 	dockerreference "github.com/docker/docker/reference"
 	"github.com/docker/docker/registry"
 	"github.com/docker/libtrust"
@@ -49,7 +53,7 @@ type ImageServiceConfig struct {
 }
 
 // NewImageService returns a new ImageService from a configuration
-func NewImageService(config ImageServiceConfig) *ImageService {
+func NewImageService(config ImageServiceConfig) (i *ImageService) {
 	logrus.Debugf("Max Concurrent Downloads: %d", config.MaxConcurrentDownloads)
 	logrus.Debugf("Max Concurrent Uploads: %d", config.MaxConcurrentUploads)
 	logrus.Debugf("Max Download Attempts: %d", config.MaxDownloadAttempts)
@@ -67,6 +71,12 @@ func NewImageService(config ImageServiceConfig) *ImageService {
 		leases:                    config.Leases,
 		content:                   config.ContentStore,
 		contentNamespace:          config.ContentNamespace,
+		imageDiskUsageSingleton: compute.NewSingleton(func(ctx context.Context) (interface{}, error) {
+			return i.imageDiskUsage(ctx)
+		}),
+		layerDiskUsageSingleton: compute.NewSingleton(func(ctx context.Context) (interface{}, error) {
+			return i.layerDiskUsage(ctx)
+		}),
 	}
 }
 
@@ -86,6 +96,8 @@ type ImageService struct {
 	leases                    leases.Manager
 	content                   content.Store
 	contentNamespace          string
+	imageDiskUsageSingleton   *compute.Singleton
+	layerDiskUsageSingleton   *compute.Singleton
 }
 
 // DistributionServices provides daemon image storage services
@@ -192,9 +204,7 @@ func (i *ImageService) ReleaseLayer(rwlayer layer.RWLayer, containerOS string) e
 	return nil
 }
 
-// LayerDiskUsage returns the number of bytes used by layer stores
-// called from disk_usage.go
-func (i *ImageService) LayerDiskUsage(ctx context.Context) (int64, error) {
+func (i *ImageService) layerDiskUsage(ctx context.Context) (int64, error) {
 	var allLayersSize int64
 	layerRefs := i.getLayerRefs()
 	allLayers := i.layerStore.Map()
@@ -216,6 +226,16 @@ func (i *ImageService) LayerDiskUsage(ctx context.Context) (int64, error) {
 	return allLayersSize, nil
 }
 
+// LayerDiskUsage returns the number of bytes used by layer stores
+// called from disk_usage.go
+func (i *ImageService) LayerDiskUsage(ctx context.Context) (int64, error) {
+	v, err := i.layerDiskUsageSingleton.Do(ctx)
+	if err != nil {
+		return 0, err
+	}
+	return v.(int64), nil
+}
+
 func (i *ImageService) getLayerRefs() map[layer.ChainID]int {
 	tmpImages := i.imageStore.Map()
 	layerRefs := map[layer.ChainID]int{}
@@ -235,6 +255,28 @@ func (i *ImageService) getLayerRefs() map[layer.ChainID]int {
 	}
 
 	return layerRefs
+}
+
+func (i *ImageService) imageDiskUsage(ctx context.Context) ([]*types.ImageSummary, error) {
+	// Get all top images with extra attributes
+	images, err := i.Images(ctx, types.ImageListOptions{
+		Filters:        filters.NewArgs(),
+		SharedSize:     true,
+		ContainerCount: true,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to retrieve image list: %v", err)
+	}
+	return images, nil
+}
+
+// ImageDiskUsage returns information about image data disk usage.
+func (i *ImageService) ImageDiskUsage(ctx context.Context) ([]*types.ImageSummary, error) {
+	v, err := i.imageDiskUsageSingleton.Do(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return v.([]*types.ImageSummary), nil
 }
 
 // UpdateConfig values

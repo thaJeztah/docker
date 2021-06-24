@@ -3,36 +3,44 @@ package daemon // import "github.com/docker/docker/daemon"
 import (
 	"context"
 	"fmt"
-	"sync/atomic"
 
 	"github.com/docker/docker/api/server/router/system"
 	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/api/types/filters"
 	"golang.org/x/sync/errgroup"
 )
 
-// SystemDiskUsage returns information about the daemon data disk usage
-func (daemon *Daemon) SystemDiskUsage(ctx context.Context, opts system.DiskUsageOptions) (*types.DiskUsage, error) {
-	if !atomic.CompareAndSwapInt32(&daemon.diskUsageRunning, 0, 1) {
-		return nil, fmt.Errorf("a disk usage operation is already running")
+func (daemon *Daemon) containerDiskUsage(ctx context.Context) ([]*types.Container, error) {
+	// Retrieve container list
+	containers, err := daemon.Containers(&types.ContainerListOptions{
+		Size: true,
+		All:  true,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to retrieve container list: %v", err)
 	}
-	defer atomic.StoreInt32(&daemon.diskUsageRunning, 0)
+	return containers, nil
+}
 
+// ContainerDiskUsage returns information about container data disk usage.
+func (daemon *Daemon) ContainerDiskUsage(ctx context.Context) ([]*types.Container, error) {
+	v, err := daemon.containerDiskUsageSingleton.Do(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return v.([]*types.Container), nil
+}
+
+// SystemDiskUsage returns information about the daemon data disk usage.
+// Callers must not mutate contents of the returned fields.
+func (daemon *Daemon) SystemDiskUsage(ctx context.Context, opts system.DiskUsageOptions) (*types.DiskUsage, error) {
 	eg, ctx := errgroup.WithContext(ctx)
 
 	var containers []*types.Container
 	if opts.Containers {
 		eg.Go(func() error {
 			var err error
-			// Retrieve container list
-			containers, err = daemon.Containers(&types.ContainerListOptions{
-				Size: true,
-				All:  true,
-			})
-			if err != nil {
-				return fmt.Errorf("failed to retrieve container list: %v", err)
-			}
-			return nil
+			containers, err = daemon.ContainerDiskUsage(ctx)
+			return err
 		})
 	}
 
@@ -43,16 +51,8 @@ func (daemon *Daemon) SystemDiskUsage(ctx context.Context, opts system.DiskUsage
 	if opts.Images {
 		eg.Go(func() error {
 			var err error
-			// Get all top images with extra attributes
-			images, err = daemon.imageService.Images(ctx, types.ImageListOptions{
-				Filters:        filters.NewArgs(),
-				SharedSize:     true,
-				ContainerCount: true,
-			})
-			if err != nil {
-				return fmt.Errorf("failed to retrieve image list: %v", err)
-			}
-			return nil
+			images, err = daemon.imageService.ImageDiskUsage(ctx)
+			return err
 		})
 		eg.Go(func() error {
 			var err error
