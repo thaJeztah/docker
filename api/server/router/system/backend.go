@@ -12,14 +12,8 @@ import (
 
 // DiskUsageOptions holds parameters for system disk usage query.
 type DiskUsageOptions struct {
-	// Containers controls whether container disk usage should be computed.
-	Containers bool
-
-	// Images controls whether image disk usage should be computed.
-	Images bool
-
-	// Volumes controls whether volume disk usage should be computed.
-	Volumes bool
+	// ObjectTypes to include when collecting usage.
+	ObjectTypes map[DiskUsageObject]bool
 }
 
 // Backend is the methods that need to be implemented to provide

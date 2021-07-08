@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/docker/docker/api/server/httputils"
@@ -95,39 +94,27 @@ type DiskUsageObject string
 
 const (
 	// ContainerObject represents a container DiskUsageObject.
-	ContainerObject DiskUsageObject = "containers"
+	ContainerObject DiskUsageObject = "container"
 	// ImageObject represents an image DiskUsageObject.
-	ImageObject DiskUsageObject = "images"
+	ImageObject DiskUsageObject = "image"
 	// VolumeObject represents a volume DiskUsageObject.
-	VolumeObject DiskUsageObject = "volumes"
+	VolumeObject DiskUsageObject = "volume"
 	// BuildCacheObject represents a build-cache DiskUsageObject.
-	BuildCacheObject DiskUsageObject = "builds"
+	BuildCacheObject DiskUsageObject = "build-cache"
 )
 
 func (s *systemRouter) getDiskUsage(ctx context.Context, w http.ResponseWriter, r *http.Request, vars map[string]string) error {
 	if err := httputils.ParseForm(r); err != nil {
 		return err
 	}
-
-	var getContainers, getImages, getVolumes, getBuildCache bool
-	typesStrs, ok := r.Form["types"]
-	if !ok {
-		getContainers, getImages, getVolumes, getBuildCache = true, true, true, true
-	} else {
-		for _, s := range typesStrs {
-			for _, typ := range strings.Split(s, ",") {
-				switch DiskUsageObject(typ) {
-				case ContainerObject:
-					getContainers = true
-				case ImageObject:
-					getImages = true
-				case VolumeObject:
-					getVolumes = true
-				case BuildCacheObject:
-					getBuildCache = true
-				default:
-					return invalidRequestError{fmt.Errorf("unknown object type: %s", typ)}
-				}
+	oTypes := map[DiskUsageObject]bool{}
+	if typesStrs, ok := r.Form["types"]; ok {
+		for _, t := range typesStrs {
+			switch typ := DiskUsageObject(t); typ {
+			case ContainerObject, ImageObject, VolumeObject, BuildCacheObject:
+				oTypes[typ] = true
+			default:
+				return invalidRequestError{fmt.Errorf("unknown object type: %s", typ)}
 			}
 		}
 	}
@@ -137,16 +124,12 @@ func (s *systemRouter) getDiskUsage(ctx context.Context, w http.ResponseWriter, 
 	var du *types.DiskUsage
 	eg.Go(func() error {
 		var err error
-		du, err = s.backend.SystemDiskUsage(ctx, DiskUsageOptions{
-			Containers: getContainers,
-			Images:     getImages,
-			Volumes:    getVolumes,
-		})
+		du, err = s.backend.SystemDiskUsage(ctx, DiskUsageOptions{ObjectTypes: oTypes})
 		return err
 	})
 
 	var buildCache []*types.BuildCache
-	if getBuildCache {
+	if len(oTypes) == 0 || oTypes[BuildCacheObject] {
 		eg.Go(func() error {
 			var err error
 			buildCache, err = s.builder.DiskUsage(ctx)
@@ -161,14 +144,13 @@ func (s *systemRouter) getDiskUsage(ctx context.Context, w http.ResponseWriter, 
 		return err
 	}
 
-	if getBuildCache {
-		var builderSize int64
-		for _, b := range buildCache {
-			builderSize += b.Size
-		}
-		du.BuilderSize = builderSize
-		du.BuildCache = buildCache
+	var builderSize int64
+	for _, b := range buildCache {
+		builderSize += b.Size
 	}
+
+	du.BuilderSize = builderSize
+	du.BuildCache = buildCache
 
 	return httputils.WriteJSON(w, http.StatusOK, du)
 }

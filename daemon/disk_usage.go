@@ -8,7 +8,17 @@ import (
 	"github.com/docker/docker/api/server/router/system"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
+	"github.com/docker/docker/errdefs"
 )
+
+type usageCollector func(ctx context.Context, daemon *Daemon, du *types.DiskUsage) error
+
+var collectors = map[system.DiskUsageObject]usageCollector{
+	system.ContainerObject:  appendContainers,
+	system.ImageObject:      appendImages,
+	system.VolumeObject:     appendVolumes,
+	system.BuildCacheObject: nil, // build-cache is currently collected in systemRouter.getDiskUsage()
+}
 
 // SystemDiskUsage returns information about the daemon data disk usage
 func (daemon *Daemon) SystemDiskUsage(ctx context.Context, opts system.DiskUsageOptions) (*types.DiskUsage, error) {
@@ -17,48 +27,66 @@ func (daemon *Daemon) SystemDiskUsage(ctx context.Context, opts system.DiskUsage
 	}
 	defer atomic.StoreInt32(&daemon.diskUsageRunning, 0)
 
-	var err error
-
-	var containers []*types.Container
-	if opts.Containers {
-		// Retrieve container list
-		containers, err = daemon.Containers(&types.ContainerListOptions{
-			Size: true,
-			All:  true,
-		})
-		if err != nil {
-			return nil, fmt.Errorf("failed to retrieve container list: %v", err)
+	if len(opts.ObjectTypes) == 0 {
+		// Collect all objects by default
+		opts.ObjectTypes = map[system.DiskUsageObject]bool{
+			system.ContainerObject: true,
+			system.ImageObject:     true,
+			system.VolumeObject:    true,
 		}
 	}
 
-	var (
-		images     []*types.ImageSummary
-		layersSize int64
-	)
-	if opts.Images {
-		// Get all top images with extra attributes
-		images, err = daemon.imageService.Images(filters.NewArgs(), false, true)
-		if err != nil {
-			return nil, fmt.Errorf("failed to retrieve image list: %v", err)
+	du := &types.DiskUsage{}
+	for t := range opts.ObjectTypes {
+		c, ok := collectors[t]
+		if !ok {
+			return nil, errdefs.InvalidParameter(fmt.Errorf("unknown object type: %s", t))
 		}
-
-		layersSize, err = daemon.imageService.LayerDiskUsage(ctx)
-		if err != nil {
+		if c == nil {
+			continue
+		}
+		if err := c(ctx, daemon, du); err != nil {
 			return nil, err
 		}
 	}
+	return du, nil
+}
 
-	var volumes []*types.Volume
-	if opts.Volumes {
-		volumes, err = daemon.volumes.LocalVolumesSize(ctx)
-		if err != nil {
-			return nil, err
-		}
+// appendContainers retrieves container list, and adds it to du
+func appendContainers(_ context.Context, daemon *Daemon, du *types.DiskUsage) error {
+	containers, err := daemon.Containers(&types.ContainerListOptions{
+		Size: true,
+		All:  true,
+	})
+	if err != nil {
+		return fmt.Errorf("failed to retrieve container list: %v", err)
 	}
-	return &types.DiskUsage{
-		LayersSize: layersSize,
-		Containers: containers,
-		Volumes:    volumes,
-		Images:     images,
-	}, nil
+	du.Containers = containers
+	return nil
+}
+
+// appendImages retrieves image list and layersSize, and adds it to du
+func appendImages(ctx context.Context, daemon *Daemon, du *types.DiskUsage) error {
+	images, err := daemon.imageService.Images(filters.NewArgs(), false, true)
+	if err != nil {
+		return fmt.Errorf("failed to retrieve image list: %v", err)
+	}
+
+	layersSize, err := daemon.imageService.LayerDiskUsage(ctx)
+	if err != nil {
+		return err
+	}
+	du.Images = images
+	du.LayersSize = layersSize
+	return nil
+}
+
+// appendVolumes retrieves volumes list, and adds it to du
+func appendVolumes(ctx context.Context, daemon *Daemon, du *types.DiskUsage) error {
+	volumes, err := daemon.volumes.LocalVolumesSize(ctx)
+	if err != nil {
+		return err
+	}
+	du.Volumes = volumes
+	return nil
 }
