@@ -299,10 +299,14 @@ func (p *windowsParser) ParseMountRaw(raw, volumeDriver string) (*MountPoint, er
 	if err != nil {
 		return nil, err
 	}
-	return p.parseMount(arr, raw, volumeDriver, true, windowsValidators)
+	mp, err := p.parseMount(arr, volumeDriver, true, windowsValidators)
+	if err != nil {
+		return nil, fmt.Errorf("invalid volume specification '%s': %v", raw, err)
+	}
+	return mp, nil
 }
 
-func (p *windowsParser) parseMount(arr []string, raw, volumeDriver string, convertTargetToBackslash bool, additionalValidators ...mountValidator) (*MountPoint, error) {
+func (p *windowsParser) parseMount(arr []string, volumeDriver string, convertTargetToBackslash bool, additionalValidators ...mountValidator) (*MountPoint, error) {
 	var spec mount.Mount
 	var mode string
 	switch len(arr) {
@@ -313,7 +317,7 @@ func (p *windowsParser) parseMount(arr []string, raw, volumeDriver string, conve
 		if windowsValidMountMode(arr[1]) {
 			// Destination + Mode is not a valid volume - volumes
 			// cannot include a mode. e.g. /foo:rw
-			return nil, errInvalidSpec(raw)
+			return nil, errInvalidMode(mode + " is not allowed on Windows")
 		}
 		// Host Source Path or Name + Destination
 		spec.Source = strings.Replace(arr[0], `/`, `\`, -1)
@@ -324,7 +328,7 @@ func (p *windowsParser) parseMount(arr []string, raw, volumeDriver string, conve
 		spec.Target = arr[1]
 		mode = arr[2]
 	default:
-		return nil, errInvalidSpec(raw)
+		return nil, fmt.Errorf("expected 1-3 parts in spec, but got %d", len(arr))
 	}
 	if convertTargetToBackslash {
 		spec.Target = strings.Replace(spec.Target, `/`, `\`, -1)
@@ -356,9 +360,9 @@ func (p *windowsParser) parseMount(arr []string, raw, volumeDriver string, conve
 		mp.Mode = mode
 	}
 	if err != nil {
-		err = fmt.Errorf("%v: %v", errInvalidSpec(raw), err)
+		return nil, err
 	}
-	return mp, err
+	return mp, nil
 }
 
 func (p *windowsParser) ParseMountSpec(cfg mount.Mount) (*MountPoint, error) {

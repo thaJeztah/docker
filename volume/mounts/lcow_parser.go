@@ -58,7 +58,11 @@ func (p *lcowParser) ParseMountRaw(raw, volumeDriver string) (*MountPoint, error
 	if err != nil {
 		return nil, err
 	}
-	return p.parseMount(arr, raw, volumeDriver, false, lcowValidators)
+	mp, err := p.parseMount(arr, volumeDriver, true, lcowValidators)
+	if err != nil {
+		return nil, fmt.Errorf("invalid volume specification '%s': %v", raw, err)
+	}
+	return mp, nil
 }
 
 func (p *lcowParser) ParseMountSpec(cfg mount.Mount) (*MountPoint, error) {
