@@ -556,6 +556,24 @@ type DiskUsageOptions struct {
 	Types []DiskUsageObject
 }
 
+// ContainerUsage contains container usage part of response of Engine API:
+// GET "/system/df"
+type ContainerUsage struct {
+	ID         string `json:"Id"` // Use "Id" in JSON for backward-compatibility with API < 1.42
+	Image      string
+	ImageID    string
+	Command    string
+	Created    int64
+	Ports      []Port
+	Names      []string
+	SizeRw     int64 `json:",omitempty"`
+	SizeRootFs int64 `json:",omitempty"`
+	Labels     map[string]string
+	State      string
+	Status     string
+	Mounts     []MountPoint
+}
+
 // DiskUsage contains response of Engine API:
 // GET "/system/df"
 type DiskUsage struct {
