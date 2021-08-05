@@ -8220,7 +8220,9 @@ paths:
                 items:
                   $ref: "#/definitions/ImageSummary"
               Containers:
-                $ref: "#/definitions/ContainerSummary"
+                type: "array"
+                items:
+                  $ref: "#/definitions/ContainerUsage"
               Volumes:
                 type: "array"
                 items:

@@ -10,7 +10,7 @@ import (
 )
 
 // ContainerDiskUsage returns information about container data disk usage.
-func (daemon *Daemon) ContainerDiskUsage(ctx context.Context) ([]*types.Container, error) {
+func (daemon *Daemon) ContainerDiskUsage(ctx context.Context) ([]*types.ContainerUsage, error) {
 	ch := daemon.usage.DoChan("ContainerDiskUsage", func() (interface{}, error) {
 		// Retrieve container list
 		containers, err := daemon.Containers(&types.ContainerListOptions{
@@ -20,7 +20,25 @@ func (daemon *Daemon) ContainerDiskUsage(ctx context.Context) ([]*types.Containe
 		if err != nil {
 			return nil, fmt.Errorf("failed to retrieve container list: %v", err)
 		}
-		return containers, nil
+		us := make([]*types.ContainerUsage, 0, len(containers))
+		for _, c := range containers {
+			us = append(us, &types.ContainerUsage{
+				ID:         c.ID,
+				Image:      c.Image,
+				ImageID:    c.ImageID,
+				Command:    c.Command,
+				Created:    c.Created,
+				Ports:      c.Ports,
+				Names:      c.Names,
+				SizeRw:     c.SizeRw,
+				SizeRootFs: c.SizeRootFs,
+				Labels:     c.Labels,
+				State:      c.State,
+				Status:     c.Status,
+				Mounts:     c.Mounts,
+			})
+		}
+		return us, nil
 	})
 	select {
 	case <-ctx.Done():
@@ -29,7 +47,7 @@ func (daemon *Daemon) ContainerDiskUsage(ctx context.Context) ([]*types.Containe
 		if res.Err != nil {
 			return nil, res.Err
 		}
-		return res.Val.([]*types.Container), nil
+		return res.Val.([]*types.ContainerUsage), nil
 	}
 }
 
@@ -38,7 +56,7 @@ func (daemon *Daemon) ContainerDiskUsage(ctx context.Context) ([]*types.Containe
 func (daemon *Daemon) SystemDiskUsage(ctx context.Context, opts system.DiskUsageOptions) (*types.DiskUsage, error) {
 	eg, ctx := errgroup.WithContext(ctx)
 
-	var containers []*types.Container
+	var containers []*types.ContainerUsage
 	if opts.Containers {
 		eg.Go(func() error {
 			var err error
