@@ -8,7 +8,6 @@ import (
 
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/errdefs"
-	"github.com/docker/docker/pkg/compute"
 	"github.com/docker/docker/volume"
 	volumedrivers "github.com/docker/docker/volume/drivers"
 	"github.com/docker/docker/volume/service/opts"
@@ -234,7 +233,7 @@ func TestServicePrune(t *testing.T) {
 	assert.Assert(t, is.Equal(pr.VolumesDeleted[0], "test"))
 }
 
-func newTestService(t *testing.T, ds *volumedrivers.Store) (s *VolumesService, cleanup func()) {
+func newTestService(t *testing.T, ds *volumedrivers.Store) (*VolumesService, func()) {
 	t.Helper()
 
 	dir, err := ioutil.TempDir("", t.Name())
@@ -242,16 +241,11 @@ func newTestService(t *testing.T, ds *volumedrivers.Store) (s *VolumesService, c
 
 	store, err := NewStore(dir, ds)
 	assert.NilError(t, err)
-	return &VolumesService{
-			vs:          store,
-			eventLogger: dummyEventLogger{},
-			localVolumesSizeSingleton: compute.NewSingleton(func(ctx context.Context) (interface{}, error) {
-				return s.localVolumesSize(ctx)
-			}),
-		}, func() {
-			assert.Check(t, s.Shutdown())
-			assert.Check(t, os.RemoveAll(dir))
-		}
+	s := &VolumesService{vs: store, eventLogger: dummyEventLogger{}}
+	return s, func() {
+		assert.Check(t, s.Shutdown())
+		assert.Check(t, os.RemoveAll(dir))
+	}
 }
 
 type dummyEventLogger struct{}

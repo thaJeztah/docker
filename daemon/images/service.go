@@ -16,13 +16,13 @@ import (
 	"github.com/docker/docker/distribution/xfer"
 	"github.com/docker/docker/image"
 	"github.com/docker/docker/layer"
-	"github.com/docker/docker/pkg/compute"
 	dockerreference "github.com/docker/docker/reference"
 	"github.com/docker/docker/registry"
 	"github.com/docker/libtrust"
 	digest "github.com/opencontainers/go-digest"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"golang.org/x/sync/singleflight"
 )
 
 type containerStore interface {
@@ -53,7 +53,7 @@ type ImageServiceConfig struct {
 }
 
 // NewImageService returns a new ImageService from a configuration
-func NewImageService(config ImageServiceConfig) (i *ImageService) {
+func NewImageService(config ImageServiceConfig) *ImageService {
 	logrus.Debugf("Max Concurrent Downloads: %d", config.MaxConcurrentDownloads)
 	logrus.Debugf("Max Concurrent Uploads: %d", config.MaxConcurrentUploads)
 	logrus.Debugf("Max Download Attempts: %d", config.MaxDownloadAttempts)
@@ -71,12 +71,6 @@ func NewImageService(config ImageServiceConfig) (i *ImageService) {
 		leases:                    config.Leases,
 		content:                   config.ContentStore,
 		contentNamespace:          config.ContentNamespace,
-		imageDiskUsageSingleton: compute.NewSingleton(func(ctx context.Context) (interface{}, error) {
-			return i.imageDiskUsage(ctx)
-		}),
-		layerDiskUsageSingleton: compute.NewSingleton(func(ctx context.Context) (interface{}, error) {
-			return i.layerDiskUsage(ctx)
-		}),
 	}
 }
 
@@ -96,8 +90,7 @@ type ImageService struct {
 	leases                    leases.Manager
 	content                   content.Store
 	contentNamespace          string
-	imageDiskUsageSingleton   *compute.Singleton
-	layerDiskUsageSingleton   *compute.Singleton
+	singleflightGroup         singleflight.Group
 }
 
 // DistributionServices provides daemon image storage services
@@ -229,11 +222,19 @@ func (i *ImageService) layerDiskUsage(ctx context.Context) (int64, error) {
 // LayerDiskUsage returns the number of bytes used by layer stores
 // called from disk_usage.go
 func (i *ImageService) LayerDiskUsage(ctx context.Context) (int64, error) {
-	v, err := i.layerDiskUsageSingleton.Do(ctx)
-	if err != nil {
-		return 0, err
+	ch := i.singleflightGroup.DoChan("layerDiskUsage", func() (interface{}, error) {
+		return i.layerDiskUsage(ctx)
+	})
+	select {
+	case <-ctx.Done():
+		go func() { <-ch }()
+		return 0, ctx.Err()
+	case res := <-ch:
+		if res.Err != nil {
+			return 0, res.Err
+		}
+		return res.Val.(int64), nil
 	}
-	return v.(int64), nil
 }
 
 func (i *ImageService) getLayerRefs() map[layer.ChainID]int {
@@ -272,11 +273,19 @@ func (i *ImageService) imageDiskUsage(ctx context.Context) ([]*types.ImageSummar
 
 // ImageDiskUsage returns information about image data disk usage.
 func (i *ImageService) ImageDiskUsage(ctx context.Context) ([]*types.ImageSummary, error) {
-	v, err := i.imageDiskUsageSingleton.Do(ctx)
-	if err != nil {
-		return nil, err
+	ch := i.singleflightGroup.DoChan("imageDiskUsage", func() (interface{}, error) {
+		return i.imageDiskUsage(ctx)
+	})
+	select {
+	case <-ctx.Done():
+		go func() { <-ch }()
+		return nil, ctx.Err()
+	case res := <-ch:
+		if res.Err != nil {
+			return nil, res.Err
+		}
+		return res.Val.([]*types.ImageSummary), nil
 	}
-	return v.([]*types.ImageSummary), nil
 }
 
 // UpdateConfig values

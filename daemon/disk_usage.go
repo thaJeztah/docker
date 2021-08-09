@@ -23,11 +23,19 @@ func (daemon *Daemon) containerDiskUsage(ctx context.Context) ([]*types.Containe
 
 // ContainerDiskUsage returns information about container data disk usage.
 func (daemon *Daemon) ContainerDiskUsage(ctx context.Context) ([]*types.Container, error) {
-	v, err := daemon.containerDiskUsageSingleton.Do(ctx)
-	if err != nil {
-		return nil, err
+	ch := daemon.singleflightGroup.DoChan("containerDiskUsage", func() (interface{}, error) {
+		return daemon.containerDiskUsage(ctx)
+	})
+	select {
+	case <-ctx.Done():
+		go func() { <-ch }()
+		return nil, ctx.Err()
+	case res := <-ch:
+		if res.Err != nil {
+			return nil, res.Err
+		}
+		return res.Val.([]*types.Container), nil
 	}
-	return v.([]*types.Container), nil
 }
 
 // SystemDiskUsage returns information about the daemon data disk usage.

@@ -8,7 +8,6 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/errdefs"
-	"github.com/docker/docker/pkg/compute"
 	"github.com/docker/docker/pkg/directory"
 	"github.com/docker/docker/pkg/idtools"
 	"github.com/docker/docker/pkg/plugingetter"
@@ -18,6 +17,7 @@ import (
 	"github.com/docker/docker/volume/service/opts"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"golang.org/x/sync/singleflight"
 )
 
 type ds interface {
@@ -33,17 +33,17 @@ type VolumeEventLogger interface {
 // VolumesService manages access to volumes
 // This is used as the main access point for volumes to higher level services and the API.
 type VolumesService struct {
-	vs                        *VolumeStore
-	ds                        ds
-	pruneRunning              int32
-	eventLogger               VolumeEventLogger
-	localVolumesSizeSingleton *compute.Singleton
+	vs                *VolumeStore
+	ds                ds
+	pruneRunning      int32
+	eventLogger       VolumeEventLogger
+	singleflightGroup singleflight.Group
 }
 
 // NewVolumeService creates a new volume service
-func NewVolumeService(root string, pg plugingetter.PluginGetter, rootIDs idtools.Identity, logger VolumeEventLogger) (s *VolumesService, err error) {
+func NewVolumeService(root string, pg plugingetter.PluginGetter, rootIDs idtools.Identity, logger VolumeEventLogger) (*VolumesService, error) {
 	ds := drivers.NewStore(pg)
-	if err = setupDefaultDriver(ds, root, rootIDs); err != nil {
+	if err := setupDefaultDriver(ds, root, rootIDs); err != nil {
 		return nil, err
 	}
 
@@ -51,14 +51,7 @@ func NewVolumeService(root string, pg plugingetter.PluginGetter, rootIDs idtools
 	if err != nil {
 		return nil, err
 	}
-	return &VolumesService{
-		vs:          vs,
-		ds:          ds,
-		eventLogger: logger,
-		localVolumesSizeSingleton: compute.NewSingleton(func(ctx context.Context) (interface{}, error) {
-			return s.localVolumesSize(ctx)
-		}),
-	}, nil
+	return &VolumesService{vs: vs, ds: ds, eventLogger: logger}, nil
 }
 
 // GetDriverList gets the list of registered volume drivers
@@ -202,11 +195,19 @@ func (s *VolumesService) localVolumesSize(ctx context.Context) ([]*types.Volume,
 // volumes with mount options are not really local even if they are using the
 // local driver.
 func (s *VolumesService) LocalVolumesSize(ctx context.Context) ([]*types.Volume, error) {
-	v, err := s.localVolumesSizeSingleton.Do(ctx)
-	if err != nil {
-		return nil, err
+	ch := s.singleflightGroup.DoChan("localVolumesSize", func() (interface{}, error) {
+		return s.localVolumesSize(ctx)
+	})
+	select {
+	case <-ctx.Done():
+		go func() { <-ch }()
+		return nil, ctx.Err()
+	case res := <-ch:
+		if res.Err != nil {
+			return nil, res.Err
+		}
+		return res.Val.([]*types.Volume), nil
 	}
-	return v.([]*types.Volume), nil
 }
 
 // Prune removes (local) volumes which match the past in filter arguments.
