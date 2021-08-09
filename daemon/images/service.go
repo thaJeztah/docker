@@ -90,7 +90,7 @@ type ImageService struct {
 	leases                    leases.Manager
 	content                   content.Store
 	contentNamespace          string
-	singleflightGroup         singleflight.Group
+	singleFlight              singleflight.Group
 }
 
 // DistributionServices provides daemon image storage services
@@ -197,33 +197,29 @@ func (i *ImageService) ReleaseLayer(rwlayer layer.RWLayer, containerOS string) e
 	return nil
 }
 
-func (i *ImageService) layerDiskUsage(ctx context.Context) (int64, error) {
-	var allLayersSize int64
-	layerRefs := i.getLayerRefs()
-	allLayers := i.layerStore.Map()
-	for _, l := range allLayers {
-		select {
-		case <-ctx.Done():
-			return allLayersSize, ctx.Err()
-		default:
-			size, err := l.DiffSize()
-			if err == nil {
-				if _, ok := layerRefs[l.ChainID()]; ok {
-					allLayersSize += size
-				}
-			} else {
-				logrus.Warnf("failed to get diff size for layer %v", l.ChainID())
-			}
-		}
-	}
-	return allLayersSize, nil
-}
-
 // LayerDiskUsage returns the number of bytes used by layer stores
 // called from disk_usage.go
 func (i *ImageService) LayerDiskUsage(ctx context.Context) (int64, error) {
-	ch := i.singleflightGroup.DoChan("layerDiskUsage", func() (interface{}, error) {
-		return i.layerDiskUsage(ctx)
+	ch := i.singleFlight.DoChan("layerDiskUsage", func() (interface{}, error) {
+		var allLayersSize int64
+		layerRefs := i.getLayerRefs()
+		allLayers := i.layerStore.Map()
+		for _, l := range allLayers {
+			select {
+			case <-ctx.Done():
+				return allLayersSize, ctx.Err()
+			default:
+				size, err := l.DiffSize()
+				if err == nil {
+					if _, ok := layerRefs[l.ChainID()]; ok {
+						allLayersSize += size
+					}
+				} else {
+					logrus.Warnf("failed to get diff size for layer %v", l.ChainID())
+				}
+			}
+		}
+		return allLayersSize, nil
 	})
 	select {
 	case <-ctx.Done():
@@ -258,23 +254,19 @@ func (i *ImageService) getLayerRefs() map[layer.ChainID]int {
 	return layerRefs
 }
 
-func (i *ImageService) imageDiskUsage(ctx context.Context) ([]*types.ImageSummary, error) {
-	// Get all top images with extra attributes
-	images, err := i.Images(ctx, types.ImageListOptions{
-		Filters:        filters.NewArgs(),
-		SharedSize:     true,
-		ContainerCount: true,
-	})
-	if err != nil {
-		return nil, fmt.Errorf("failed to retrieve image list: %v", err)
-	}
-	return images, nil
-}
-
 // ImageDiskUsage returns information about image data disk usage.
 func (i *ImageService) ImageDiskUsage(ctx context.Context) ([]*types.ImageSummary, error) {
-	ch := i.singleflightGroup.DoChan("imageDiskUsage", func() (interface{}, error) {
-		return i.imageDiskUsage(ctx)
+	ch := i.singleFlight.DoChan("imageDiskUsage", func() (interface{}, error) {
+		// Get all top images with extra attributes
+		images, err := i.Images(ctx, types.ImageListOptions{
+			Filters:        filters.NewArgs(),
+			SharedSize:     true,
+			ContainerCount: true,
+		})
+		if err != nil {
+			return nil, fmt.Errorf("failed to retrieve image list: %v", err)
+		}
+		return images, nil
 	})
 	select {
 	case <-ctx.Done():

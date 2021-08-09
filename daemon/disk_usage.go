@@ -9,22 +9,18 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-func (daemon *Daemon) containerDiskUsage(ctx context.Context) ([]*types.Container, error) {
-	// Retrieve container list
-	containers, err := daemon.Containers(&types.ContainerListOptions{
-		Size: true,
-		All:  true,
-	})
-	if err != nil {
-		return nil, fmt.Errorf("failed to retrieve container list: %v", err)
-	}
-	return containers, nil
-}
-
 // ContainerDiskUsage returns information about container data disk usage.
 func (daemon *Daemon) ContainerDiskUsage(ctx context.Context) ([]*types.Container, error) {
-	ch := daemon.singleflightGroup.DoChan("containerDiskUsage", func() (interface{}, error) {
-		return daemon.containerDiskUsage(ctx)
+	ch := daemon.singleFlight.DoChan("containerDiskUsage", func() (interface{}, error) {
+		// Retrieve container list
+		containers, err := daemon.Containers(&types.ContainerListOptions{
+			Size: true,
+			All:  true,
+		})
+		if err != nil {
+			return nil, fmt.Errorf("failed to retrieve container list: %v", err)
+		}
+		return containers, nil
 	})
 	select {
 	case <-ctx.Done():

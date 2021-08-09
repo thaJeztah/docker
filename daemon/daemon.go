@@ -118,11 +118,10 @@ type Daemon struct {
 	seccompProfile     []byte
 	seccompProfilePath string
 
-	singleflightGroup singleflight.Group
-
 	pruneRunning int32
 	hosts        map[string]bool // hosts stores the addresses the daemon is listening on
 	startupDone  chan struct{}
+	singleFlight singleflight.Group
 
 	attachmentStore       network.AttachmentStore
 	attachableNetworkLock *locker.Locker

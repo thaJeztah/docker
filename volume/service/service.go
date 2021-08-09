@@ -33,11 +33,11 @@ type VolumeEventLogger interface {
 // VolumesService manages access to volumes
 // This is used as the main access point for volumes to higher level services and the API.
 type VolumesService struct {
-	vs                *VolumeStore
-	ds                ds
-	pruneRunning      int32
-	eventLogger       VolumeEventLogger
-	singleflightGroup singleflight.Group
+	vs           *VolumeStore
+	ds           ds
+	pruneRunning int32
+	eventLogger  VolumeEventLogger
+	singleFlight singleflight.Group
 }
 
 // NewVolumeService creates a new volume service
@@ -179,24 +179,20 @@ var acceptedListFilters = map[string]bool{
 	"label":    true,
 }
 
-func (s *VolumesService) localVolumesSize(ctx context.Context) ([]*types.Volume, error) {
-	ls, _, err := s.vs.Find(ctx, And(ByDriver(volume.DefaultDriverName), CustomFilter(func(v volume.Volume) bool {
-		dv, ok := v.(volume.DetailedVolume)
-		return ok && len(dv.Options()) == 0
-	})))
-	if err != nil {
-		return nil, err
-	}
-	return s.volumesToAPI(ctx, ls, calcSize(true)), nil
-}
-
 // LocalVolumesSize gets all local volumes and fetches their size on disk
 // Note that this intentionally skips volumes which have mount options. Typically
 // volumes with mount options are not really local even if they are using the
 // local driver.
 func (s *VolumesService) LocalVolumesSize(ctx context.Context) ([]*types.Volume, error) {
-	ch := s.singleflightGroup.DoChan("localVolumesSize", func() (interface{}, error) {
-		return s.localVolumesSize(ctx)
+	ch := s.singleFlight.DoChan("localVolumesSize", func() (interface{}, error) {
+		ls, _, err := s.vs.Find(ctx, And(ByDriver(volume.DefaultDriverName), CustomFilter(func(v volume.Volume) bool {
+			dv, ok := v.(volume.DetailedVolume)
+			return ok && len(dv.Options()) == 0
+		})))
+		if err != nil {
+			return nil, err
+		}
+		return s.volumesToAPI(ctx, ls, calcSize(true)), nil
 	})
 	select {
 	case <-ctx.Done():
