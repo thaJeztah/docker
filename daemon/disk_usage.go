@@ -12,16 +12,11 @@ import (
 // ContainerDiskUsage returns information about container data disk usage.
 func (daemon *Daemon) ContainerDiskUsage(ctx context.Context) ([]*types.ContainerUsage, error) {
 	ch := daemon.usage.DoChan("ContainerDiskUsage", func() (interface{}, error) {
-		// Retrieve container list
-		containers, err := daemon.Containers(&types.ContainerListOptions{
+		var us []*types.ContainerUsage
+		if err := daemon.rangeContainers(&types.ContainerListOptions{
 			Size: true,
 			All:  true,
-		})
-		if err != nil {
-			return nil, fmt.Errorf("failed to retrieve container list: %v", err)
-		}
-		us := make([]*types.ContainerUsage, 0, len(containers))
-		for _, c := range containers {
+		}, func(c *types.Container, lCtx *listContext) bool {
 			us = append(us, &types.ContainerUsage{
 				ID:         c.ID,
 				Names:      c.Names,
@@ -37,6 +32,10 @@ func (daemon *Daemon) ContainerDiskUsage(ctx context.Context) ([]*types.Containe
 				Status:     c.Status,
 				Mounts:     c.Mounts,
 			})
+			lCtx.idx++
+			return true
+		}); err != nil {
+			return nil, fmt.Errorf("failed to range over containers: %v", err)
 		}
 		return us, nil
 	})

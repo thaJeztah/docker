@@ -38,10 +38,6 @@ var acceptedPsFilterTags = map[string]bool{
 // iterationAction represents possible outcomes happening during the container iteration.
 type iterationAction int
 
-// containerReducer represents a reducer for a container.
-// Returns the object to serialize by the api.
-type containerReducer func(*container.Snapshot, *listContext) (*types.Container, error)
-
 const (
 	// includeContainer is the action to include a container in the reducer.
 	includeContainer iterationAction = iota
@@ -50,9 +46,6 @@ const (
 	// stopIteration is the action to stop iterating over the list of containers.
 	stopIteration
 )
-
-// errStopIteration makes the iterator to stop without returning an error.
-var errStopIteration = errors.New("container list iteration stopped")
 
 // List returns an array of all containers registered in the daemon.
 func (daemon *Daemon) List() []*container.Container {
@@ -105,7 +98,12 @@ func (r byCreatedDescending) Less(i, j int) bool {
 
 // Containers returns the list of containers to show given the user's filtering.
 func (daemon *Daemon) Containers(config *types.ContainerListOptions) ([]*types.Container, error) {
-	return daemon.reduceContainers(config, daemon.refreshImage)
+	var containers []*types.Container
+	return containers, daemon.rangeContainers(config, func(c *types.Container, lCtx *listContext) bool {
+		containers = append(containers, c)
+		lCtx.idx++
+		return true
+	})
 }
 
 func (daemon *Daemon) filterByNameIDMatches(view container.View, ctx *listContext) ([]container.Snapshot, error) {
@@ -174,20 +172,17 @@ func (daemon *Daemon) filterByNameIDMatches(view container.View, ctx *listContex
 	return cntrs, nil
 }
 
-// reduceContainers parses the user's filtering options and generates the list of containers to return based on a reducer.
-func (daemon *Daemon) reduceContainers(config *types.ContainerListOptions, reducer containerReducer) ([]*types.Container, error) {
+// rangeContainers parses the user's filtering options and ranges over the list of matching containers.
+// If f returns false, range stops the iteration.
+func (daemon *Daemon) rangeContainers(config *types.ContainerListOptions, f func(*types.Container, *listContext) bool) error {
 	if err := config.Filters.Validate(acceptedPsFilterTags); err != nil {
-		return nil, err
+		return err
 	}
 
-	var (
-		view       = daemon.containersReplica.Snapshot()
-		containers = []*types.Container{}
-	)
-
+	view := daemon.containersReplica.Snapshot()
 	ctx, err := daemon.foldFilter(view, config)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	// fastpath to only look at a subset of containers if specific name
@@ -195,49 +190,43 @@ func (daemon *Daemon) reduceContainers(config *types.ContainerListOptions, reduc
 	// end up querying many more containers than intended
 	containerList, err := daemon.filterByNameIDMatches(view, ctx)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	for i := range containerList {
-		t, err := daemon.reducePsContainer(&containerList[i], ctx, reducer)
-		if err != nil {
-			if err != errStopIteration {
-				return nil, err
+	for _, s := range containerList {
+		switch includeContainerInList(&s, ctx) {
+		case excludeContainer:
+			continue
+		case stopIteration:
+			return nil
+		}
+
+		// check if the Image ref still points to the correct ID, and update the ref to the actual ID when it doesn't
+		image := s.Image // keep the original ref if still valid (hasn't changed)
+		if image != s.ImageID {
+			img, err := daemon.imageService.GetImage(image, nil)
+			if _, isDNE := err.(images.ErrImageDoesNotExist); err != nil && !isDNE {
+				return errors.Wrap(err, "failed to query container image")
 			}
-			break
+			if err != nil || img.ImageID() != s.ImageID {
+				// ref changed, we need to use original ID
+				image = s.ImageID
+			}
 		}
-		if t != nil {
-			containers = append(containers, t)
-			ctx.idx++
+
+		// transform internal container struct into api structs
+		c := s.Container
+		c.Image = image
+		if ctx.Size {
+			sizeRw, sizeRootFs := daemon.imageService.GetContainerLayerSize(c.ID)
+			c.SizeRw = sizeRw
+			c.SizeRootFs = sizeRootFs
+		}
+		if !f(&c, ctx) {
+			return nil
 		}
 	}
-
-	return containers, nil
-}
-
-// reducePsContainer is the basic representation for a container as expected by the ps command.
-func (daemon *Daemon) reducePsContainer(container *container.Snapshot, ctx *listContext, reducer containerReducer) (*types.Container, error) {
-	// filter containers to return
-	switch includeContainerInList(container, ctx) {
-	case excludeContainer:
-		return nil, nil
-	case stopIteration:
-		return nil, errStopIteration
-	}
-
-	// transform internal container struct into api structs
-	newC, err := reducer(container, ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	// release lock because size calculation is slow
-	if ctx.Size {
-		sizeRw, sizeRootFs := daemon.imageService.GetContainerLayerSize(newC.ID)
-		newC.SizeRw = sizeRw
-		newC.SizeRootFs = sizeRootFs
-	}
-	return newC, nil
+	return nil
 }
 
 // foldFilter generates the container filter based on the user's filtering options.
@@ -574,24 +563,6 @@ func includeContainerInList(container *container.Snapshot, ctx *listContext) ite
 	}
 
 	return includeContainer
-}
-
-// refreshImage checks if the Image ref still points to the correct ID, and updates the ref to the actual ID when it doesn't
-func (daemon *Daemon) refreshImage(s *container.Snapshot, ctx *listContext) (*types.Container, error) {
-	c := s.Container
-	image := s.Image // keep the original ref if still valid (hasn't changed)
-	if image != s.ImageID {
-		img, err := daemon.imageService.GetImage(image, nil)
-		if _, isDNE := err.(images.ErrImageDoesNotExist); err != nil && !isDNE {
-			return nil, err
-		}
-		if err != nil || img.ImageID() != s.ImageID {
-			// ref changed, we need to use original ID
-			image = s.ImageID
-		}
-	}
-	c.Image = image
-	return &c, nil
 }
 
 func populateImageFilterByParents(ancestorMap map[image.ID]bool, imageID image.ID, getChildren func(image.ID) []image.ID) {
