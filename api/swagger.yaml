@@ -4241,6 +4241,14 @@ definitions:
       Spec:
         $ref: "#/definitions/ConfigSpec"
 
+  ContainerStateStatus:
+    description: |
+      String representation of the container state. Can be one of "created",
+      "running", "paused", "restarting", "removing", "exited", or "dead".
+    type: "string"
+    enum: ["created", "running", "paused", "restarting", "removing", "exited", "dead"]
+    example: "running"
+
   ContainerState:
     description: |
       ContainerState stores container's running state. It's part of ContainerJSONBase
@@ -4248,12 +4256,7 @@ definitions:
     type: "object"
     properties:
       Status:
-        description: |
-          String representation of the container state. Can be one of "created",
-          "running", "paused", "restarting", "removing", "exited", or "dead".
-        type: "string"
-        enum: ["created", "running", "paused", "restarting", "removing", "exited", "dead"]
-        example: "running"
+        $ref: "#/definitions/ContainerStateStatus"
       Running:
         description: |
           Whether this container is running.
