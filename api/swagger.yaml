@@ -1606,39 +1606,52 @@ definitions:
       Id:
         type: "string"
         x-nullable: false
+        example: "sha256:69593048aa3acfee0f75f20b77acb549de2472063053f6730c4091b53f2dfb02"
       ParentId:
         type: "string"
         x-nullable: false
+        example: ""
       RepoTags:
         type: "array"
         x-nullable: false
         items:
           type: "string"
+        example:
+          - "busybox:1.33.1"
+          - "busybox:latest"
       RepoDigests:
         type: "array"
         x-nullable: false
         items:
           type: "string"
+        example:
+          - "busybox@sha256:0f354ec1728d9ff32edcd7d1b8bbdfc798277ad36120dc3dc683be44524c8b60"
       Created:
         type: "integer"
         x-nullable: false
+        example: 1466724217
       Size:
         type: "integer"
         x-nullable: false
+        example: 1092588
       SharedSize:
         type: "integer"
         x-nullable: false
+        example: 0
       VirtualSize:
         type: "integer"
         x-nullable: false
+        example: 1092588
       Labels:
         type: "object"
         x-nullable: false
         additionalProperties:
           type: "string"
+        example: {}
       Containers:
         x-nullable: false
         type: "integer"
+        example: 1
 
   AuthConfig:
     type: "object"
@@ -1680,18 +1693,22 @@ definitions:
         type: "string"
         description: "Name of the volume."
         x-nullable: false
+        example: "my-volume"
       Driver:
         type: "string"
         description: "Name of the volume driver used by the volume."
         x-nullable: false
+        example: "local"
       Mountpoint:
         type: "string"
         description: "Mount path of the volume on the host."
         x-nullable: false
+        example: "/var/lib/docker/volumes/my-volume/_data"
       CreatedAt:
         type: "string"
         format: "dateTime"
         description: "Date/Time the volume was created."
+        example: "2021-06-07T20:31:11.853781916Z"
       Status:
         type: "object"
         description: |
@@ -1703,18 +1720,24 @@ definitions:
           does not support this feature.
         additionalProperties:
           type: "object"
+        example:
+          hello: "world"
       Labels:
         type: "object"
         description: "User-defined key/value metadata."
         x-nullable: false
         additionalProperties:
           type: "string"
+        example:
+          com.example.some-label: "some-value"
+          com.example.some-other-label: "some-other-value"
       Scope:
         type: "string"
         description: |
           The level at which the volume exists. Either `global` for cluster-wide,
           or `local` for machine level.
         default: "local"
+        example: "local"
         x-nullable: false
         enum: ["local", "global"]
       Options:
@@ -1723,6 +1746,7 @@ definitions:
           The driver specific options used when creating the volume.
         additionalProperties:
           type: "string"
+        example: null
       UsageData:
         type: "object"
         x-nullable: true
@@ -1740,6 +1764,7 @@ definitions:
               driver. For volumes created with other volume drivers, this field
               is set to `-1` ("not available")
             x-nullable: false
+            example: 10920104
           RefCount:
             type: "integer"
             default: -1
@@ -1747,18 +1772,7 @@ definitions:
               The number of containers referencing this volume. This field
               is set to `-1` if the reference-count is not available.
             x-nullable: false
-
-    example:
-      Name: "tardis"
-      Driver: "custom"
-      Mountpoint: "/var/lib/docker/volumes/tardis"
-      Status:
-        hello: "world"
-      Labels:
-        com.example.some-label: "some-value"
-        com.example.some-other-label: "some-other-value"
-      Scope: "local"
-      CreatedAt: "2016-06-07T20:31:11.853781916Z"
+            example: 2
 
   Network:
     type: "object"
@@ -1894,20 +1908,28 @@ definitions:
     properties:
       ID:
         type: "string"
+        example: "hw53o5aio51xtltp5xjp8v7fx"
       Parent:
         type: "string"
+        example: ""
       Type:
+        # TODO: add enum
         type: "string"
+        example: "regular"
       Description:
         type: "string"
+        example: "pulled from docker.io/library/debian@sha256:234cb88d3020898631af0ccbbcca9a66ae7306ecd30c9720690858c1b007d2a0"
       InUse:
         type: "boolean"
+        example: false
       Shared:
         type: "boolean"
+        example: true
       Size:
         description: |
           Amount of disk space used by the build cache (in bytes).
         type: "integer"
+        example: 51
       CreatedAt:
         description: |
           Date and time at which the build cache was created in
@@ -1925,6 +1947,7 @@ definitions:
         example: "2017-08-09T07:09:37.632105588Z"
       UsageCount:
         type: "integer"
+        example: 26
 
   ImageID:
     type: "object"
@@ -4030,24 +4053,31 @@ definitions:
           description: "The ID of this container"
           type: "string"
           x-go-name: "ID"
+          example: "e575172ed11dc01bfce087fb27bee502db149e1a0fad7c296ad300bbff178148"
         Names:
           description: "The names that this container has been given"
           type: "array"
           items:
             type: "string"
+          example:
+            - "/foo"
         Image:
           description: "The name of the image used when creating this container"
           type: "string"
+          example: "busybox"
         ImageID:
           description: "The ID of the image that this container was created from"
           type: "string"
+          example: "sha256:2b8fd9751c4c0f5dd266fcae00707e67a2545ef34f9a29354585f93dac90674"
         Command:
           description: "Command to run when starting the container"
           type: "string"
+          example: "top"
         Created:
           description: "When the container was created"
           type: "integer"
           format: "int64"
+          example: 1472592424
         Ports:
           description: "The ports exposed by this container"
           type: "array"
@@ -4057,26 +4087,32 @@ definitions:
           description: "The size of files that have been created or changed by this container"
           type: "integer"
           format: "int64"
+          example: 12300
         SizeRootFs:
           description: "The total size of all the files in this container"
           type: "integer"
           format: "int64"
+          example: 1092588
         Labels:
           description: "User-defined key/value metadata."
           type: "object"
           additionalProperties:
             type: "string"
+          example: {}
         State:
           description: "The state of this container (e.g. `Exited`)"
           type: "string"
+          example: "exited"
         Status:
           description: "Additional human-readable status of this container (e.g. `Exit 0`)"
           type: "string"
+          example:  "Exited (0) 6 minutes ago"
         HostConfig:
           type: "object"
           properties:
             NetworkMode:
               type: "string"
+              example: "default"
         NetworkSettings:
           description: "A summary of the container's network settings"
           type: "object"
@@ -5262,133 +5298,6 @@ paths:
           description: "no error"
           schema:
             $ref: "#/definitions/ContainerSummary"
-          examples:
-            application/json:
-              - Id: "8dfafdbc3a40"
-                Names:
-                  - "/boring_feynman"
-                Image: "ubuntu:latest"
-                ImageID: "d74508fb6632491cea586a1fd7d748dfc5274cd6fdfedee309ecdcbc2bf5cb82"
-                Command: "echo 1"
-                Created: 1367854155
-                State: "Exited"
-                Status: "Exit 0"
-                Ports:
-                  - PrivatePort: 2222
-                    PublicPort: 3333
-                    Type: "tcp"
-                Labels:
-                  com.example.vendor: "Acme"
-                  com.example.license: "GPL"
-                  com.example.version: "1.0"
-                SizeRw: 12288
-                SizeRootFs: 0
-                HostConfig:
-                  NetworkMode: "default"
-                NetworkSettings:
-                  Networks:
-                    bridge:
-                      NetworkID: "7ea29fc1412292a2d7bba362f9253545fecdfa8ce9a6e37dd10ba8bee7129812"
-                      EndpointID: "2cdc4edb1ded3631c81f57966563e5c8525b81121bb3706a9a9a3ae102711f3f"
-                      Gateway: "172.17.0.1"
-                      IPAddress: "172.17.0.2"
-                      IPPrefixLen: 16
-                      IPv6Gateway: ""
-                      GlobalIPv6Address: ""
-                      GlobalIPv6PrefixLen: 0
-                      MacAddress: "02:42:ac:11:00:02"
-                Mounts:
-                  - Name: "fac362...80535"
-                    Source: "/data"
-                    Destination: "/data"
-                    Driver: "local"
-                    Mode: "ro,Z"
-                    RW: false
-                    Propagation: ""
-              - Id: "9cd87474be90"
-                Names:
-                  - "/coolName"
-                Image: "ubuntu:latest"
-                ImageID: "d74508fb6632491cea586a1fd7d748dfc5274cd6fdfedee309ecdcbc2bf5cb82"
-                Command: "echo 222222"
-                Created: 1367854155
-                State: "Exited"
-                Status: "Exit 0"
-                Ports: []
-                Labels: {}
-                SizeRw: 12288
-                SizeRootFs: 0
-                HostConfig:
-                  NetworkMode: "default"
-                NetworkSettings:
-                  Networks:
-                    bridge:
-                      NetworkID: "7ea29fc1412292a2d7bba362f9253545fecdfa8ce9a6e37dd10ba8bee7129812"
-                      EndpointID: "88eaed7b37b38c2a3f0c4bc796494fdf51b270c2d22656412a2ca5d559a64d7a"
-                      Gateway: "172.17.0.1"
-                      IPAddress: "172.17.0.8"
-                      IPPrefixLen: 16
-                      IPv6Gateway: ""
-                      GlobalIPv6Address: ""
-                      GlobalIPv6PrefixLen: 0
-                      MacAddress: "02:42:ac:11:00:08"
-                Mounts: []
-              - Id: "3176a2479c92"
-                Names:
-                  - "/sleepy_dog"
-                Image: "ubuntu:latest"
-                ImageID: "d74508fb6632491cea586a1fd7d748dfc5274cd6fdfedee309ecdcbc2bf5cb82"
-                Command: "echo 3333333333333333"
-                Created: 1367854154
-                State: "Exited"
-                Status: "Exit 0"
-                Ports: []
-                Labels: {}
-                SizeRw: 12288
-                SizeRootFs: 0
-                HostConfig:
-                  NetworkMode: "default"
-                NetworkSettings:
-                  Networks:
-                    bridge:
-                      NetworkID: "7ea29fc1412292a2d7bba362f9253545fecdfa8ce9a6e37dd10ba8bee7129812"
-                      EndpointID: "8b27c041c30326d59cd6e6f510d4f8d1d570a228466f956edf7815508f78e30d"
-                      Gateway: "172.17.0.1"
-                      IPAddress: "172.17.0.6"
-                      IPPrefixLen: 16
-                      IPv6Gateway: ""
-                      GlobalIPv6Address: ""
-                      GlobalIPv6PrefixLen: 0
-                      MacAddress: "02:42:ac:11:00:06"
-                Mounts: []
-              - Id: "4cb07b47f9fb"
-                Names:
-                  - "/running_cat"
-                Image: "ubuntu:latest"
-                ImageID: "d74508fb6632491cea586a1fd7d748dfc5274cd6fdfedee309ecdcbc2bf5cb82"
-                Command: "echo 444444444444444444444444444444444"
-                Created: 1367854152
-                State: "Exited"
-                Status: "Exit 0"
-                Ports: []
-                Labels: {}
-                SizeRw: 12288
-                SizeRootFs: 0
-                HostConfig:
-                  NetworkMode: "default"
-                NetworkSettings:
-                  Networks:
-                    bridge:
-                      NetworkID: "7ea29fc1412292a2d7bba362f9253545fecdfa8ce9a6e37dd10ba8bee7129812"
-                      EndpointID: "d91c7b2f0644403d7ef3095985ea0e2370325cd2332ff3a3225c4247328e66e9"
-                      Gateway: "172.17.0.1"
-                      IPAddress: "172.17.0.5"
-                      IPPrefixLen: 16
-                      IPv6Gateway: ""
-                      GlobalIPv6Address: ""
-                      GlobalIPv6PrefixLen: 0
-                      MacAddress: "02:42:ac:11:00:05"
-                Mounts: []
         400:
           description: "bad parameter"
           schema:
@@ -7149,35 +7058,6 @@ paths:
             type: "array"
             items:
               $ref: "#/definitions/ImageSummary"
-          examples:
-            application/json:
-              - Id: "sha256:e216a057b1cb1efc11f8a268f37ef62083e70b1b38323ba252e25ac88904a7e8"
-                ParentId: ""
-                RepoTags:
-                  - "ubuntu:12.04"
-                  - "ubuntu:precise"
-                RepoDigests:
-                  - "ubuntu@sha256:992069aee4016783df6345315302fa59681aae51a8eeb2f889dea59290f21787"
-                Created: 1474925151
-                Size: 103579269
-                VirtualSize: 103579269
-                SharedSize: 0
-                Labels: {}
-                Containers: 2
-              - Id: "sha256:3e314f95dcace0f5e4fd37b10862fe8398e3c60ed36600bc0ca5fda78b087175"
-                ParentId: ""
-                RepoTags:
-                  - "ubuntu:12.10"
-                  - "ubuntu:quantal"
-                RepoDigests:
-                  - "ubuntu@sha256:002fba3e3255af10be97ea26e476692a7ebed0bb074a9ab960b2e7a1526b15d7"
-                  - "ubuntu@sha256:68ea0200f0b90df725d99d823905b04cf844f6039ef60c60bf3e019915017bd3"
-                Created: 1403128455
-                Size: 172064416
-                VirtualSize: 172064416
-                SharedSize: 0
-                Labels: {}
-                Containers: 5
         500:
           description: "server error"
           schema:
@@ -8274,98 +8154,16 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/definitions/ImageSummary"
-                example:
-                  -
-                    Id: "sha256:2b8fd9751c4c0f5dd266fcae00707e67a2545ef34f9a29354585f93dac906749"
-                    ParentId: ""
-                    RepoTags:
-                      - "busybox:latest"
-                    RepoDigests:
-                      - "busybox@sha256:a59906e33509d14c036c8678d687bd4eec81ed7c4b8ce907b888c607f6a1e0e6"
-                    Created: 1466724217
-                    Size: 1092588
-                    SharedSize: 0
-                    VirtualSize: 1092588
-                    Labels: {}
-                    Containers: 1
               Containers:
-                type: "array"
-                items:
-                  $ref: "#/definitions/ContainerSummary"
-                example:
-                  -
-                    Id: "e575172ed11dc01bfce087fb27bee502db149e1a0fad7c296ad300bbff178148"
-                    Names:
-                      - "/top"
-                    Image: "busybox"
-                    ImageID: "sha256:2b8fd9751c4c0f5dd266fcae00707e67a2545ef34f9a29354585f93dac906749"
-                    Command: "top"
-                    Created: 1472592424
-                    Ports: []
-                    SizeRootFs: 1092588
-                    Labels: {}
-                    State: "exited"
-                    Status: "Exited (0) 56 minutes ago"
-                    HostConfig:
-                      NetworkMode: "default"
-                    NetworkSettings:
-                      Networks:
-                        bridge:
-                          IPAMConfig: null
-                          Links: null
-                          Aliases: null
-                          NetworkID: "d687bc59335f0e5c9ee8193e5612e8aee000c8c62ea170cfb99c098f95899d92"
-                          EndpointID: "8ed5115aeaad9abb174f68dcf135b49f11daf597678315231a32ca28441dec6a"
-                          Gateway: "172.18.0.1"
-                          IPAddress: "172.18.0.2"
-                          IPPrefixLen: 16
-                          IPv6Gateway: ""
-                          GlobalIPv6Address: ""
-                          GlobalIPv6PrefixLen: 0
-                          MacAddress: "02:42:ac:12:00:02"
-                    Mounts: []
+                $ref: "#/definitions/ContainerSummary"
               Volumes:
                 type: "array"
                 items:
                   $ref: "#/definitions/Volume"
-                example:
-                  -
-                    Name: "my-volume"
-                    Driver: "local"
-                    Mountpoint: "/var/lib/docker/volumes/my-volume/_data"
-                    Labels: null
-                    Scope: "local"
-                    Options: null
-                    UsageData:
-                      Size: 10920104
-                      RefCount: 2
               BuildCache:
                 type: "array"
                 items:
                   $ref: "#/definitions/BuildCache"
-                example:
-                  -
-                    ID: "hw53o5aio51xtltp5xjp8v7fx"
-                    Parent: ""
-                    Type: "regular"
-                    Description: "pulled from docker.io/library/debian@sha256:234cb88d3020898631af0ccbbcca9a66ae7306ecd30c9720690858c1b007d2a0"
-                    InUse: false
-                    Shared: true
-                    Size: 0
-                    CreatedAt: "2021-06-28T13:31:01.474619385Z"
-                    LastUsedAt: "2021-07-07T22:02:32.738075951Z"
-                    UsageCount: 26
-                  -
-                    ID: "ndlpt0hhvkqcdfkputsk4cq9c"
-                    Parent: "hw53o5aio51xtltp5xjp8v7fx"
-                    Type: "regular"
-                    Description: "mount / from exec /bin/sh -c echo 'Binary::apt::APT::Keep-Downloaded-Packages \"true\";' > /etc/apt/apt.conf.d/keep-cache"
-                    InUse: false
-                    Shared: true
-                    Size: 51
-                    CreatedAt: "2021-06-28T13:31:03.002625487Z"
-                    LastUsedAt: "2021-07-07T22:02:32.773909517Z"
-                    UsageCount: 26
         500:
           description: "server error"
           schema:
