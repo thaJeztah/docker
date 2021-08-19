@@ -160,6 +160,14 @@ func (s *systemRouter) getDiskUsage(ctx context.Context, w http.ResponseWriter, 
 		}
 	}
 
+	if versions.GreaterThanOrEqualTo(version, "1.42") {
+		// Clear deprecated fields
+		for _, c := range systemDiskUsage.Containers {
+			c.HostConfig = nil
+			c.NetworkSettings = nil
+		}
+	}
+
 	du := types.DiskUsage{
 		BuildCache:  buildCache,
 		BuilderSize: builderSize,

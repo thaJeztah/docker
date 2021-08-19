@@ -69,12 +69,16 @@ type Container struct {
 	Labels     map[string]string
 	State      string
 	Status     string
-	HostConfig struct {
+	HostConfig *struct {
 		NetworkMode string `json:",omitempty"`
-	}
+	} `json:".omitempty"`
 	NetworkSettings *SummaryNetworkSettings
 	Mounts          []MountPoint
 }
+
+// ContainerUsage contains container usage part of response of Engine API:
+// GET "/system/df"
+type ContainerUsage = Container
 
 // CopyConfig contains request body of Engine API:
 // POST "/containers/"+containerID+"/copy"
@@ -561,7 +565,7 @@ type DiskUsageOptions struct {
 type DiskUsage struct {
 	LayersSize  int64
 	Images      []*ImageSummary
-	Containers  []*Container
+	Containers  []*ContainerUsage
 	Volumes     []*Volume
 	BuildCache  []*BuildCache
 	BuilderSize int64 `json:",omitempty"` // Deprecated: deprecated in API 1.38, and no longer used since API 1.40.
