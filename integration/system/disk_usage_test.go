@@ -96,12 +96,12 @@ func TestDiskUsage(t *testing.T) {
 					Containers: []*types.ContainerUsage{
 						{
 							ID:         cID,
+							Names:      du.Containers[0].Names,
 							Image:      "busybox",
 							ImageID:    prev.Images[0].ID,
 							Command:    du.Containers[0].Command,
 							Created:    du.Containers[0].Created,
 							Ports:      []types.Port{},
-							Names:      du.Containers[0].Names,
 							SizeRootFs: prev.Images[0].Size,
 							Labels:     map[string]string{},
 							State:      "running",

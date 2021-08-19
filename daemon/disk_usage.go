@@ -24,12 +24,12 @@ func (daemon *Daemon) ContainerDiskUsage(ctx context.Context) ([]*types.Containe
 		for _, c := range containers {
 			us = append(us, &types.ContainerUsage{
 				ID:         c.ID,
+				Names:      c.Names,
 				Image:      c.Image,
 				ImageID:    c.ImageID,
 				Command:    c.Command,
 				Created:    c.Created,
 				Ports:      c.Ports,
-				Names:      c.Names,
 				SizeRw:     c.SizeRw,
 				SizeRootFs: c.SizeRootFs,
 				Labels:     c.Labels,

@@ -560,12 +560,12 @@ type DiskUsageOptions struct {
 // GET "/system/df"
 type ContainerUsage struct {
 	ID         string `json:"Id"` // Use "Id" in JSON for backward-compatibility with API < 1.42
+	Names      []string
 	Image      string
 	ImageID    string
 	Command    string
 	Created    int64
 	Ports      []Port
-	Names      []string
 	SizeRw     int64 `json:",omitempty"`
 	SizeRootFs int64 `json:",omitempty"`
 	Labels     map[string]string
