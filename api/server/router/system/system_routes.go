@@ -172,27 +172,21 @@ func (s *systemRouter) getDiskUsage(ctx context.Context, w http.ResponseWriter, 
 	}
 	var out interface{} = du
 	if versions.LessThan(version, "1.42") {
-		containers := make([]types.Container, 0, len(du.Containers))
+		type pre142Container struct {
+			*types.ContainerUsage
+			HostConfig struct {
+				NetworkMode string `json:",omitempty"`
+			}
+			NetworkSettings *types.SummaryNetworkSettings
+		}
+
+		containers := make([]pre142Container, 0, len(du.Containers))
 		for _, c := range du.Containers {
-			containers = append(containers, types.Container{
-				ID:         c.ID,
-				Image:      c.Image,
-				ImageID:    c.ImageID,
-				Command:    c.Command,
-				Created:    c.Created,
-				Ports:      c.Ports,
-				Names:      c.Names,
-				SizeRw:     c.SizeRw,
-				SizeRootFs: c.SizeRootFs,
-				Labels:     c.Labels,
-				State:      c.State,
-				Status:     c.Status,
-				Mounts:     c.Mounts,
-			})
+			containers = append(containers, pre142Container{ContainerUsage: c})
 		}
 		out = struct {
 			types.DiskUsage
-			Containers []types.Container
+			Containers []pre142Container
 		}{
 			DiskUsage:  du,
 			Containers: containers,
