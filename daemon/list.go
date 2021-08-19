@@ -99,11 +99,14 @@ func (r byCreatedDescending) Less(i, j int) bool {
 // Containers returns the list of containers to show given the user's filtering.
 func (daemon *Daemon) Containers(config *types.ContainerListOptions) ([]*types.Container, error) {
 	var containers []*types.Container
-	return containers, daemon.rangeContainers(config, func(c *types.Container, lCtx *listContext) bool {
-		containers = append(containers, c)
-		lCtx.idx++
-		return true
+	err := daemon.rangeContainers(config, func(s *container.Snapshot) iterationAction {
+		containers = append(containers, &s.Container)
+		return includeContainer
 	})
+	if err != nil {
+		return nil, err
+	}
+	return containers, err
 }
 
 func (daemon *Daemon) filterByNameIDMatches(view container.View, ctx *listContext) ([]container.Snapshot, error) {
@@ -172,9 +175,11 @@ func (daemon *Daemon) filterByNameIDMatches(view container.View, ctx *listContex
 	return cntrs, nil
 }
 
+type rangeFunc func(c *container.Snapshot) iterationAction
+
 // rangeContainers parses the user's filtering options and ranges over the list of matching containers.
 // If f returns false, range stops the iteration.
-func (daemon *Daemon) rangeContainers(config *types.ContainerListOptions, f func(*types.Container, *listContext) bool) error {
+func (daemon *Daemon) rangeContainers(config *types.ContainerListOptions, f rangeFunc) error {
 	if err := config.Filters.Validate(acceptedPsFilterTags); err != nil {
 		return err
 	}
@@ -215,15 +220,19 @@ func (daemon *Daemon) rangeContainers(config *types.ContainerListOptions, f func
 		}
 
 		// transform internal container struct into api structs
-		c := s.Container
-		c.Image = image
+		s.Container.Image = image
 		if ctx.Size {
-			sizeRw, sizeRootFs := daemon.imageService.GetContainerLayerSize(c.ID)
-			c.SizeRw = sizeRw
-			c.SizeRootFs = sizeRootFs
+			sizeRw, sizeRootFs := daemon.imageService.GetContainerLayerSize(s.Container.ID)
+			s.Container.SizeRw = sizeRw
+			s.Container.SizeRootFs = sizeRootFs
 		}
-		if !f(&c, ctx) {
+		switch f(&s) {
+		case excludeContainer:
+			continue
+		case stopIteration:
 			return nil
+		default:
+			ctx.idx++
 		}
 	}
 	return nil

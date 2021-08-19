@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/docker/docker/container"
+
 	"github.com/docker/docker/api/server/router/system"
 	"github.com/docker/docker/api/types"
 	"golang.org/x/sync/errgroup"
@@ -13,10 +15,11 @@ import (
 func (daemon *Daemon) ContainerDiskUsage(ctx context.Context) ([]*types.ContainerUsage, error) {
 	ch := daemon.usage.DoChan("ContainerDiskUsage", func() (interface{}, error) {
 		var us []*types.ContainerUsage
-		if err := daemon.rangeContainers(&types.ContainerListOptions{
+		err := daemon.rangeContainers(&types.ContainerListOptions{
 			Size: true,
 			All:  true,
-		}, func(c *types.Container, lCtx *listContext) bool {
+		}, func(s *container.Snapshot) (iterationAction, error) {
+			c := s.Container
 			us = append(us, &types.ContainerUsage{
 				ID:         c.ID,
 				Names:      c.Names,
@@ -32,9 +35,9 @@ func (daemon *Daemon) ContainerDiskUsage(ctx context.Context) ([]*types.Containe
 				Status:     c.Status,
 				Mounts:     c.Mounts,
 			})
-			lCtx.idx++
-			return true
-		}); err != nil {
+			return includeContainer, nil
+		})
+		if err != nil {
 			return nil, fmt.Errorf("failed to range over containers: %v", err)
 		}
 		return us, nil
