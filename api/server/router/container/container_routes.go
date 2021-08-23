@@ -465,39 +465,52 @@ func (s *containerRouter) postContainersCreate(ctx context.Context, w http.Respo
 		return err
 	}
 
-	name := r.Form.Get("name")
-
 	config, hostConfig, networkingConfig, err := s.decoder.DecodeConfig(r.Body)
 	if err != nil {
 		return err
 	}
-	version := httputils.VersionFromContext(ctx)
-	adjustCPUShares := versions.LessThan(version, "1.19")
+	var (
+		name            = r.Form.Get("name")
+		version         = httputils.VersionFromContext(ctx)
+		adjustCPUShares bool
+	)
 
-	// When using API 1.24 and under, the client is responsible for removing the container
-	if hostConfig != nil && versions.LessThan(version, "1.25") {
-		hostConfig.AutoRemove = false
-	}
+	if hostConfig != nil {
+		if versions.LessThan(version, "1.19") {
+			adjustCPUShares = true
+		}
+		if versions.LessThan(version, "1.25") {
+			// the client is responsible for removing the container when using API 1.24 and under.
+			hostConfig.AutoRemove = false
+		}
+		if versions.LessThan(version, "1.40") {
+			// Ignore BindOptions.NonRecursive because it was added in API 1.40.
+			for _, m := range hostConfig.Mounts {
+				if bo := m.BindOptions; bo != nil {
+					bo.NonRecursive = false
+				}
+			}
+			// Ignore KernelMemoryTCP because it was added in API 1.40.
+			hostConfig.KernelMemoryTCP = 0
 
-	if hostConfig != nil && versions.LessThan(version, "1.40") {
-		// Ignore BindOptions.NonRecursive because it was added in API 1.40.
-		for _, m := range hostConfig.Mounts {
-			if bo := m.BindOptions; bo != nil {
-				bo.NonRecursive = false
+			// Older clients (API < 1.40) expects the default to be shareable, make them happy
+			if hostConfig.IpcMode.IsEmpty() {
+				hostConfig.IpcMode = container.IPCModeShareable
 			}
 		}
-		// Ignore KernelMemoryTCP because it was added in API 1.40.
-		hostConfig.KernelMemoryTCP = 0
-
-		// Older clients (API < 1.40) expects the default to be shareable, make them happy
-		if hostConfig.IpcMode.IsEmpty() {
-			hostConfig.IpcMode = container.IPCModeShareable
+		if versions.LessThan(version, "1.41") && !s.cgroup2 {
+			// Older clients expect the default to be "host" on cgroup v1 hosts
+			if hostConfig.CgroupnsMode.IsEmpty() {
+				hostConfig.CgroupnsMode = container.CgroupnsModeHost
+			}
 		}
-	}
-	if hostConfig != nil && versions.LessThan(version, "1.41") && !s.cgroup2 {
-		// Older clients expect the default to be "host" on cgroup v1 hosts
-		if hostConfig.CgroupnsMode.IsEmpty() {
-			hostConfig.CgroupnsMode = container.CgroupnsModeHost
+
+		if hostConfig.PidsLimit != nil && *hostConfig.PidsLimit <= 0 {
+			// Don't set a limit if either no limit was specified, or "unlimited" was
+			// explicitly set.
+			// Both `0` and `-1` are accepted as "unlimited", and historically any
+			// negative value was accepted, so treat those as "unlimited" as well.
+			hostConfig.PidsLimit = nil
 		}
 	}
 
@@ -510,14 +523,6 @@ func (s *containerRouter) postContainersCreate(ctx context.Context, w http.Respo
 			}
 			platform = &p
 		}
-	}
-
-	if hostConfig != nil && hostConfig.PidsLimit != nil && *hostConfig.PidsLimit <= 0 {
-		// Don't set a limit if either no limit was specified, or "unlimited" was
-		// explicitly set.
-		// Both `0` and `-1` are accepted as "unlimited", and historically any
-		// negative value was accepted, so treat those as "unlimited" as well.
-		hostConfig.PidsLimit = nil
 	}
 
 	ccr, err := s.backend.ContainerCreate(types.ContainerCreateConfig{
