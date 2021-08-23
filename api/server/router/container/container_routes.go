@@ -504,6 +504,12 @@ func (s *containerRouter) postContainersCreate(ctx context.Context, w http.Respo
 				hostConfig.CgroupnsMode = container.CgroupnsModeHost
 			}
 		}
+		if versions.GreaterThanOrEqualTo(version, "1.42") {
+			// KernelMemory and KernelMemoryTCP have been deprecated, and are no
+			// longer supported by runc.
+			hostConfig.KernelMemory = 0
+			hostConfig.KernelMemoryTCP = 0
+		}
 
 		if hostConfig.PidsLimit != nil && *hostConfig.PidsLimit <= 0 {
 			// Don't set a limit if either no limit was specified, or "unlimited" was
