@@ -87,6 +87,8 @@ func (cli *DaemonCli) start(opts *daemonOptions) (err error) {
 		return nil
 	}
 
+	configureProxyEnv(cli.Config)
+
 	warnOnDeprecatedConfigOptions(cli.Config)
 
 	if err := configureDaemonLogs(cli.Config); err != nil {
@@ -778,4 +780,19 @@ func configureDaemonLogs(conf *config.Config) error {
 		FullTimestamp:   true,
 	})
 	return nil
+}
+
+func configureProxyEnv(conf *config.Config) {
+	if p := conf.HTTPProxy; p != "" {
+		_ = os.Setenv("HTTP_PROXY", p)
+		_ = os.Setenv("http_proxy", p)
+	}
+	if p := conf.HTTPSProxy; p != "" {
+		_ = os.Setenv("HTTPS_PROXY", p)
+		_ = os.Setenv("https_proxy", p)
+	}
+	if p := conf.NoProxy; p != "" {
+		_ = os.Setenv("NO_PROXY", p)
+		_ = os.Setenv("no_proxy", p)
+	}
 }
