@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net"
+	"net/url"
 	"os"
 	"reflect"
 	"strings"
@@ -635,4 +636,14 @@ func ModifiedDiscoverySettings(config *Config, backendType, advertise string, cl
 	}
 
 	return !reflect.DeepEqual(config.ClusterOpts, clusterOpts)
+}
+
+// MaskCredentials masks credentials that are in an URL.
+func MaskCredentials(rawURL string) string {
+	parsedURL, err := url.Parse(rawURL)
+	if err != nil || parsedURL.User == nil {
+		return rawURL
+	}
+	parsedURL.User = url.UserPassword("xxxxx", "xxxxx")
+	return parsedURL.String()
 }
