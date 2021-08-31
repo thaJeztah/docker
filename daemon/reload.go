@@ -28,7 +28,17 @@ func (daemon *Daemon) Reload(conf *config.Config) (err error) {
 	attributes := map[string]string{}
 
 	defer func() {
-		jsonString, _ := json.Marshal(daemon.configStore)
+		jsonString, _ := json.Marshal(&struct {
+			*config.Config
+			config.ProxyConfig
+		}{
+			Config: daemon.configStore,
+			ProxyConfig: config.ProxyConfig{
+				HTTPProxy:  config.MaskCredentials(daemon.configStore.HTTPProxy),
+				HTTPSProxy: config.MaskCredentials(daemon.configStore.HTTPSProxy),
+				NoProxy:    config.MaskCredentials(daemon.configStore.NoProxy),
+			},
+		})
 
 		// we're unlocking here, because
 		// LogDaemonEventWithAttributes() -> SystemInfo() -> GetAllRuntimes()
