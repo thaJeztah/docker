@@ -1,16 +1,24 @@
 package daemon // import "github.com/docker/docker/integration/daemon"
 
 import (
+	"context"
+	"fmt"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"strings"
+	"syscall"
 	"testing"
 
+	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/daemon/config"
 	"github.com/docker/docker/testutil/daemon"
 	"gotest.tools/v3/assert"
 	is "gotest.tools/v3/assert/cmp"
+	"gotest.tools/v3/env"
 	"gotest.tools/v3/skip"
 )
 
@@ -145,4 +153,139 @@ func TestConfigDaemonSeccompProfiles(t *testing.T) {
 			d.Stop(t)
 		})
 	}
+}
+
+func TestDaemonProxy(t *testing.T) {
+	skip.If(t, runtime.GOOS != "linux")
+
+	var received string
+	proxyServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		received = r.Host
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte("OK"))
+	}))
+	defer proxyServer.Close()
+
+	d := daemon.New(t)
+	client := d.NewClientT(t)
+	defer func() { _ = client.Close() }()
+	ctx := context.Background()
+
+	// Configure proxy through env-vars
+	t.Run("environment variables", func(t *testing.T) {
+		defer env.Patch(t, "HTTP_PROXY", proxyServer.URL)()
+		defer env.Patch(t, "HTTPS_PROXY", proxyServer.URL)()
+		defer env.Patch(t, "NO_PROXY", "example.com")()
+
+		d.Start(t)
+		_, err := client.ImagePull(ctx, "example.org:5000/some/image:latest", types.ImagePullOptions{})
+		assert.ErrorContains(t, err, "", "pulling should have failed")
+		assert.Equal(t, received, "example.org:5000")
+
+		// Test NoProxy: example.com should not hit the proxy, and "received" variable should not be changed.
+		_, err = client.ImagePull(ctx, "example.com/some/image:latest", types.ImagePullOptions{})
+		assert.ErrorContains(t, err, "", "pulling should have failed")
+		assert.Equal(t, received, "example.org:5000", "should not have used proxy")
+
+		info := d.Info(t)
+		assert.Equal(t, info.HTTPProxy, proxyServer.URL)
+		assert.Equal(t, info.HTTPSProxy, proxyServer.URL)
+		assert.Equal(t, info.NoProxy, "example.com")
+		d.Stop(t)
+	})
+
+	// Configure proxy through command-line flags
+	t.Run("command-line options", func(t *testing.T) {
+		defer env.Patch(t, "HTTP_PROXY", "http://from-env-http.invalid")()
+		defer env.Patch(t, "HTTPS_PROXY", "https://from-env-https.invalid")()
+		defer env.Patch(t, "NO_PROXY", "ignore.invalid")()
+
+		d.Start(t, "--http-proxy", proxyServer.URL, "--https-proxy", proxyServer.URL, "--no-proxy", "example.com")
+
+		_, err := client.ImagePull(ctx, "example.org:5001/some/image:latest", types.ImagePullOptions{})
+		assert.ErrorContains(t, err, "", "pulling should have failed")
+		assert.Equal(t, received, "example.org:5001")
+
+		// Test NoProxy: example.com should not hit the proxy, and "received" variable should not be changed.
+		_, err = client.ImagePull(ctx, "example.com/some/image:latest", types.ImagePullOptions{})
+		assert.ErrorContains(t, err, "", "pulling should have failed")
+		assert.Equal(t, received, "example.org:5001", "should not have used proxy")
+
+		info := d.Info(t)
+		assert.Equal(t, info.HTTPProxy, proxyServer.URL)
+		assert.Equal(t, info.HTTPSProxy, proxyServer.URL)
+		assert.Equal(t, info.NoProxy, "example.com")
+
+		d.Stop(t)
+	})
+
+	// Configure proxy through configuration file
+	t.Run("configuration file", func(t *testing.T) {
+		defer env.Patch(t, "HTTP_PROXY", "http://from-env-http.invalid")()
+		defer env.Patch(t, "HTTPS_PROXY", "https://from-env-https.invalid")()
+		defer env.Patch(t, "NO_PROXY", "ignore.invalid")()
+
+		configFile := filepath.Join(d.RootDir(), "daemon.json")
+		configJSON := fmt.Sprintf(`{"http-proxy":%[1]q, "https-proxy": %[1]q, "no-proxy": "example.com"}`, proxyServer.URL)
+		assert.NilError(t, os.WriteFile(configFile, []byte(configJSON), 0644))
+
+		d.Start(t, "--config-file", configFile)
+
+		_, err := client.ImagePull(ctx, "example.org:5002/some/image:latest", types.ImagePullOptions{})
+		assert.ErrorContains(t, err, "", "pulling should have failed")
+		assert.Equal(t, received, "example.org:5002")
+
+		// Test NoProxy: example.com should not hit the proxy, and "received" variable should not be changed.
+		_, err = client.ImagePull(ctx, "example.com/some/image:latest", types.ImagePullOptions{})
+		assert.ErrorContains(t, err, "", "pulling should have failed")
+		assert.Equal(t, received, "example.org:5002", "should not have used proxy")
+
+		info := d.Info(t)
+		assert.Equal(t, info.HTTPProxy, proxyServer.URL)
+		assert.Equal(t, info.HTTPSProxy, proxyServer.URL)
+		assert.Equal(t, info.NoProxy, "example.com")
+
+		d.Stop(t)
+	})
+
+	// Conflicting options (passed both through command-line options and config file)
+	t.Run("conflicting options", func(t *testing.T) {
+		const (
+			proxyRawURL = "https://myuser:mypassword@example.org"
+			proxyURL    = "https://xxxxx:xxxxx@example.org"
+		)
+
+		configFile := filepath.Join(d.RootDir(), "daemon.json")
+		configJSON := fmt.Sprintf(`{"http-proxy":%[1]q, "https-proxy": %[1]q, "no-proxy": "example.com"}`, proxyRawURL)
+		assert.NilError(t, os.WriteFile(configFile, []byte(configJSON), 0644))
+
+		err := d.StartWithError("--http-proxy", proxyRawURL, "--https-proxy", proxyRawURL, "--no-proxy", "example.com", "--config-file", configFile, "--validate")
+		assert.ErrorContains(t, err, "daemon exited during startup")
+		logs, err := d.ReadLogFile()
+		assert.NilError(t, err)
+		expected := fmt.Sprintf(
+			`the following directives are specified both as a flag and in the configuration file: http-proxy: (from flag: %[1]s, from file: %[1]s), https-proxy: (from flag: %[1]s, from file: %[1]s), no-proxy: (from flag: example.com, from file: example.com)`,
+			proxyURL,
+		)
+		assert.Assert(t, is.Contains(string(logs), expected))
+	})
+
+	// Make sure values are sanitized when reloading the daemon-config
+	t.Run("reload sanitized", func(t *testing.T) {
+		const (
+			proxyRawURL = "https://myuser:mypassword@example.org"
+			proxyURL    = "https://xxxxx:xxxxx@example.org"
+		)
+
+		d.Start(t, "--http-proxy", proxyRawURL, "--https-proxy", proxyRawURL, "--no-proxy", "example.com")
+		err := d.Signal(syscall.SIGHUP)
+		assert.NilError(t, err)
+		d.Stop(t)
+
+		logs, err := d.ReadLogFile()
+		assert.NilError(t, err)
+		assert.Assert(t, is.Contains(string(logs), "Reloaded configuration:"))
+		assert.Assert(t, is.Contains(string(logs), proxyURL))
+		assert.Assert(t, !strings.Contains(string(logs), proxyRawURL), "logs should not contain the non-sanitized proxy URL: %s", string(logs))
+	})
 }
