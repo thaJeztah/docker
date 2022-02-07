@@ -38,10 +38,10 @@ func (daemon *Daemon) ContainerInspectCurrent(name string, size bool) (*types.Co
 	}
 
 	ctr.Lock()
+	defer ctr.Unlock()
 
 	base, err := daemon.getInspectData(ctr)
 	if err != nil {
-		ctr.Unlock()
 		return nil, err
 	}
 
@@ -75,8 +75,6 @@ func (daemon *Daemon) ContainerInspectCurrent(name string, size bool) (*types.Co
 	}
 	networkSettings.NetworkSettingsBase.Ports = ports
 
-	ctr.Unlock()
-
 	if size {
 		sizeRw, sizeRootFs := daemon.imageService.GetContainerLayerSize(base.ID)
 		base.SizeRw = &sizeRw
@@ -87,39 +85,6 @@ func (daemon *Daemon) ContainerInspectCurrent(name string, size bool) (*types.Co
 		ContainerJSONBase: base,
 		Mounts:            mountPoints,
 		Config:            ctr.Config,
-		NetworkSettings:   networkSettings,
-	}, nil
-}
-
-// containerInspect120 serializes the master version of a container into a json type.
-func (daemon *Daemon) containerInspect120(name string) (*v1p20.ContainerJSON, error) {
-	container, err := daemon.GetContainer(name)
-	if err != nil {
-		return nil, err
-	}
-
-	container.Lock()
-	defer container.Unlock()
-
-	base, err := daemon.getInspectData(container)
-	if err != nil {
-		return nil, err
-	}
-
-	mountPoints := container.GetMountPoints()
-	config := &v1p20.ContainerConfig{
-		Config:          container.Config,
-		MacAddress:      container.Config.MacAddress,
-		NetworkDisabled: container.Config.NetworkDisabled,
-		ExposedPorts:    container.Config.ExposedPorts,
-		VolumeDriver:    container.HostConfig.VolumeDriver,
-	}
-	networkSettings := daemon.getBackwardsCompatibleNetworkSettings(container.NetworkSettings)
-
-	return &v1p20.ContainerJSON{
-		ContainerJSONBase: base,
-		Mounts:            mountPoints,
-		Config:            config,
 		NetworkSettings:   networkSettings,
 	}, nil
 }
