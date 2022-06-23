@@ -55,6 +55,7 @@ import (
 	"github.com/docker/docker/api/types/versions"
 	"github.com/docker/go-connections/sockets"
 	"github.com/pkg/errors"
+	"golang.org/x/sync/singleflight"
 )
 
 // ErrRedirect is the error returned by checkRedirect when the request is non-GET.
@@ -83,6 +84,10 @@ type Client struct {
 	customHTTPHeaders map[string]string
 	// manualOverride is set to true when the version was set by users.
 	manualOverride bool
+
+	// negotiate allows API version negotiation to be called concurrently,
+	// reusing the API Ping call.
+	negotiate singleflight.Group
 
 	// negotiateVersion indicates if the client should automatically negotiate
 	// the API version to use when making requests. API version negotiation is
@@ -228,8 +233,11 @@ func (cli *Client) ClientVersion() string {
 // added (1.24).
 func (cli *Client) NegotiateAPIVersion(ctx context.Context) {
 	if !cli.manualOverride {
-		ping, _ := cli.Ping(ctx)
-		cli.negotiateAPIVersionPing(ping)
+		cli.negotiate.Do("negotiateAPIVersion", func() (interface{}, error) {
+			ping, _ := cli.Ping(ctx)
+			cli.negotiateAPIVersionPing(ping)
+			return nil, nil
+		})
 	}
 }
 
