@@ -6,6 +6,7 @@ import (
 
 	"github.com/containerd/containerd"
 	"github.com/containerd/containerd/platforms"
+	"github.com/containerd/containerd/snapshots"
 	"github.com/docker/distribution"
 	"github.com/docker/distribution/reference"
 	"github.com/docker/docker/api/types"
@@ -20,6 +21,7 @@ import (
 	"github.com/docker/docker/image"
 	"github.com/docker/docker/layer"
 	"github.com/opencontainers/go-digest"
+	"github.com/opencontainers/image-spec/identity"
 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
 )
 
@@ -74,8 +76,14 @@ func (cs *ImageService) Images(ctx context.Context, opts types.ImageListOptions)
 	}
 
 	var ret []*types.ImageSummary
+	snapshotter := cs.client.SnapshotService(containerd.DefaultSnapshotter)
 	for _, img := range imgs {
 		size, err := img.Size(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		virtualSize, err := computeVirtualSize(ctx, img, snapshotter)
 		if err != nil {
 			return nil, err
 		}
@@ -86,7 +94,7 @@ func (cs *ImageService) Images(ctx context.Context, opts types.ImageListOptions)
 			Containers:  -1,
 			ParentID:    "",
 			SharedSize:  -1,
-			VirtualSize: 10,
+			VirtualSize: virtualSize,
 			ID:          img.Target().Digest.String(),
 			Created:     img.Metadata().CreatedAt.Unix(),
 			Size:        size,
@@ -94,6 +102,22 @@ func (cs *ImageService) Images(ctx context.Context, opts types.ImageListOptions)
 	}
 
 	return ret, nil
+}
+
+func computeVirtualSize(ctx context.Context, image containerd.Image, snapshotter snapshots.Snapshotter) (int64, error) {
+	var virtualSize int64
+	diffIDs, err := image.RootFS(ctx)
+	if err != nil {
+		return virtualSize, err
+	}
+	for _, chainID := range identity.ChainIDs(diffIDs) {
+		usage, err := snapshotter.Usage(ctx, chainID.String())
+		if err != nil {
+			return virtualSize, err
+		}
+		virtualSize += usage.Size
+	}
+	return virtualSize, nil
 }
 
 // LogImageEvent generates an event related to an image with only the
