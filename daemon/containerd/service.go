@@ -68,6 +68,8 @@ func (cs *ImageService) PullImage(ctx context.Context, image, tagOrDigest string
 	return err
 }
 
+type imageFilterFunc func(image containerd.Image) bool
+
 // Images returns a filtered list of images.
 func (cs *ImageService) Images(ctx context.Context, opts types.ImageListOptions) ([]*types.ImageSummary, error) {
 	imgs, err := cs.client.ListImages(ctx)
@@ -75,9 +77,21 @@ func (cs *ImageService) Images(ctx context.Context, opts types.ImageListOptions)
 		return nil, err
 	}
 
-	var ret []*types.ImageSummary
+	filters, err := cs.setupFilters(ctx, opts)
+	if err != nil {
+		return nil, err
+	}
+
 	snapshotter := cs.client.SnapshotService(containerd.DefaultSnapshotter)
+	var ret []*types.ImageSummary
+IMAGES:
 	for _, img := range imgs {
+		for _, filter := range filters {
+			if !filter(img) {
+				continue IMAGES
+			}
+		}
+
 		size, err := img.Size(ctx)
 		if err != nil {
 			return nil, err
@@ -118,6 +132,54 @@ func computeVirtualSize(ctx context.Context, image containerd.Image, snapshotter
 		virtualSize += usage.Size
 	}
 	return virtualSize, nil
+}
+
+func (cs *ImageService) setupFilters(ctx context.Context, opts types.ImageListOptions) ([]imageFilterFunc, error) {
+	var filters []imageFilterFunc
+	err := opts.Filters.WalkValues("before", func(value string) error {
+		ref, err := reference.ParseDockerRef(value)
+		if err != nil {
+			return err
+		}
+		img, err := cs.client.GetImage(ctx, ref.String())
+		if img != nil {
+			t := img.Metadata().CreatedAt
+			filters = append(filters, func(image containerd.Image) bool {
+				created := image.Metadata().CreatedAt
+				return created.Equal(t) || created.After(t)
+			})
+		}
+		return err
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	err = opts.Filters.WalkValues("since", func(value string) error {
+		ref, err := reference.ParseDockerRef(value)
+		if err != nil {
+			return err
+		}
+		img, err := cs.client.GetImage(ctx, ref.String())
+		if img != nil {
+			t := img.Metadata().CreatedAt
+			filters = append(filters, func(image containerd.Image) bool {
+				created := image.Metadata().CreatedAt
+				return created.Equal(t) || created.Before(t)
+			})
+		}
+		return err
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	if opts.Filters.Contains("label") {
+		filters = append(filters, func(image containerd.Image) bool {
+			return opts.Filters.MatchKVList("label", image.Labels())
+		})
+	}
+	return filters, nil
 }
 
 // LogImageEvent generates an event related to an image with only the
