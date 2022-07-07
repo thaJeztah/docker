@@ -456,10 +456,32 @@ func (cs *ImageService) ImportImage(ctx context.Context, src string, repository 
 // complement of ExportImage.  The input stream is an uncompressed tar
 // ball containing images and metadata.
 func (cs *ImageService) LoadImage(ctx context.Context, inTar io.ReadCloser, outStream io.Writer, quiet bool) error {
-	_, err := cs.client.Import(ctx, inTar,
-		containerd.WithImportPlatform(platforms.DefaultStrict()),
-	)
-	return err
+	platform := platforms.DefaultStrict()
+	imgs, err := cs.client.Import(ctx, inTar, containerd.WithImportPlatform(platform))
+
+	if err != nil {
+		logrus.WithError(err).Error("Failed to import image to containerd")
+		return errors.Wrapf(err, "Failed to import image")
+	}
+
+	for _, img := range imgs {
+		platformImg := containerd.NewImageWithPlatform(cs.client, img, platform)
+
+		unpacked, err := platformImg.IsUnpacked(ctx, containerd.DefaultSnapshotter)
+		if err != nil {
+			logrus.WithError(err).WithField("image", img.Name).Error("IsUnpacked failed")
+			continue
+		}
+
+		if !unpacked {
+			err := platformImg.Unpack(ctx, containerd.DefaultSnapshotter)
+			if err != nil {
+				logrus.WithError(err).WithField("image", img.Name).Error("Failed to unpack image")
+				return errors.Wrapf(err, "Failed to unpack image")
+			}
+		}
+	}
+	return nil
 }
 
 // LookupImage is not implemented.
