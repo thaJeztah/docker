@@ -80,7 +80,38 @@ func (cs *ImageService) PullImage(ctx context.Context, image, tagOrDigest string
 	resolver := newResolverFromAuthConfig(authConfig)
 	opts = append(opts, containerd.WithResolver(resolver))
 
-	_, err = cs.client.Pull(ctx, ref.String(), opts...)
+	jobs := newJobs()
+	h := containerdimages.HandlerFunc(func(ctx context.Context, desc ocispec.Descriptor) ([]ocispec.Descriptor, error) {
+		if desc.MediaType != containerdimages.MediaTypeDockerSchema1Manifest {
+			jobs.Add(desc)
+		}
+		return nil, nil
+	})
+	opts = append(opts, containerd.WithImageHandler(h))
+
+	stop := make(chan struct{})
+	go func() {
+		showProgress(ctx, jobs, cs.client.ContentStore(), outStream, stop)
+		stop <- struct{}{}
+	}()
+
+	img, err := cs.client.Pull(ctx, ref.String(), opts...)
+	if err != nil {
+		return err
+	}
+
+	unpacked, err := img.IsUnpacked(ctx, containerd.DefaultSnapshotter)
+	if err != nil {
+		return err
+	}
+
+	if !unpacked {
+		if err := img.Unpack(ctx, containerd.DefaultSnapshotter); err != nil {
+			return err
+		}
+	}
+	stop <- struct{}{}
+	<-stop
 	return err
 }
 
