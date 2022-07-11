@@ -11,6 +11,7 @@ import (
 	"github.com/containerd/containerd/content"
 	cerrdefs "github.com/containerd/containerd/errdefs"
 	containerdimages "github.com/containerd/containerd/images"
+	"github.com/containerd/containerd/images/archive"
 	"github.com/containerd/containerd/platforms"
 	"github.com/containerd/containerd/remotes"
 	"github.com/containerd/containerd/remotes/docker"
@@ -364,8 +365,20 @@ func (cs *ImageService) SquashImage(id, parent string) (string, error) {
 // stream. All images with the given tag and all versions containing
 // the same tag are exported. names is the set of tags to export, and
 // outStream is the writer which the images are written to.
-func (cs *ImageService) ExportImage(names []string, outStream io.Writer) error {
-	panic("not implemented")
+func (cs *ImageService) ExportImage(ctx context.Context, names []string, outStream io.Writer) error {
+	opts := []archive.ExportOpt{
+		archive.WithPlatform(platforms.Ordered(platforms.DefaultSpec())),
+		archive.WithSkipNonDistributableBlobs(),
+	}
+	is := cs.client.ImageService()
+	for _, imageRef := range names {
+		named, err := reference.ParseDockerRef(imageRef)
+		if err != nil {
+			return err
+		}
+		opts = append(opts, archive.WithImage(is, named.String()))
+	}
+	return cs.client.Export(ctx, outStream, opts...)
 }
 
 // ImageDelete deletes the image referenced by the given imageRef from this
@@ -442,8 +455,11 @@ func (cs *ImageService) ImportImage(ctx context.Context, src string, repository 
 // LoadImage uploads a set of images into the repository. This is the
 // complement of ExportImage.  The input stream is an uncompressed tar
 // ball containing images and metadata.
-func (cs *ImageService) LoadImage(inTar io.ReadCloser, outStream io.Writer, quiet bool) error {
-	panic("not implemented")
+func (cs *ImageService) LoadImage(ctx context.Context, inTar io.ReadCloser, outStream io.Writer, quiet bool) error {
+	_, err := cs.client.Import(ctx, inTar,
+		containerd.WithImportPlatform(platforms.DefaultStrict()),
+	)
+	return err
 }
 
 // LookupImage is not implemented.
