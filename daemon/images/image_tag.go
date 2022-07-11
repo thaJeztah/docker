@@ -1,13 +1,15 @@
 package images // import "github.com/docker/docker/daemon/images"
 
 import (
+	"context"
+
 	"github.com/docker/distribution/reference"
 	"github.com/docker/docker/image"
 )
 
 // TagImage creates the tag specified by newTag, pointing to the image named
 // imageName (alternatively, imageName can also be an image ID).
-func (i *ImageService) TagImage(imageName, repository, tag string) (string, error) {
+func (i *ImageService) TagImage(ctx context.Context, imageName, repository, tag string) (string, error) {
 	img, err := i.GetImage(nil, imageName, nil)
 	if err != nil {
 		return "", err
@@ -23,12 +25,12 @@ func (i *ImageService) TagImage(imageName, repository, tag string) (string, erro
 		}
 	}
 
-	err = i.TagImageWithReference(img.ID(), newTag)
+	err = i.TagImageWithReference(nil, img.ID(), newTag)
 	return reference.FamiliarString(newTag), err
 }
 
 // TagImageWithReference adds the given reference to the image ID provided.
-func (i *ImageService) TagImageWithReference(imageID image.ID, newTag reference.Named) error {
+func (i *ImageService) TagImageWithReference(ctx context.Context, imageID image.ID, newTag reference.Named) error {
 	if err := i.referenceStore.AddTag(newTag, imageID.Digest(), true); err != nil {
 		return err
 	}
