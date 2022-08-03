@@ -179,7 +179,7 @@ func (daemon *Daemon) containerStart(ctx context.Context, container *container.C
 
 	newContainerOpts := []containerd.NewContainerOpts{}
 	if daemon.UsesSnapshotter() {
-		newContainerOpts = append(newContainerOpts, containerd.WithSnapshotter(containerd.DefaultSnapshotter))
+		newContainerOpts = append(newContainerOpts, containerd.WithSnapshotter(daemon.graphDriver))
 		newContainerOpts = append(newContainerOpts, containerd.WithSnapshot(container.ID))
 	}
 

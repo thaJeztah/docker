@@ -62,13 +62,13 @@ func (i *ImageService) PullImage(ctx context.Context, image, tagOrDigest string,
 		return err
 	}
 
-	unpacked, err := img.IsUnpacked(ctx, containerd.DefaultSnapshotter)
+	unpacked, err := img.IsUnpacked(ctx, i.snapshotter)
 	if err != nil {
 		return err
 	}
 
 	if !unpacked {
-		if err := img.Unpack(ctx, containerd.DefaultSnapshotter); err != nil {
+		if err := img.Unpack(ctx, i.snapshotter); err != nil {
 			return err
 		}
 	}

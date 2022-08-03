@@ -10,6 +10,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/containerd/containerd"
 	"github.com/docker/docker/opts"
 	"github.com/docker/docker/pkg/authorization"
 	"github.com/docker/docker/registry"
@@ -50,6 +51,9 @@ const (
 	DefaultContainersNamespace = "moby"
 	// DefaultPluginNamespace is the name of the default containerd namespace used for plugins.
 	DefaultPluginNamespace = "plugins.moby"
+
+	// DefaultContainerdSnapshotter is the name of the default containerd snapshotter used for creating container root fs
+	DefaultContainerdSnapshotter = containerd.DefaultSnapshotter
 
 	// LinuxV2RuntimeName is the runtime used to specify the containerd v2 runc shim
 	LinuxV2RuntimeName = "io.containerd.runc.v2"

@@ -11,7 +11,6 @@ import (
 	"strings"
 
 	cdcgroups "github.com/containerd/cgroups"
-	"github.com/containerd/containerd"
 	"github.com/containerd/containerd/containers"
 	coci "github.com/containerd/containerd/oci"
 	"github.com/containerd/containerd/pkg/apparmor"
@@ -1061,10 +1060,19 @@ func (daemon *Daemon) createSpec(ctx context.Context, c *container.Container) (r
 	if daemon.configStore.Rootless {
 		opts = append(opts, WithRootless(daemon))
 	}
+
+	snapshotter := ""
+	snapshotKey := ""
+	if daemon.UsesSnapshotter() {
+		snapshotter = daemon.graphDriver
+		snapshotKey = c.ID
+
+	}
+
 	return &s, coci.ApplyOpts(context.Background(), nil, &containers.Container{
 		ID:          c.ID,
-		Snapshotter: containerd.DefaultSnapshotter,
-		SnapshotKey: c.ID,
+		Snapshotter: snapshotter,
+		SnapshotKey: snapshotKey,
 	}, &s, opts...)
 }
 

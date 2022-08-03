@@ -48,14 +48,14 @@ func (i *ImageService) LoadImage(ctx context.Context, inTar io.ReadCloser, outSt
 	for _, img := range imgs {
 		platformImg := containerd.NewImageWithPlatform(i.client, img, platform)
 
-		unpacked, err := platformImg.IsUnpacked(ctx, containerd.DefaultSnapshotter)
+		unpacked, err := platformImg.IsUnpacked(ctx, i.snapshotter)
 		if err != nil {
 			logrus.WithError(err).WithField("image", img.Name).Error("IsUnpacked failed")
 			continue
 		}
 
 		if !unpacked {
-			err := platformImg.Unpack(ctx, containerd.DefaultSnapshotter)
+			err := platformImg.Unpack(ctx, i.snapshotter)
 			if err != nil {
 				logrus.WithError(err).WithField("image", img.Name).Error("Failed to unpack image")
 				return errors.Wrapf(err, "Failed to unpack image")
