@@ -838,21 +838,6 @@ func NewDaemon(ctx context.Context, config *config.Config, pluginStore *plugin.S
 		}
 	}
 
-	if isWindows {
-		// On Windows we don't support the environment variable, or a user supplied graphdriver
-		d.graphDriver = "windowsfilter"
-	} else {
-		// Unix platforms however run a single graphdriver for all containers, and it can
-		// be set through an environment variable, a daemon start parameter, or chosen through
-		// initialization of the layerstore through driver priority order for example.
-		if drv := os.Getenv("DOCKER_DRIVER"); drv != "" {
-			d.graphDriver = drv
-			logrus.Infof("Setting the storage driver from the $DOCKER_DRIVER environment variable (%s)", drv)
-		} else {
-			d.graphDriver = config.GraphDriver // May still be empty. Layerstore init determines instead.
-		}
-	}
-
 	d.registryService = registryService
 	logger.RegisterPluginGetter(d.PluginStore)
 
@@ -942,28 +927,6 @@ func NewDaemon(ctx context.Context, config *config.Config, pluginStore *plugin.S
 		return nil, err
 	}
 
-	layerStore, err := layer.NewStoreFromOptions(layer.StoreOptions{
-		Root:                      config.Root,
-		MetadataStorePathTemplate: filepath.Join(config.Root, "image", "%s", "layerdb"),
-		GraphDriver:               d.graphDriver,
-		GraphDriverOptions:        config.GraphOptions,
-		IDMapping:                 idMapping,
-		PluginGetter:              d.PluginStore,
-		ExperimentalEnabled:       config.Experimental,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	// As layerstore initialization may set the driver
-	d.graphDriver = layerStore.DriverName()
-
-	// Configure and validate the kernels security support. Note this is a Linux/FreeBSD
-	// operation only, so it is safe to pass *just* the runtime OS graphdriver.
-	if err := configureKernelSecuritySupport(config, d.graphDriver); err != nil {
-		return nil, err
-	}
-
 	imageRoot := filepath.Join(config.Root, "image", d.graphDriver)
 
 	d.volumes, err = volumesservice.NewVolumeService(config.Root, d.PluginStore, rootIDs, d)
@@ -978,23 +941,6 @@ func NewDaemon(ctx context.Context, config *config.Config, pluginStore *plugin.S
 	if err != nil {
 		logrus.WithError(err).Warnf("unable to migrate engine ID; a new engine ID will be generated")
 	}
-
-	// We have a single tag/reference store for the daemon globally. However, it's
-	// stored under the graphdriver. On host platforms which only support a single
-	// container OS, but multiple selectable graphdrivers, this means depending on which
-	// graphdriver is chosen, the global reference store is under there. For
-	// platforms which support multiple container operating systems, this is slightly
-	// more problematic as where does the global ref store get located? Fortunately,
-	// for Windows, which is currently the only daemon supporting multiple container
-	// operating systems, the list of graphdrivers available isn't user configurable.
-	// For backwards compatibility, we just put it under the windowsfilter
-	// directory regardless.
-	refStoreLocation := filepath.Join(imageRoot, `repositories.json`)
-	rs, err := refstore.NewReferenceStore(refStoreLocation)
-	if err != nil {
-		return nil, fmt.Errorf("Couldn't create reference store repository: %s", err)
-	}
-	d.ReferenceStore = rs
 
 	// Check if Devices cgroup is mounted, it is hard requirement for container security,
 	// on Linux.
@@ -1026,14 +972,71 @@ func NewDaemon(ctx context.Context, config *config.Config, pluginStore *plugin.S
 
 	d.linkIndex = newLinkIndex()
 
+	// On Windows we don't support the environment variable, or a user supplied graphdriver
+	// Unix platforms however run a single graphdriver for all containers, and it can
+	// be set through an environment variable, a daemon start parameter, or chosen through
+	// initialization of the layerstore through driver priority order for example.
+	graphDriver := os.Getenv("DOCKER_DRIVER")
+	if isWindows {
+		graphDriver = "windowsfilter"
+	} else if graphDriver != "" {
+		logrus.Infof("Setting the storage driver from the $DOCKER_DRIVER environment variable (%s)", graphDriver)
+	} else {
+		graphDriver = config.GraphDriver
+	}
+
 	if d.UsesSnapshotter() {
-		d.graphDriver = d.configStore.GraphDriver
+		d.graphDriver = ctrd.SnapshotterFromGraphDriver(graphDriver)
+		// Configure and validate the kernels security support. Note this is a Linux/FreeBSD
+		// operation only, so it is safe to pass *just* the runtime OS graphdriver.
+		if err := configureKernelSecuritySupport(config, graphDriver); err != nil {
+			return nil, err
+		}
 		d.imageService = ctrd.NewService(d.containerdCli, d.containers, d.graphDriver)
 	} else {
 		ifs, err := image.NewFSStoreBackend(filepath.Join(imageRoot, "imagedb"))
 		if err != nil {
 			return nil, err
 		}
+
+		layerStore, err := layer.NewStoreFromOptions(layer.StoreOptions{
+			Root:                      config.Root,
+			MetadataStorePathTemplate: filepath.Join(config.Root, "image", "%s", "layerdb"),
+			GraphDriver:               graphDriver,
+			GraphDriverOptions:        config.GraphOptions,
+			IDMapping:                 idMapping,
+			PluginGetter:              d.PluginStore,
+			ExperimentalEnabled:       config.Experimental,
+		})
+		if err != nil {
+			return nil, err
+		}
+
+		// As layerstore initialization may set the driver
+		d.graphDriver = layerStore.DriverName()
+
+		// Configure and validate the kernels security support. Note this is a Linux/FreeBSD
+		// operation only, so it is safe to pass *just* the runtime OS graphdriver.
+		if err := configureKernelSecuritySupport(config, d.graphDriver); err != nil {
+			return nil, err
+		}
+
+		// We have a single tag/reference store for the daemon globally. However, it's
+		// stored under the graphdriver. On host platforms which only support a single
+		// container OS, but multiple selectable graphdrivers, this means depending on which
+		// graphdriver is chosen, the global reference store is under there. For
+		// platforms which support multiple container operating systems, this is slightly
+		// more problematic as where does the global ref store get located? Fortunately,
+		// for Windows, which is currently the only daemon supporting multiple container
+		// operating systems, the list of graphdrivers available isn't user configurable.
+		// For backwards compatibility, we just put it under the windowsfilter
+		// directory regardless.
+		refStoreLocation := filepath.Join(imageRoot, `repositories.json`)
+		rs, err := refstore.NewReferenceStore(refStoreLocation)
+		if err != nil {
+			return nil, fmt.Errorf("Couldn't create reference store repository: %s", err)
+		}
+		d.ReferenceStore = rs
 
 		imageStore, err := image.NewImageStore(ifs, layerStore)
 		if err != nil {
