@@ -984,13 +984,14 @@ func NewDaemon(ctx context.Context, config *config.Config, pluginStore *plugin.S
 	}
 
 	if d.UsesSnapshotter() {
-		d.graphDriver = ctrd.SnapshotterFromGraphDriver(graphDriver)
+		snapshotter := ctrd.SnapshotterFromGraphDriver(graphDriver)
 		// Configure and validate the kernels security support. Note this is a Linux/FreeBSD
 		// operation only, so it is safe to pass *just* the runtime OS graphdriver.
-		if err := configureKernelSecuritySupport(config, graphDriver); err != nil {
+		if err := configureKernelSecuritySupport(config, snapshotter); err != nil {
 			return nil, err
 		}
-		d.imageService = ctrd.NewService(d.containerdCli, d.containers, d.graphDriver)
+		d.imageService = ctrd.NewService(d.containerdCli, d.containers, snapshotter)
+		d.graphDriver = snapshotter
 	} else {
 		layerStore, err := layer.NewStoreFromOptions(layer.StoreOptions{
 			Root:                      config.Root,
