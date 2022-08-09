@@ -4,57 +4,55 @@ import (
 	"testing"
 
 	"github.com/containerd/containerd"
+	"gotest.tools/v3/assert"
 )
 
 func TestSnapshotterFromGraphDriver(t *testing.T) {
 	testCases := []struct {
-		desc   string
-		input  string
-		output string
+		desc     string
+		input    string
+		expected string
 	}{
 		{
-			desc:   "empty defaults to containerd default",
-			input:  "",
-			output: containerd.DefaultSnapshotter,
+			desc:     "empty defaults to containerd default",
+			input:    "",
+			expected: containerd.DefaultSnapshotter,
 		},
 		{
-			desc:   "overlay -> overlayfs",
-			input:  "overlay",
-			output: "overlayfs",
+			desc:     "overlay -> overlayfs",
+			input:    "overlay",
+			expected: "overlayfs",
 		},
 		{
-			desc:   "overlay2 -> overlayfs",
-			input:  "overlay2",
-			output: "overlayfs",
+			desc:     "overlay2 -> overlayfs",
+			input:    "overlay2",
+			expected: "overlayfs",
 		},
 		{
-			desc:   "windowsfilter -> windows",
-			input:  "windowsfilter",
-			output: "windows",
+			desc:     "windowsfilter -> windows",
+			input:    "windowsfilter",
+			expected: "windows",
 		},
 		{
-			desc:   "containerd overlayfs",
-			input:  "overlayfs",
-			output: "overlayfs",
+			desc:     "containerd overlayfs",
+			input:    "overlayfs",
+			expected: "overlayfs",
 		},
 		{
-			desc:   "containerd zfs",
-			input:  "zfs",
-			output: "zfs",
+			desc:     "containerd zfs",
+			input:    "zfs",
+			expected: "zfs",
 		},
 		{
-			desc:   "unknown is unchanged",
-			input:  "somefuturesnapshotter",
-			output: "somefuturesnapshotter",
+			desc:     "unknown is unchanged",
+			input:    "somefuturesnapshotter",
+			expected: "somefuturesnapshotter",
 		},
 	}
-	for _, tC := range testCases {
-		want := tC.output
-		t.Run(tC.desc, func(t *testing.T) {
-			got := SnapshotterFromGraphDriver(tC.input)
-			if want != got {
-				t.Errorf("Expected sanitizeGraphDriver to return %q, got %q", want, got)
-			}
+	for _, tc := range testCases {
+		tc := tc
+		t.Run(tc.desc, func(t *testing.T) {
+			assert.Equal(t, SnapshotterFromGraphDriver(tc.input), tc.expected)
 		})
 	}
 }
