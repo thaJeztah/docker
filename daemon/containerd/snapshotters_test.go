@@ -28,8 +28,8 @@ func TestSnapshotterFromGraphDriver(t *testing.T) {
 			output: "overlayfs",
 		},
 		{
-			desc:   "windowsgraph -> windows",
-			input:  "windowsgraph",
+			desc:   "windowsfilter -> windows",
+			input:  "windowsfilter",
 			output: "windows",
 		},
 		{

@@ -17,7 +17,7 @@ func SnapshotterFromGraphDriver(graphDriver string) string {
 	switch graphDriver {
 	case "overlay", "overlay2":
 		graphDriver = "overlayfs"
-	case "windowsgraph":
+	case "windowsfilter":
 		graphDriver = "windows"
 	}
 
