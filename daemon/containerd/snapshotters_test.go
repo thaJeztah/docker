@@ -34,12 +34,12 @@ func TestSnapshotterFromGraphDriver(t *testing.T) {
 		},
 		{
 			desc:   "containerd overlayfs",
-			input:  "io.containerd.snapshotter.v1.overlayfs",
+			input:  "overlayfs",
 			output: "overlayfs",
 		},
 		{
 			desc:   "containerd zfs",
-			input:  "io.containerd.snapshotter.v1.zfs",
+			input:  "zfs",
 			output: "zfs",
 		},
 		{
