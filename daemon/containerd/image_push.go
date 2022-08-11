@@ -11,6 +11,7 @@ import (
 	"github.com/containerd/containerd/remotes"
 	"github.com/docker/distribution/reference"
 	"github.com/docker/docker/api/types/registry"
+	"github.com/google/uuid"
 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -19,7 +20,7 @@ import (
 // PushImage initiates a push operation on the repository named localName.
 func (i *ImageService) PushImage(ctx context.Context, image, tag string, metaHeaders map[string][]string, authConfig *registry.AuthConfig, outStream io.Writer) error {
 	// TODO: Pass this from user?
-	platformMatcher := platforms.DefaultStrict()
+	platformMatcher := platforms.All
 
 	ref, err := reference.ParseNormalizedNamed(image)
 	if err != nil {
@@ -43,17 +44,29 @@ func (i *ImageService) PushImage(ctx context.Context, image, tag string, metaHea
 
 	target := img.Target
 
-	// Create a temporary image which is stripped from content that references other platforms.
-	// We or the remote may not have them and referencing them will end with an error.
-	if platformMatcher != platforms.All {
-		tmpRef := ref.String() + "-tmp-platformspecific"
-		platformImg, err := converter.Convert(ctx, i.client, tmpRef, ref.String(), converter.WithPlatform(platformMatcher))
-		if err != nil {
-			return errors.Wrap(err, "Failed to convert image to platform specific")
-		}
+	if containerdimages.IsIndexType(target.MediaType) {
+		if platformMatcher == platforms.All {
+			// Create an image with manifest list that references only present blobs.
+			fullest, err := i.createFullestImage(ctx, img)
+			if err != nil {
+				return err
+			}
+			if fullest != nil {
+				target = fullest.Target
+				defer i.client.ImageService().Delete(ctx, fullest.Name, containerdimages.SynchronousDelete())
+			}
+		} else {
+			// If user requests to push a specific platform, convert the index to one that
+			// doesn't reference manifest of other platforms.
+			tmpRef := ref.String() + "-tmp-" + uuid.NewString()
+			platformImg, err := converter.Convert(ctx, i.client, tmpRef, ref.String(), converter.WithPlatform(platformMatcher))
+			if err != nil {
+				return errors.Wrap(err, "failed to convert image to platform specific")
+			}
 
-		target = platformImg.Target
-		defer i.client.ImageService().Delete(ctx, platformImg.Name, containerdimages.SynchronousDelete())
+			target = platformImg.Target
+			defer i.client.ImageService().Delete(ctx, platformImg.Name, containerdimages.SynchronousDelete())
+		}
 	}
 
 	jobs := newJobs()

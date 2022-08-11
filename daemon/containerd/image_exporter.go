@@ -5,16 +5,13 @@ import (
 	"io"
 
 	"github.com/containerd/containerd"
-	cerrdefs "github.com/containerd/containerd/errdefs"
 	containerdimages "github.com/containerd/containerd/images"
 	"github.com/containerd/containerd/images/archive"
-	"github.com/containerd/containerd/images/converter"
 	"github.com/containerd/containerd/mount"
 	"github.com/containerd/containerd/platforms"
 	"github.com/docker/distribution/reference"
 	"github.com/docker/docker/container"
 	"github.com/docker/docker/pkg/containerfs"
-	v1 "github.com/opencontainers/image-spec/specs-go/v1"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
@@ -72,71 +69,32 @@ func (i *ImageService) ExportImage(ctx context.Context, names []string, outStrea
 		archive.WithSkipNonDistributableBlobs(),
 	}
 
-	for _, imageRef := range names {
-		var err error
-		opts, err = i.appendImageForExport(ctx, opts, imageRef)
+	is := i.client.ImageService()
+
+	for _, name := range names {
+		ref, err := reference.ParseDockerRef(name)
 		if err != nil {
 			return err
 		}
+
+		img, err := is.Get(ctx, ref.String())
+		if err != nil {
+			return err
+		}
+
+		converted, err := i.createFullestImage(ctx, img)
+		if err != nil {
+			return err
+		}
+
+		if converted != nil {
+			opts = append(opts, archive.WithImage(is, converted.Name))
+			defer is.Delete(context.Background(), converted.Name, containerdimages.SynchronousDelete())
+			continue
+		}
+
+		opts = append(opts, archive.WithImage(is, img.Name))
 	}
 
 	return i.client.Export(ctx, outStream, opts...)
-}
-
-func (i *ImageService) appendImageForExport(ctx context.Context, opts []archive.ExportOpt, name string) ([]archive.ExportOpt, error) {
-	ref, err := reference.ParseDockerRef(name)
-	if err != nil {
-		return opts, err
-	}
-
-	is := i.client.ImageService()
-
-	img, err := is.Get(ctx, ref.String())
-	if err != nil {
-		return opts, err
-	}
-
-	store := i.client.ContentStore()
-
-	if containerdimages.IsIndexType(img.Target.MediaType) {
-		children, err := containerdimages.Children(ctx, store, img.Target)
-		if err != nil {
-			return opts, err
-		}
-
-		// Check which platform manifests we have blobs for.
-		missingPlatforms := []v1.Platform{}
-		presentPlatforms := []v1.Platform{}
-		for _, child := range children {
-			if containerdimages.IsManifestType(child.MediaType) {
-				_, err := store.ReaderAt(ctx, child)
-				if cerrdefs.IsNotFound(err) {
-					missingPlatforms = append(missingPlatforms, *child.Platform)
-					logrus.WithField("digest", child.Digest.String()).Debug("missing blob, not exporting")
-					continue
-				} else if err != nil {
-					return opts, err
-				}
-				presentPlatforms = append(presentPlatforms, *child.Platform)
-			}
-		}
-
-		// If we have all the manifests, just export the original index.
-		if len(missingPlatforms) == 0 {
-			return append(opts, archive.WithImage(is, img.Name)), nil
-		}
-
-		// Create a new manifest which contains only the manifests we have in store.
-		srcRef := ref.String()
-		targetRef := srcRef + "-tmp-export"
-		newImg, err := converter.Convert(ctx, i.client, targetRef, srcRef,
-			converter.WithPlatform(platforms.Any(presentPlatforms...)))
-		if err != nil {
-			return opts, err
-		}
-		defer i.client.ImageService().Delete(ctx, newImg.Name, containerdimages.SynchronousDelete())
-		return append(opts, archive.WithManifest(newImg.Target, srcRef)), nil
-	}
-
-	return append(opts, archive.WithImage(is, img.Name)), nil
 }

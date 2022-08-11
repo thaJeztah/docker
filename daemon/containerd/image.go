@@ -10,6 +10,8 @@ import (
 	"github.com/containerd/containerd/content"
 	cerrdefs "github.com/containerd/containerd/errdefs"
 	containerdimages "github.com/containerd/containerd/images"
+	"github.com/containerd/containerd/images/converter"
+	"github.com/containerd/containerd/platforms"
 	"github.com/docker/distribution/reference"
 	containertypes "github.com/docker/docker/api/types/container"
 	imagetype "github.com/docker/docker/api/types/image"
@@ -17,9 +19,11 @@ import (
 	"github.com/docker/docker/image"
 	"github.com/docker/docker/layer"
 	"github.com/docker/go-connections/nat"
+	"github.com/google/uuid"
 	"github.com/opencontainers/go-digest"
 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 var shortID = regexp.MustCompile(`^([a-f0-9]{4,64})$`)
@@ -296,4 +300,93 @@ func (i *ImageService) presentChildrenHandler() containerdimages.HandlerFunc {
 
 		return containerdimages.Children(ctx, store, desc)
 	}
+}
+
+// createFullestImage converts the given manifest list to a fullest possible with the current store content.
+// If all manifests blobs are present in the content store, then no conversion is performed and it returns nil.
+// Otherwise it creates a new image which targets a manifest list referencing only manifests with present blobs.
+func (i *ImageService) createFullestImage(ctx context.Context, img containerdimages.Image) (*containerdimages.Image, error) {
+	if containerdimages.IsIndexType(img.Target.MediaType) {
+		// Check which platform manifests we have blobs for.
+		presentPlatforms, missingPlatforms, err := i.checkPresentPlatforms(ctx, img.Target)
+
+		// If we have all the manifests, no need to convert the image.
+		if len(missingPlatforms) == 0 {
+			return nil, nil
+		}
+
+		// Create a new manifest list which contains only the manifests we have in store.
+		srcRef := img.Name
+		targetRef := srcRef + "-tmp-" + uuid.NewString()
+		for _, p := range presentPlatforms {
+			targetRef += "-" + platforms.Format(p)
+		}
+
+		newImg, err := converter.Convert(ctx, i.client, targetRef, srcRef,
+			converter.WithPlatform(platforms.Any(presentPlatforms...)))
+		if err != nil {
+			return nil, err
+		}
+		return newImg, nil
+	}
+
+	return nil, nil
+}
+
+// checkPresentPlatforms returns the platforms for which the image targeting an index/manifest list
+// has all the blobs present in the content store.
+// Both present and missing platforms list returned if there wasn't any error.
+func (i *ImageService) checkPresentPlatforms(ctx context.Context, index ocispec.Descriptor) ([]ocispec.Platform, []ocispec.Platform, error) {
+	if !containerdimages.IsIndexType(index.MediaType) {
+		return nil, nil, errors.New("not an index/manifest list")
+	}
+
+	store := i.client.ContentStore()
+
+	children, err := containerdimages.Children(ctx, store, index)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	missingPlatforms := []ocispec.Platform{}
+	presentPlatforms := []ocispec.Platform{}
+	for _, child := range children {
+		if containerdimages.IsManifestType(child.MediaType) {
+			missing := false
+
+			_, err := store.ReaderAt(ctx, child)
+			if cerrdefs.IsNotFound(err) {
+				missing = true
+			} else if err != nil {
+				return nil, nil, err
+			}
+
+			// If the manifest is not missing, also check for its blobs.
+			if !missing {
+				manifestChildren, err := containerdimages.Children(ctx, store, child)
+				if err != nil {
+					return nil, nil, err
+				}
+
+				// If any blob is missing, mark the manifest as missing.
+				for _, manifestChild := range manifestChildren {
+					_, err := store.ReaderAt(ctx, manifestChild)
+					if cerrdefs.IsNotFound(err) {
+						missing = true
+						break
+					} else if err != nil {
+						return nil, nil, err
+					}
+				}
+			}
+
+			if missing {
+				missingPlatforms = append(missingPlatforms, *child.Platform)
+				logrus.WithField("digest", child.Digest.String()).Debug("missing blob")
+			} else {
+				presentPlatforms = append(presentPlatforms, *child.Platform)
+			}
+		}
+	}
+	return presentPlatforms, missingPlatforms, nil
 }
