@@ -137,6 +137,6 @@ func (i *ImageService) GetLayerFolders(img *image.Image, rwLayer layer.RWLayer) 
 }
 
 // GetContainerLayerSize returns the real size & virtual size of the container.
-func (i *ImageService) GetContainerLayerSize(containerID string) (int64, int64) {
-	panic("not implemented")
+func (i *ImageService) GetContainerLayerSize(ctx context.Context, containerID string) (int64, int64, error) {
+	return 0, 0, errdefs.NotImplemented(errors.New("not implemented"))
 }
