@@ -2,6 +2,7 @@ package volume
 
 import (
 	"context"
+	"io"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -14,6 +15,7 @@ import (
 	"github.com/docker/docker/api/types/volume"
 	clientpkg "github.com/docker/docker/client"
 	"github.com/docker/docker/integration/internal/container"
+	"github.com/docker/docker/testutil/fakecontext"
 	"github.com/docker/docker/testutil/request"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"gotest.tools/v3/assert"
@@ -233,4 +235,47 @@ func TestVolumePruneAnonymous(t *testing.T) {
 	assert.Check(t, is.Equal(len(pruneReport.VolumesDeleted), 2))
 	assert.Check(t, cmp.Contains(pruneReport.VolumesDeleted, v.Name))
 	assert.Check(t, cmp.Contains(pruneReport.VolumesDeleted, vNamed.Name))
+}
+
+func TestVolumePruneAnonFromImage(t *testing.T) {
+	defer setupTest(t)()
+	client := testEnv.APIClient()
+
+	dockerfile := `FROM busybox
+VOLUME /foo
+`
+
+	buildContext := fakecontext.New(t, "", fakecontext.WithDockerfile(dockerfile))
+	img := "busybox:withvolume"
+
+	ctx := context.Background()
+	resp, err := client.ImageBuild(ctx, buildContext.AsTarReader(t), types.ImageBuildOptions{
+		Tags: []string{img},
+	})
+	assert.NilError(t, err)
+
+	_, err = io.Copy(io.Discard, resp.Body)
+	resp.Body.Close()
+	assert.NilError(t, err)
+
+	id := container.Create(ctx, t, client, container.WithImage(img))
+	inspect, err := client.ContainerInspect(ctx, id)
+	assert.NilError(t, err)
+
+	var volumeName string
+	for _, m := range inspect.Mounts {
+		if m.Destination != "/foo" {
+			continue
+		}
+		volumeName = m.Name
+		break
+	}
+	assert.Assert(t, volumeName != "")
+
+	err = client.ContainerRemove(ctx, id, types.ContainerRemoveOptions{})
+	assert.NilError(t, err)
+
+	pruneReport, err := client.VolumesPrune(ctx, filters.Args{})
+	assert.NilError(t, err)
+	assert.Assert(t, cmp.Contains(pruneReport.VolumesDeleted, volumeName))
 }
