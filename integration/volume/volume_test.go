@@ -1,6 +1,7 @@
 package volume
 
 import (
+	"bytes"
 	"context"
 	"io"
 	"net/http"
@@ -241,9 +242,15 @@ func TestVolumePruneAnonFromImage(t *testing.T) {
 	defer setupTest(t)()
 	client := testEnv.APIClient()
 
+	var volumePath string
+	if testEnv.OSType == "windows" {
+		volumePath = "c:/foo"
+	} else {
+		volumePath = "/foo"
+	}
+
 	dockerfile := `FROM busybox
-VOLUME /foo
-`
+VOLUME ` + volumePath
 
 	buildContext := fakecontext.New(t, "", fakecontext.WithDockerfile(dockerfile))
 	img := "busybox:withvolume"
@@ -254,9 +261,11 @@ VOLUME /foo
 	})
 	assert.NilError(t, err)
 
-	_, err = io.Copy(io.Discard, resp.Body)
-	resp.Body.Close()
+	out := bytes.NewBuffer(nil)
+	_, err = io.Copy(out, resp.Body)
+	_ = resp.Body.Close()
 	assert.NilError(t, err)
+	assert.Check(t, is.Contains(out.String(), "Successfully built"))
 
 	id := container.Create(ctx, t, client, container.WithImage(img))
 	inspect, err := client.ContainerInspect(ctx, id)
@@ -264,7 +273,7 @@ VOLUME /foo
 
 	var volumeName string
 	for _, m := range inspect.Mounts {
-		if m.Destination != "/foo" {
+		if m.Destination != volumePath {
 			continue
 		}
 		volumeName = m.Name
