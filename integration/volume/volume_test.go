@@ -273,7 +273,8 @@ VOLUME ` + volumePath
 
 	var volumeName string
 	for _, m := range inspect.Mounts {
-		if m.Destination != volumePath {
+		if m.Destination != volumePath && m.Destination != filepath.Clean(volumePath) {
+			t.Logf("skipping: %+v, as it doesn't match '%s' or '%s'", m, volumePath, filepath.Clean(volumePath))
 			continue
 		}
 		volumeName = m.Name
