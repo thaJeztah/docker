@@ -40,13 +40,16 @@ func (daemon *Daemon) createContainerOSSpecificSettings(container *container.Con
 		container.HostConfig.ReadonlyPaths = hostConfig.ReadonlyPaths
 	}
 
-	for spec := range config.Volumes {
-		destination := filepath.Clean(spec)
+	// Look for volume-paths defined in the image config, and attach anonymous
+	// volumes for those paths that do not have a volume or bind-mount mounted
+	// at the location.
+	for dest := range config.Volumes {
+		destination := filepath.Clean(dest)
 
 		// Skip volumes for which we already have something mounted on that
 		// destination because of a --volume-from.
 		if container.HasMountFor(destination) {
-			logrus.WithField("container", container.ID).WithField("destination", spec).Debug("mountpoint already exists, skipping anonymous volume")
+			logrus.WithField("container", container.ID).WithField("destination", dest).Debug("mountpoint already exists, skipping anonymous volume")
 			// Not an error, this could easily have come from the image config.
 			continue
 		}

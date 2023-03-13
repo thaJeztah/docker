@@ -2,12 +2,12 @@ package daemon // import "github.com/docker/docker/daemon"
 
 import (
 	"context"
-	"fmt"
+	"path/filepath"
 
 	containertypes "github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/container"
-	volumemounts "github.com/docker/docker/volume/mounts"
 	volumeopts "github.com/docker/docker/volume/service/opts"
+	"github.com/sirupsen/logrus"
 )
 
 // createContainerOSSpecificSettings performs host-OS specific container create functionality
@@ -16,21 +16,24 @@ func (daemon *Daemon) createContainerOSSpecificSettings(container *container.Con
 		// Make sure the host config has the default daemon isolation if not specified by caller.
 		hostConfig.Isolation = daemon.defaultIsolation
 	}
-	parser := volumemounts.NewParser()
-	for spec := range config.Volumes {
 
-		mp, err := parser.ParseMountRaw(spec, hostConfig.VolumeDriver)
-		if err != nil {
-			return fmt.Errorf("Unrecognised volume spec: %v", err)
-		}
+	// Look for volume-paths defined in the image config, and attach anonymous
+	// volumes for those paths that do not have a volume or bind-mount mounted
+	// at the location.
+	for dest := range config.Volumes {
+		// TODO(thaJeztah): should we allow `/some-path` to be used on Windows, and treat it as `C:/some-path` ?
+		destination := filepath.Clean(dest)
 
 		// Skip volumes for which we already have something mounted on that
 		// destination because of a --volume-from.
-		if container.IsDestinationMounted(mp.Destination) {
+		// TODO(thaJeztah): on Unix this is HasMountFor() - why do we have different names for Unix and Windows?
+		if container.IsDestinationMounted(destination) {
+			logrus.WithField("container", container.ID).WithField("destination", dest).Debug("mountpoint already exists, skipping anonymous volume")
+			// Not an error, this could easily have come from the image config.
 			continue
 		}
 
-		// FIXME(thaJeztah); is this indeed only intended to be used for anonymous volumes?
+		// TODO(thaJeztah); is this indeed only intended to be used for anonymous volumes?
 		v, err := daemon.volumes.Create(context.TODO(), "", hostConfig.VolumeDriver, volumeopts.WithCreateReference(container.ID))
 		if err != nil {
 			return err
@@ -67,7 +70,7 @@ func (daemon *Daemon) createContainerOSSpecificSettings(container *container.Con
 		//	}
 
 		// Add it to container.MountPoints
-		container.AddMountPointWithVolume(mp.Destination, &volumeWrapper{v: v, s: daemon.volumes}, mp.RW)
+		container.AddMountPointWithVolume(destination, &volumeWrapper{v: v, s: daemon.volumes}, true)
 	}
 	return nil
 }
