@@ -81,10 +81,9 @@ func (i *ImageService) ImageDelete(ctx context.Context, imageRef string, force, 
 		return records, nil
 	}
 
-	using := func(c *container.Container) bool {
+	ctr := i.containers.First(func(c *container.Container) bool {
 		return c.ImageID == imgID
-	}
-	ctr := i.containers.First(using)
+	})
 	if ctr != nil {
 		if !force {
 			// If we removed the repository reference then
@@ -94,7 +93,6 @@ func (i *ImageService) ImageDelete(ctx context.Context, imageRef string, force, 
 			refString := reference.FamiliarString(reference.TagNameOnly(parsedRef))
 			err := &imageDeleteConflict{
 				reference: refString,
-				used:      true,
 				message: fmt.Sprintf("container %s is using its referenced image %s",
 					stringid.TruncateID(ctr.ID),
 					stringid.TruncateID(imgID.String())),
@@ -178,8 +176,23 @@ func (i *ImageService) deleteAll(ctx context.Context, img images.Image, force, p
 	return records, nil
 }
 
-// isImageIDPrefix returns whether the given
-// possiblePrefix is a prefix of the given imageID.
+// isSingleReference returns true if there are no other images in the
+// daemon targeting the same content as `img` that are not dangling.
+func (i *ImageService) isSingleReference(ctx context.Context, img images.Image) (bool, error) {
+	refs, err := i.client.ImageService().List(ctx, "target.digest=="+img.Target.Digest.String())
+	if err != nil {
+		return false, err
+	}
+	for _, ref := range refs {
+		if ref.Name != img.Name && !isDanglingImage(ref) {
+			return false, nil
+		}
+	}
+	return true, nil
+}
+
+// isImageIDPrefix returns whether the given possiblePrefix is a prefix of the
+// given imageID.
 func isImageIDPrefix(imageID, possiblePrefix string) bool {
 	if strings.HasPrefix(imageID, possiblePrefix) {
 		return true
@@ -201,21 +214,6 @@ func sortParentsByAffinity(parents []imageWithRootfs) {
 	})
 }
 
-// isSingleReference returns true if there are no other images in the
-// daemon targeting the same content as `img` that are not dangling.
-func (i *ImageService) isSingleReference(ctx context.Context, img images.Image) (bool, error) {
-	refs, err := i.client.ImageService().List(ctx, "target.digest=="+img.Target.Digest.String())
-	if err != nil {
-		return false, err
-	}
-	for _, ref := range refs {
-		if !isDanglingImage(ref) && ref.Name != img.Name {
-			return false, nil
-		}
-	}
-	return true, nil
-}
-
 type conflictType int
 
 const (
@@ -225,6 +223,30 @@ const (
 	conflictHard = conflictRunningContainer
 	conflictSoft = conflictActiveReference | conflictStoppedContainer
 )
+
+// ImageDeleteConflict holds a soft or hard conflict and associated
+// error. A hard conflict represents a running container using the
+// image, while a soft conflict is any tags/digests referencing the
+// given image or any stopped container using the image.
+// Implements the error interface.
+type imageDeleteConflict struct {
+	hard      bool
+	reference string
+	message   string
+}
+
+func (idc *imageDeleteConflict) Error() string {
+	var forceMsg string
+	if idc.hard {
+		forceMsg = "cannot be forced"
+	} else {
+		forceMsg = "must be forced"
+	}
+
+	return fmt.Sprintf("conflict: unable to delete %s (%s) - %s", idc.reference, forceMsg, idc.message)
+}
+
+func (*imageDeleteConflict) Conflict() {}
 
 // imageDeleteHelper attempts to delete the given image from this daemon.
 // If the image has any hard delete conflicts (running containers using
@@ -264,30 +286,6 @@ func (i *ImageService) imageDeleteHelper(ctx context.Context, img images.Image, 
 	return nil
 }
 
-// ImageDeleteConflict holds a soft or hard conflict and associated
-// error. A hard conflict represents a running container using the
-// image, while a soft conflict is any tags/digests referencing the
-// given image or any stopped container using the image.
-// Implements the error interface.
-type imageDeleteConflict struct {
-	hard      bool
-	used      bool
-	reference string
-	message   string
-}
-
-func (idc *imageDeleteConflict) Error() string {
-	var forceMsg string
-	if idc.hard {
-		forceMsg = "cannot be forced"
-	} else {
-		forceMsg = "must be forced"
-	}
-	return fmt.Sprintf("conflict: unable to delete %s (%s) - %s", idc.reference, forceMsg, idc.message)
-}
-
-func (imageDeleteConflict) Conflict() {}
-
 // checkImageDeleteConflict returns a conflict representing
 // any issue preventing deletion of the given image ID, and
 // nil if there are none. It takes a bitmask representing a
@@ -295,6 +293,7 @@ func (imageDeleteConflict) Conflict() {}
 // and will only check for these conflict types.
 func (i *ImageService) checkImageDeleteConflict(ctx context.Context, imgID image.ID, mask conflictType) error {
 	if mask&conflictRunningContainer != 0 {
+		// Check if any running container is using the image.
 		running := func(c *container.Container) bool {
 			return c.ImageID == imgID && c.IsRunning()
 		}
@@ -302,20 +301,19 @@ func (i *ImageService) checkImageDeleteConflict(ctx context.Context, imgID image
 			return &imageDeleteConflict{
 				reference: stringid.TruncateID(imgID.String()),
 				hard:      true,
-				used:      true,
 				message:   fmt.Sprintf("image is being used by running container %s", stringid.TruncateID(ctr.ID)),
 			}
 		}
 	}
 
 	if mask&conflictStoppedContainer != 0 {
+		// Check if any stopped containers reference this image.
 		stopped := func(c *container.Container) bool {
 			return !c.IsRunning() && c.ImageID == imgID
 		}
 		if ctr := i.containers.First(stopped); ctr != nil {
 			return &imageDeleteConflict{
 				reference: stringid.TruncateID(imgID.String()),
-				used:      true,
 				message:   fmt.Sprintf("image is being used by stopped container %s", stringid.TruncateID(ctr.ID)),
 			}
 		}

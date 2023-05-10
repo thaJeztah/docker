@@ -16,17 +16,6 @@ import (
 	"github.com/pkg/errors"
 )
 
-type conflictType int
-
-const (
-	conflictDependentChild conflictType = 1 << iota
-	conflictRunningContainer
-	conflictActiveReference
-	conflictStoppedContainer
-	conflictHard = conflictDependentChild | conflictRunningContainer
-	conflictSoft = conflictActiveReference | conflictStoppedContainer
-)
-
 // ImageDelete deletes the image referenced by the given imageRef from this
 // daemon. The given imageRef can be an image ID, ID prefix, or a repository
 // reference (with an optional tag or digest, defaulting to the tag name
@@ -213,11 +202,9 @@ func isImageIDPrefix(imageID, possiblePrefix string) bool {
 	if strings.HasPrefix(imageID, possiblePrefix) {
 		return true
 	}
-
 	if i := strings.IndexRune(imageID, ':'); i >= 0 {
 		return strings.HasPrefix(imageID[i+1:], possiblePrefix)
 	}
-
 	return false
 }
 
@@ -251,16 +238,28 @@ func (i *ImageService) removeAllReferencesToImageID(imgID image.ID, records *[]t
 			return err
 		}
 
-		untaggedRecord := types.ImageDeleteResponseItem{Untagged: reference.FamiliarString(parsedRef)}
-
 		i.LogImageEvent(imgID.String(), imgID.String(), "untag")
-		*records = append(*records, untaggedRecord)
+		*records = append(*records, types.ImageDeleteResponseItem{Untagged: reference.FamiliarString(parsedRef)})
 	}
 
 	return nil
 }
 
-// ImageDeleteConflict holds a soft or hard conflict and an associated error.
+type conflictType int
+
+const (
+	conflictDependentChild conflictType = 1 << iota
+	conflictRunningContainer
+	conflictActiveReference
+	conflictStoppedContainer
+	conflictHard = conflictDependentChild | conflictRunningContainer
+	conflictSoft = conflictActiveReference | conflictStoppedContainer
+)
+
+// ImageDeleteConflict holds a soft or hard conflict and associated
+// error. A hard conflict represents a running container using the
+// image, while a soft conflict is any tags/digests referencing the
+// given image or any stopped container using the image.
 // Implements the error interface.
 type imageDeleteConflict struct {
 	hard    bool
@@ -280,7 +279,7 @@ func (idc *imageDeleteConflict) Error() string {
 	return fmt.Sprintf("conflict: unable to delete %s (%s) - %s", stringid.TruncateID(idc.imgID.String()), forceMsg, idc.message)
 }
 
-func (idc *imageDeleteConflict) Conflict() {}
+func (*imageDeleteConflict) Conflict() {}
 
 // imageDeleteHelper attempts to delete the given image from this daemon. If
 // the image has any hard delete conflicts (child images or running containers
