@@ -81,8 +81,13 @@ func (daemon *Daemon) containerStop(ctx context.Context, ctr *container.Containe
 	}
 	defer cancel()
 
-	if status := <-ctr.Wait(subCtx, container.WaitConditionNotRunning); status.Err() == nil {
+	switch status := <-ctr.Wait(subCtx, container.WaitConditionNotRunning); status.Err() {
+	case nil:
 		// container did exit, so ignore any previous errors and return
+		return nil
+	case context.Canceled:
+		// request cancelled
+		logrus.WithField("container", ctr.ID).Info("Stopping container canceled")
 		return nil
 	}
 
@@ -103,12 +108,16 @@ func (daemon *Daemon) containerStop(ctx context.Context, ctr *container.Containe
 		// got a kill error, but give container 2 more seconds to exit just in case
 		subCtx, cancel := context.WithTimeout(ctx, 2*time.Second)
 		defer cancel()
-		status := <-ctr.Wait(subCtx, container.WaitConditionNotRunning)
-		if status.Err() != nil {
+		switch status := <-ctr.Wait(subCtx, container.WaitConditionNotRunning); status.Err() {
+		case nil:
+			// container did exit, so ignore previous errors and continue
+		case context.Canceled:
+			// request cancelled
+			logrus.WithField("container", ctr.ID).Info("Stopping container canceled")
+		default:
 			logrus.WithError(err).WithField("container", ctr.ID).Errorf("error killing container: %v", status.Err())
 			return err
 		}
-		// container did exit, so ignore previous errors and continue
 	}
 
 	return nil

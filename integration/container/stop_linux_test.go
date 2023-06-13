@@ -6,9 +6,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/docker/docker/api/types"
 	containertypes "github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/errdefs"
 	"github.com/docker/docker/integration/internal/container"
 	"gotest.tools/v3/assert"
+	is "gotest.tools/v3/assert/cmp"
 	"gotest.tools/v3/poll"
 )
 
@@ -63,4 +66,66 @@ func TestStopContainerWithTimeout(t *testing.T) {
 			assert.Equal(t, inspect.State.ExitCode, d.expectedExitCode)
 		})
 	}
+}
+
+// TestStopContainerWithTimeoutCancel checks that ContainerStop with a timeout
+// cancels the stop, but does not forcefully kill the container.
+// See issue https://github.com/moby/moby/issues/45731
+func TestStopContainerWithTimeoutCancel(t *testing.T) {
+	t.Parallel()
+	defer setupTest(t)()
+
+	const (
+		cancelContext   = "cancel context"
+		closeConnection = "close connection"
+	)
+
+	for _, tc := range []string{cancelContext, closeConnection} {
+		tc := tc
+		t.Run(tc, func(t *testing.T) {
+			t.Parallel()
+			apiClient := testEnv.APIClient()
+			defer apiClient.Close()
+			ctx := context.Background()
+
+			testCmd := container.WithCmd("sh", "-c", "sleep 30")
+			id := container.Run(ctx, t, apiClient, testCmd)
+
+			ctxCancel, cancel := context.WithCancel(context.Background())
+			defer cancel()
+			go func() {
+				stopTimeout := 15
+				err := apiClient.ContainerStop(ctxCancel, id, containertypes.StopOptions{Timeout: &stopTimeout})
+				switch tc {
+				case cancelContext:
+					assert.Check(t, is.ErrorType(err, errdefs.IsCancelled))
+				case closeConnection:
+					assert.Check(t, err)
+				}
+			}()
+
+			// Give the ContainerStop some time to make sure it's being handled,
+			// then cancel the context or close the client to cancel the stop.
+			time.Sleep(1 * time.Second)
+			switch tc {
+			case cancelContext:
+				// cancel the context
+				cancel()
+			case closeConnection:
+				// close the client connection
+				assert.Check(t, apiClient.Close())
+			}
+
+			// The stop should be cancelled, and the container should still
+			// be running
+			inspect, err := apiClient.ContainerInspect(ctx, id)
+			assert.Check(t, err)
+			assert.Check(t, inspect.State.Running)
+
+			err = apiClient.ContainerRemove(ctx, id, types.ContainerRemoveOptions{Force: true})
+			assert.Check(t, err)
+		})
+
+	}
+
 }
