@@ -351,16 +351,24 @@ func killProcessDirectly(container *container.Container) error {
 		return err
 	}
 
-	// In case there were some exceptions(e.g., state of zombie and D)
 	if process.Alive(pid) {
-		// Since we can not kill a zombie pid, add zombie check here
-		isZombie, err := process.Zombie(pid)
+		status, err := process.Status(pid)
 		if err != nil {
 			logrus.WithError(err).WithField("container", container.ID).Warn("Container state is invalid")
 			return err
 		}
-		if isZombie {
+		// Since we can not kill a zombie and D status pid, add check here
+		switch status {
+		case "D":
+			return errdefs.System(errors.Errorf("container %s PID %d is uninterruptible and can not be killed", stringid.TruncateID(container.ID), pid))
+		case "Z":
 			return errdefs.System(errors.Errorf("container %s PID %d is zombie and can not be killed. Use the --init option when creating containers to run an init inside the container that forwards signals and reaps processes", stringid.TruncateID(container.ID), pid))
+		case "R", "S":
+			return errdefs.System(errors.Errorf("container %s PID %d is %s and can not be killed", stringid.TruncateID(container.ID), pid, status))
+		case "", "T", "X", "x":
+		default:
+			// If process can't be killed and status is not D or Z print some warning log.It is almost impossible to happen.
+			logrus.Warnf("container %s PID %d status is \"%s\"", container.ID, pid, status)
 		}
 	}
 	return nil
