@@ -351,24 +351,36 @@ func killProcessDirectly(container *container.Container) error {
 		return err
 	}
 
+	// In case there were some exceptions (e.g., zombie or uninterruptible).
 	if process.Alive(pid) {
 		status, err := process.Status(pid)
 		if err != nil {
 			logrus.WithError(err).WithField("container", container.ID).Warn("Container state is invalid")
 			return err
 		}
-		// Since we can not kill a zombie and D status pid, add check here
 		switch status {
-		case "D":
-			return errdefs.System(errors.Errorf("container %s PID %d is uninterruptible and can not be killed", stringid.TruncateID(container.ID), pid))
-		case "Z":
+		case "S": // Sleeping in an interruptible wait
+			return errdefs.System(errors.Errorf("container %s PID %d is in interruptible wait and can not be killed", stringid.TruncateID(container.ID), pid))
+		case "D": // Waiting in uninterruptible disk sleep
+			return errdefs.System(errors.Errorf("container %s PID %d is in uninterruptible disk sleep and can not be killed", stringid.TruncateID(container.ID), pid))
+		case "Z": // Zombie
 			return errdefs.System(errors.Errorf("container %s PID %d is zombie and can not be killed. Use the --init option when creating containers to run an init inside the container that forwards signals and reaps processes", stringid.TruncateID(container.ID), pid))
-		case "R", "S":
-			return errdefs.System(errors.Errorf("container %s PID %d is %s and can not be killed", stringid.TruncateID(container.ID), pid, status))
-		case "", "T", "X", "x":
+		case "", "R", "T", "t", "W", "X", "x", "K", "P", "I":
+			// From proc(5) (https://man7.org/linux/man-pages/man5/proc.5.html):
+			//
+			// R Running
+			// T Stopped (on a signal) or (before Linux 2.6.33) trace stopped
+			// t Tracing stop (Linux 2.6.33 onward)
+			// W Paging (only before Linux 2.6.0)
+			// W Waking (Linux 2.6.33 to 3.13 only)
+			// X Dead (from Linux 2.6.0 onward)
+			// x Dead (Linux 2.6.33 to 3.13 only)
+			// K Wakekill (Linux 2.6.33 to 3.13 only)
+			// P Parked (Linux 3.9 to 3.13 only)
+			// I Idle (Linux 4.14 onward)
 		default:
-			// If process can't be killed and status is not D or Z print some warning log.It is almost impossible to happen.
-			logrus.Warnf("container %s PID %d status is \"%s\"", container.ID, pid, status)
+			// Print a warning if we find an unknown status.
+			logrus.Warnf("container %s PID %d status is %q", container.ID, pid, status)
 		}
 	}
 	return nil
