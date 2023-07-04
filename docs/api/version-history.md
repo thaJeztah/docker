@@ -27,6 +27,10 @@ keywords: "API, Docker, rcli, REST, documentation"
 * `POST /containers/create` now accepts a `HealthConfig.StartInterval` to set the
   interval for health checks during the start period.
 * A new `MacAddress` field has been added to `EndpointSettings` in API v1.44.
+  The `MacAddress` field in `NetworkSettings` that can be set in
+  `POST /containers/create` and returned by `GET /containers/{name}/json` is
+  deprecated and will be removed in a future release.
+
 
 ## v1.43 API changes
 

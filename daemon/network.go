@@ -882,22 +882,6 @@ func buildCreateEndpointOptions(c *container.Container, n libnetwork.Network, ep
 		createOptions = append(createOptions, libnetwork.CreateOptionDisableResolution())
 	}
 
-	// configs that are applicable only for the endpoint in the network
-	// to which container was connected to on docker run.
-	// Ideally all these network-specific endpoint configurations must be moved under
-	// container.NetworkSettings.Networks[n.Name()]
-	if n.Name() == c.HostConfig.NetworkMode.NetworkName() ||
-		(n.Name() == defaultNetName && c.HostConfig.NetworkMode.IsDefault()) {
-		if c.Config.MacAddress != "" {
-			mac, err := net.ParseMAC(c.Config.MacAddress)
-			if err != nil {
-				return nil, err
-			}
-
-			genericOptions[netlabel.MacAddress] = mac
-		}
-	}
-
 	// Port-mapping rules belong to the container & applicable only to non-internal networks
 	portmaps := getPortMapInfo(sb)
 	if n.Info().Internal() || len(portmaps) > 0 {

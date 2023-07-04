@@ -116,7 +116,7 @@ func (daemon *Daemon) containerInspect120(name string) (*v1p20.ContainerJSON, er
 		Mounts:            ctr.GetMountPoints(),
 		Config: &v1p20.ContainerConfig{
 			Config:          ctr.Config,
-			MacAddress:      ctr.Config.MacAddress,
+			MacAddress:      ctr.Config.MacAddress, //nolint:staticcheck
 			NetworkDisabled: ctr.Config.NetworkDisabled,
 			ExposedPorts:    ctr.Config.ExposedPorts,
 			VolumeDriver:    ctr.HostConfig.VolumeDriver,

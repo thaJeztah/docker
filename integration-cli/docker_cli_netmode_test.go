@@ -73,13 +73,6 @@ func (s *DockerCLINetmodeSuite) TestConflictContainerNetworkHostAndLinks(c *test
 	assert.Assert(c, strings.Contains(out, runconfig.ErrConflictHostNetworkAndLinks.Error()))
 }
 
-func (s *DockerCLINetmodeSuite) TestConflictNetworkModeNetHostAndOptions(c *testing.T) {
-	testRequires(c, DaemonIsLinux, NotUserNamespace)
-
-	out, _ := dockerCmdWithFail(c, "run", "--net=host", "--mac-address=92:d0:c6:0a:29:33", "busybox", "ps")
-	assert.Assert(c, strings.Contains(out, runconfig.ErrConflictContainerNetworkAndMac.Error()))
-}
-
 func (s *DockerCLINetmodeSuite) TestConflictNetworkModeAndOptions(c *testing.T) {
 	testRequires(c, DaemonIsLinux)
 
@@ -87,8 +80,6 @@ func (s *DockerCLINetmodeSuite) TestConflictNetworkModeAndOptions(c *testing.T) 
 	assert.Assert(c, strings.Contains(out, runconfig.ErrConflictNetworkAndDNS.Error()))
 	out, _ = dockerCmdWithFail(c, "run", "--net=container:other", "--add-host=name:8.8.8.8", "busybox", "ps")
 	assert.Assert(c, strings.Contains(out, runconfig.ErrConflictNetworkHosts.Error()))
-	out, _ = dockerCmdWithFail(c, "run", "--net=container:other", "--mac-address=92:d0:c6:0a:29:33", "busybox", "ps")
-	assert.Assert(c, strings.Contains(out, runconfig.ErrConflictContainerNetworkAndMac.Error()))
 	out, _ = dockerCmdWithFail(c, "run", "--net=container:other", "-P", "busybox", "ps")
 	assert.Assert(c, strings.Contains(out, runconfig.ErrConflictNetworkPublishPorts.Error()))
 	out, _ = dockerCmdWithFail(c, "run", "--net=container:other", "-p", "8080", "busybox", "ps")

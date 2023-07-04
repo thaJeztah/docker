@@ -18,6 +18,7 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/mount"
+	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/api/types/versions"
 	containerpkg "github.com/docker/docker/container"
 	"github.com/docker/docker/errdefs"
@@ -606,6 +607,19 @@ func (s *containerRouter) postContainersCreate(ctx context.Context, w http.Respo
 				}
 			}
 		}
+	}
+
+	if config != nil && versions.LessThan(version, "1.44") {
+		// The container-wide MacAddress parameter is deprecated and should now be specified in EndpointsConfig.
+		if config.MacAddress != "" && (hostConfig.NetworkMode.IsDefault() || hostConfig.NetworkMode.IsBridge() || //nolint:staticcheck
+			hostConfig.NetworkMode.IsUserDefined()) {
+			nwName := hostConfig.NetworkMode.NetworkName()
+			if _, ok := networkingConfig.EndpointsConfig[nwName]; !ok {
+				networkingConfig.EndpointsConfig[nwName] = &network.EndpointSettings{}
+			}
+			networkingConfig.EndpointsConfig[nwName].MacAddress = config.MacAddress //nolint:staticcheck
+		}
+		config.MacAddress = "" //nolint:staticcheck
 	}
 
 	ccr, err := s.backend.ContainerCreate(ctx, types.ContainerCreateConfig{
