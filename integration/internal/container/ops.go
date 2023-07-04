@@ -114,6 +114,18 @@ func WithTmpfs(targetAndOpts string) func(config *TestContainerConfig) {
 	}
 }
 
+func WithMacAddress(network, mac string) func(config *TestContainerConfig) {
+	return func(c *TestContainerConfig) {
+		if c.NetworkingConfig.EndpointsConfig == nil {
+			c.NetworkingConfig.EndpointsConfig = map[string]*networktypes.EndpointSettings{}
+		}
+		if v, ok := c.NetworkingConfig.EndpointsConfig[network]; !ok || v == nil {
+			c.NetworkingConfig.EndpointsConfig[network] = &networktypes.EndpointSettings{}
+		}
+		c.NetworkingConfig.EndpointsConfig[network].MacAddress = mac
+	}
+}
+
 // WithIPv4 sets the specified ip for the specified network of the container
 func WithIPv4(network, ip string) func(*TestContainerConfig) {
 	return func(c *TestContainerConfig) {

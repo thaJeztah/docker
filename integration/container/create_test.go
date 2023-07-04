@@ -1,20 +1,23 @@
 package container // import "github.com/docker/docker/integration/container"
 
 import (
+	"bufio"
 	"context"
 	"encoding/json"
 	"fmt"
 	"strconv"
+	"strings"
 	"testing"
 	"time"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	containertypes "github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/api/types/network"
+	networktypes "github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/api/types/versions"
 	"github.com/docker/docker/errdefs"
 	ctr "github.com/docker/docker/integration/internal/container"
+	"github.com/docker/docker/integration/internal/network"
 	"github.com/docker/docker/oci"
 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
 	"gotest.tools/v3/assert"
@@ -56,7 +59,7 @@ func TestCreateFailsWhenIdentifierDoesNotExist(t *testing.T) {
 			_, err := client.ContainerCreate(context.Background(),
 				&container.Config{Image: tc.image},
 				&container.HostConfig{},
-				&network.NetworkingConfig{},
+				&networktypes.NetworkingConfig{},
 				nil,
 				"",
 			)
@@ -81,7 +84,7 @@ func TestCreateLinkToNonExistingContainer(t *testing.T) {
 		&container.HostConfig{
 			Links: []string{"no-such-container"},
 		},
-		&network.NetworkingConfig{},
+		&networktypes.NetworkingConfig{},
 		nil,
 		"",
 	)
@@ -121,7 +124,7 @@ func TestCreateWithInvalidEnv(t *testing.T) {
 					Env:   []string{tc.env},
 				},
 				&container.HostConfig{},
-				&network.NetworkingConfig{},
+				&networktypes.NetworkingConfig{},
 				nil,
 				"",
 			)
@@ -168,7 +171,7 @@ func TestCreateTmpfsMountsTarget(t *testing.T) {
 			&container.HostConfig{
 				Tmpfs: map[string]string{tc.target: ""},
 			},
-			&network.NetworkingConfig{},
+			&networktypes.NetworkingConfig{},
 			nil,
 			"",
 		)
@@ -239,7 +242,7 @@ func TestCreateWithCustomMaskedPaths(t *testing.T) {
 		c, err := client.ContainerCreate(context.Background(),
 			&config,
 			&hc,
-			&network.NetworkingConfig{},
+			&networktypes.NetworkingConfig{},
 			nil,
 			name,
 		)
@@ -318,7 +321,7 @@ func TestCreateWithCustomReadonlyPaths(t *testing.T) {
 		c, err := client.ContainerCreate(context.Background(),
 			&config,
 			&hc,
-			&network.NetworkingConfig{},
+			&networktypes.NetworkingConfig{},
 			nil,
 			name,
 		)
@@ -580,5 +583,45 @@ func TestCreateInvalidHostConfig(t *testing.T) {
 			assert.Check(t, errdefs.IsInvalidParameter(err), "got: %T", err)
 			assert.Error(t, err, tc.expectedErr)
 		})
+	}
+}
+
+func TestCreateWithCustomMACs(t *testing.T) {
+	skip.If(t, testEnv.DaemonInfo.OSType == "windows")
+	skip.If(t, versions.LessThan(testEnv.DaemonAPIVersion(), "1.44"), "requires API v1.44")
+
+	defer setupTest(t)()
+	apiClient := testEnv.APIClient()
+	ctx := context.Background()
+
+	network.CreateNoError(ctx, t, apiClient, "testnet")
+
+	attachCtx, cancel := context.WithTimeout(ctx, 1*time.Second)
+	defer cancel()
+	res := ctr.RunAttached(attachCtx, t, apiClient,
+		ctr.WithCmd("ip", "-o", "link", "show"),
+		ctr.WithNetworkMode("bridge"),
+		ctr.WithMacAddress("bridge", "02:32:1c:23:00:04"))
+
+	assert.Equal(t, res.ExitCode, 0)
+	assert.Equal(t, res.Stderr.String(), "")
+
+	scanner := bufio.NewScanner(res.Stdout)
+	for scanner.Scan() {
+		fields := strings.Fields(scanner.Text())
+		// The expected output is:
+		// 1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue qlen 1000\    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+		// 134: eth0@if135: <BROADCAST,MULTICAST,UP,LOWER_UP,M-DOWN> mtu 1400 qdisc noqueue \    link/ether 02:42:ac:11:00:04 brd ff:ff:ff:ff:ff:ff
+		if len(fields) < 11 {
+			continue
+		}
+
+		ifaceName := fields[1]
+		if ifaceName[:3] != "eth" {
+			continue
+		}
+
+		mac := fields[len(fields)-3]
+		assert.Equal(t, mac, "02:32:1c:23:00:04")
 	}
 }

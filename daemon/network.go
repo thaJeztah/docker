@@ -799,10 +799,11 @@ func (daemon *Daemon) clearAttachableNetworks() {
 // buildCreateEndpointOptions builds endpoint options from a given network.
 func buildCreateEndpointOptions(c *container.Container, n libnetwork.Network, epConfig *network.EndpointSettings, sb *libnetwork.Sandbox, daemonDNS []string) ([]libnetwork.EndpointOption, error) {
 	var (
-		bindings      = make(nat.PortMap)
-		pbList        []networktypes.PortBinding
-		exposeList    []networktypes.TransportPort
-		createOptions []libnetwork.EndpointOption
+		bindings       = make(nat.PortMap)
+		pbList         []networktypes.PortBinding
+		exposeList     []networktypes.TransportPort
+		createOptions  []libnetwork.EndpointOption
+		genericOptions = make(options.Generic)
 	)
 
 	defaultNetName := runconfig.DefaultDaemonNetworkMode().NetworkName()
@@ -846,6 +847,14 @@ func buildCreateEndpointOptions(c *container.Container, n libnetwork.Network, ep
 		for k, v := range epConfig.DriverOpts {
 			createOptions = append(createOptions, libnetwork.EndpointOptionGeneric(options.Generic{k: v}))
 		}
+
+		if epConfig.MacAddress != "" {
+			mac, err := net.ParseMAC(epConfig.MacAddress)
+			if err != nil {
+				return nil, err
+			}
+			genericOptions[netlabel.MacAddress] = mac
+		}
 	}
 
 	if c.NetworkSettings.Service != nil {
@@ -885,11 +894,7 @@ func buildCreateEndpointOptions(c *container.Container, n libnetwork.Network, ep
 				return nil, err
 			}
 
-			genericOption := options.Generic{
-				netlabel.MacAddress: mac,
-			}
-
-			createOptions = append(createOptions, libnetwork.EndpointOptionGeneric(genericOption))
+			genericOptions[netlabel.MacAddress] = mac
 		}
 	}
 
@@ -963,7 +968,8 @@ func buildCreateEndpointOptions(c *container.Container, n libnetwork.Network, ep
 
 	createOptions = append(createOptions,
 		libnetwork.CreateOptionPortMapping(pbList),
-		libnetwork.CreateOptionExposedPorts(exposeList))
+		libnetwork.CreateOptionExposedPorts(exposeList),
+		libnetwork.EndpointOptionGeneric(genericOptions))
 
 	return createOptions, nil
 }

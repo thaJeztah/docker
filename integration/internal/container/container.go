@@ -75,6 +75,42 @@ func Run(ctx context.Context, t *testing.T, client client.APIClient, ops ...func
 	return id
 }
 
+type RunResult struct {
+	ExitCode int
+	Stdout   *bytes.Buffer
+	Stderr   *bytes.Buffer
+}
+
+func RunAttached(ctx context.Context, t *testing.T, client client.APIClient, ops ...func(config *TestContainerConfig)) RunResult {
+	t.Helper()
+
+	ops = append(ops, func(c *TestContainerConfig) {
+		c.Config.AttachStdout = true
+		c.Config.AttachStderr = true
+	})
+	id := Create(ctx, t, client, ops...)
+
+	aresp, err := client.ContainerAttach(ctx, id, types.ContainerAttachOptions{
+		Stream: true,
+		Stdout: true,
+		Stderr: true,
+	})
+	assert.NilError(t, err)
+	defer aresp.Close()
+
+	err = client.ContainerStart(ctx, id, types.ContainerStartOptions{})
+	assert.NilError(t, err)
+
+	s, err := demultiplexStreams(ctx, aresp.Reader)
+	assert.NilError(t, err)
+
+	// get the exit code
+	resp, err := client.ContainerInspect(ctx, id)
+	assert.NilError(t, err)
+
+	return RunResult{ExitCode: resp.State.ExitCode, Stdout: s.stdout, Stderr: s.stderr}
+}
+
 type streams struct {
 	stdout *bytes.Buffer
 	stderr *bytes.Buffer
