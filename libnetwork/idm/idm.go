@@ -19,10 +19,10 @@ type Idm struct {
 
 // placeholder is a type for function arguments which need to be present for Swarmkit
 // to compile, but for which the only acceptable value is nil.
-type placeholder *struct{}
+type placeholder any
 
 // New returns an instance of id manager for a [start,end] set of numerical ids
-func New(_ placeholder, _ string, start, end uint64) (*Idm, error) {
+func New(_, _ placeholder, start, end uint64) (*Idm, error) {
 	if end <= start {
 		return nil, fmt.Errorf("invalid set range: [%d, %d]", start, end)
 	}
