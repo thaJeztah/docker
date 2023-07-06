@@ -1,7 +1,9 @@
 package container
 
 import (
+	"bytes"
 	"context"
+	"io"
 	"runtime"
 	"testing"
 
@@ -9,6 +11,7 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/client"
+	"github.com/docker/docker/pkg/stdcopy"
 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
 	"gotest.tools/v3/assert"
 )
@@ -70,4 +73,35 @@ func Run(ctx context.Context, t *testing.T, client client.APIClient, ops ...func
 	assert.NilError(t, err)
 
 	return id
+}
+
+type streams struct {
+	stdout *bytes.Buffer
+	stderr *bytes.Buffer
+}
+
+func demultiplexStreams(ctx context.Context, src io.Reader) (streams, error) {
+	s := streams{
+		stdout: &bytes.Buffer{},
+		stderr: &bytes.Buffer{},
+	}
+	outputDone := make(chan error, 1)
+
+	go func() {
+		// StdCopy demultiplexes the stream into two buffers
+		_, err := stdcopy.StdCopy(s.stdout, s.stderr, src)
+		outputDone <- err
+	}()
+
+	select {
+	case err := <-outputDone:
+		if err != nil {
+			return s, err
+		}
+		break
+	case <-ctx.Done():
+		return s, ctx.Err()
+	}
+
+	return s, nil
 }
