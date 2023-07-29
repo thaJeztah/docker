@@ -542,7 +542,6 @@ func (s *containerRouter) postContainersCreate(ctx context.Context, w http.Respo
 				bo.CreateMountpoint = false
 			}
 		}
-
 	}
 
 	if hostConfig != nil && versions.LessThan(version, "1.44") {
@@ -609,17 +608,30 @@ func (s *containerRouter) postContainersCreate(ctx context.Context, w http.Respo
 		}
 	}
 
-	if config != nil && versions.LessThan(version, "1.44") {
+	var deprecatedMacAddress string
+	if config != nil {
+		deprecatedMacAddress = config.MacAddress
+	}
+
+	var warnings []string
+	if versions.LessThan(version, "1.44") {
 		// The container-wide MacAddress parameter is deprecated and should now be specified in EndpointsConfig.
-		if config.MacAddress != "" && (hostConfig.NetworkMode.IsDefault() || hostConfig.NetworkMode.IsBridge() || //nolint:staticcheck
-			hostConfig.NetworkMode.IsUserDefined()) {
+		if hostConfig != nil && (hostConfig.NetworkMode.IsDefault() || hostConfig.NetworkMode.IsBridge() || hostConfig.NetworkMode.IsUserDefined()) {
 			nwName := hostConfig.NetworkMode.NetworkName()
-			if _, ok := networkingConfig.EndpointsConfig[nwName]; !ok {
-				networkingConfig.EndpointsConfig[nwName] = &network.EndpointSettings{}
+			if endPointConfig, ok := networkingConfig.EndpointsConfig[nwName]; !ok {
+				if deprecatedMacAddress != "" {
+					// Migrate the top-level MacAddress to the endpoint's config.
+					endPointConfig = &network.EndpointSettings{MacAddress: deprecatedMacAddress}
+				}
+			} else {
+				// Overwrite the config: either the EndPoint's MacAddress was set by the user on API < v1.44, which
+				// must be ignored, or migrate the top-level MacAddress to the endpoint's config.
+				endPointConfig.MacAddress = ""
 			}
-			networkingConfig.EndpointsConfig[nwName].MacAddress = config.MacAddress //nolint:staticcheck
 		}
-		config.MacAddress = "" //nolint:staticcheck
+	} else if deprecatedMacAddress != "" {
+		warnings = append(warnings, "WARNING: The container-wide MacAddress field is deprecated and should now be specified in EndpointsConfig. The MacAddress will be ignored.")
+		config.MacAddress = ""
 	}
 
 	ccr, err := s.backend.ContainerCreate(ctx, types.ContainerCreateConfig{
@@ -633,7 +645,7 @@ func (s *containerRouter) postContainersCreate(ctx context.Context, w http.Respo
 	if err != nil {
 		return err
 	}
-
+	ccr.Warnings = append(ccr.Warnings, warnings...)
 	return httputils.WriteJSON(w, http.StatusCreated, ccr)
 }
 

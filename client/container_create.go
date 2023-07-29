@@ -32,6 +32,10 @@ func (cli *Client) ContainerCreate(ctx context.Context, config *container.Config
 	if err := cli.NewVersionError("1.44", "specify health-check start interval"); config != nil && config.Healthcheck != nil && config.Healthcheck.StartInterval != 0 && err != nil {
 		return response, err
 	}
+	if err := cli.NewVersionError("1.44", "specify mac-address per network"); config != nil && config.MacAddress != "" && err != nil {
+		return response, err
+	}
+	// TODO{thaJeztah): should we convert --mac-address to NetworkingConfig[<container network "mode">].MacAddress on API < 1.44 ??
 
 	if hostConfig != nil {
 		if versions.LessThan(cli.ClientVersion(), "1.25") {
