@@ -4,6 +4,7 @@ package daemon // import "github.com/docker/docker/daemon"
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"os"
 	"os/exec"
@@ -43,14 +44,22 @@ func (daemon *Daemon) fillPlatformInfo(ctx context.Context, v *system.Info, sysI
 		v.CPUSet = sysInfo.Cpuset
 		v.PidsLimit = sysInfo.PidsLimit
 	}
-	v.Runtimes = make(map[string]system.Runtime)
+	v.Runtimes = make(map[string]system.RuntimeWithStatus)
 	for n, p := range stockRuntimes() {
-		v.Runtimes[n] = system.Runtime{Path: p}
+		v.Runtimes[n] = system.RuntimeWithStatus{
+			Runtime: system.Runtime{
+				Path: p,
+			},
+			Status: daemon.runtimeStatus(cfg, n),
+		}
 	}
 	for n, r := range cfg.Config.Runtimes {
-		v.Runtimes[n] = system.Runtime{
-			Path: r.Path,
-			Args: append([]string(nil), r.Args...),
+		v.Runtimes[n] = system.RuntimeWithStatus{
+			Runtime: system.Runtime{
+				Path: r.Path,
+				Args: append([]string(nil), r.Args...),
+			},
+			Status: daemon.runtimeStatus(cfg, n),
 		}
 	}
 	v.DefaultRuntime = cfg.Runtimes.Default
@@ -485,4 +494,19 @@ func populateInitVersion(ctx context.Context, cfg *configStore, v *types.Version
 		},
 	})
 	return nil
+}
+
+func (daemon *Daemon) runtimeStatus(cfg *configStore, runtimeName string) map[string]string {
+	m := make(map[string]string)
+	if runtimeName == "" {
+		runtimeName = cfg.Runtimes.Default
+	}
+	if features := cfg.Runtimes.Features(runtimeName); features != nil {
+		if j, err := json.Marshal(features); err == nil {
+			m["features"] = string(j)
+		} else {
+			log.L.WithError(err).Warnf("Failed to call json.Marshal for the OCI features struct of runtime %q", runtimeName)
+		}
+	}
+	return m
 }
