@@ -50,7 +50,7 @@ func (daemon *Daemon) fillPlatformInfo(ctx context.Context, v *system.Info, sysI
 			Runtime: system.Runtime{
 				Path: p,
 			},
-			Status: daemon.runtimeStatus(cfg, n),
+			Status: daemon.runtimeStatus(ctx, cfg, n),
 		}
 	}
 	for n, r := range cfg.Config.Runtimes {
@@ -59,7 +59,7 @@ func (daemon *Daemon) fillPlatformInfo(ctx context.Context, v *system.Info, sysI
 				Path: r.Path,
 				Args: append([]string(nil), r.Args...),
 			},
-			Status: daemon.runtimeStatus(cfg, n),
+			Status: daemon.runtimeStatus(ctx, cfg, n),
 		}
 	}
 	v.DefaultRuntime = cfg.Runtimes.Default
@@ -496,16 +496,22 @@ func populateInitVersion(ctx context.Context, cfg *configStore, v *types.Version
 	return nil
 }
 
-func (daemon *Daemon) runtimeStatus(cfg *configStore, runtimeName string) map[string]string {
+// ociRuntimeFeaturesKey is the "well-known" used for including the
+// OCI runtime spec "features" struct.
+//
+// see https://github.com/opencontainers/runtime-spec/blob/main/features.md
+const ociRuntimeFeaturesKey = "org.opencontainers.runtime.features"
+
+func (daemon *Daemon) runtimeStatus(ctx context.Context, cfg *configStore, runtimeName string) map[string]string {
 	m := make(map[string]string)
 	if runtimeName == "" {
 		runtimeName = cfg.Runtimes.Default
 	}
 	if features := cfg.Runtimes.Features(runtimeName); features != nil {
 		if j, err := json.Marshal(features); err == nil {
-			m["features"] = string(j)
+			m[ociRuntimeFeaturesKey] = string(j)
 		} else {
-			log.L.WithError(err).Warnf("Failed to call json.Marshal for the OCI features struct of runtime %q", runtimeName)
+			log.G(ctx).WithFields(log.Fields{"error": err, "runtime": runtimeName}).Warn("Failed to call json.Marshal for the OCI features struct of runtime")
 		}
 	}
 	return m

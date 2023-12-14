@@ -5619,22 +5619,24 @@ definitions:
         description: |
           Information specific to the runtime.
 
-          <p><br /></p>
+          While this API specification does not define data provided by runtimes,
+          the following well-known properties may be provided by runtimes:
+          
+          `org.opencontainers.runtime.features`: features structure as defined
+          in the [OCI Runtime Specification](https://github.com/opencontainers/runtime-spec/blob/main/features.md),
+          in a JSON string representation.
 
+          <p><br /></p>
+          
           > **Note**: The information returned in this field, including the
           > formatting of values and labels, should not be considered stable,
-          > unless explicitly documented here.
-          > Those information may change without notice.
+          > and may change without notice.
         type: "object"
         x-nullable: true
-        properties:
-          features:
-            description: |
-              [features structure](https://github.com/opencontainers/runtime-spec/blob/main/features.md) of
-              the OCI Runtime Spec, in a JSON string representation.
-            type: "string"
         additionalProperties:
           type: "string"
+        example:
+          "org.opencontainers.runtime.features": "{\"ociVersionMin\":\"1.0.0\",\"ociVersionMax\":\"1.1.0\",\"...\":\"...\"}"
 
   Commit:
     description: |
