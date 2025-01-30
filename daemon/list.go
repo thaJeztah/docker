@@ -126,6 +126,7 @@ func (daemon *Daemon) Containers(ctx context.Context, config *containertypes.Lis
 
 	var wg sync.WaitGroup
 	results := make(chan *containertypes.Summary, len(containerList))
+	workers := make(chan struct{}, 5) // limit concurrency
 	for i := range containerList {
 		currentContainer := &containerList[i]
 		switch includeContainerInList(currentContainer, filter) {
@@ -135,8 +136,11 @@ func (daemon *Daemon) Containers(ctx context.Context, config *containertypes.Lis
 			break
 		default:
 			wg.Add(1)
+			log.G(ctx).WithField("id", currentContainer.ID).Debug("waiting for slot")
+			workers <- struct{}{} // acquire worker slot
 			go func(c *container.Snapshot) {
 				defer wg.Done()
+				defer func() { <-workers }() // release worker slot
 				log.G(ctx).WithField("id", c.ID).Debug("filtering start")
 				time.Sleep(2 * time.Second)
 				// transform internal container struct into api structs
