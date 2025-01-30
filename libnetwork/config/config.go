@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/containerd/log"
+	"github.com/docker/docker/libnetwork"
 	"github.com/docker/docker/libnetwork/cluster"
 	"github.com/docker/docker/libnetwork/datastore"
 	"github.com/docker/docker/libnetwork/ipamutils"
@@ -40,8 +41,16 @@ type Config struct {
 	NetworkControlPlaneMTU int
 	DefaultAddressPool     []*ipamutils.NetworkToSplit
 	DatastoreBucket        string
-	ActiveSandboxes        map[string]any
-	PluginGetter           plugingetter.PluginGetter
+
+	// FIXME(thaJeztah): this SHOULD be map[string][]libnetwork.SandboxOption, but causes an import cycle :sadpanda:
+	// package github.com/docker/docker/cmd/dockerd
+	//	imports github.com/docker/docker/api/server/backend/build
+	//	imports github.com/docker/docker/builder/builder-next
+	//	imports github.com/docker/docker/libnetwork
+	//	imports github.com/docker/docker/libnetwork/config
+	//	imports github.com/docker/docker/libnetwork: import cycle not allowed
+	ActiveSandboxes map[string][]libnetwork.SandboxOption
+	PluginGetter    plugingetter.PluginGetter
 }
 
 // New creates a new Config and initializes it with the given Options.
@@ -149,7 +158,7 @@ func OptionNetworkControlPlaneMTU(exp int) Option {
 
 // OptionActiveSandboxes function returns an option setter for passing the sandboxes
 // which were active during previous daemon life
-func OptionActiveSandboxes(sandboxes map[string]any) Option {
+func OptionActiveSandboxes(sandboxes map[string][]libnetwork.SandboxOption) Option {
 	return func(c *Config) {
 		c.ActiveSandboxes = sandboxes
 	}

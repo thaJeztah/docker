@@ -168,7 +168,7 @@ func (sb *Sandbox) storeDelete() error {
 }
 
 // sandboxRestore restores Sandbox objects from the store, deleting them if they're not active.
-func (c *Controller) sandboxRestore(activeSandboxes map[string]interface{}) error {
+func (c *Controller) sandboxRestore(activeSandboxes map[string][]SandboxOption) error {
 	sandboxStates, err := c.store.List(&sbState{c: c})
 	if err != nil {
 		if err == datastore.ErrKeyNotFound {
@@ -196,11 +196,10 @@ func (c *Controller) sandboxRestore(activeSandboxes map[string]interface{}) erro
 		msg := " for cleanup"
 		create := true
 		isRestore := false
-		if val, ok := activeSandboxes[sb.ID()]; ok {
+		if opts, ok := activeSandboxes[sb.ID()]; ok {
 			msg = ""
 			sb.isStub = false
 			isRestore = true
-			opts := val.([]SandboxOption)
 			sb.processOptions(opts...)
 			sb.restoreHostsPath()
 			sb.restoreResolvConfPath()
