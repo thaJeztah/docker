@@ -6,7 +6,10 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"sync"
+	"time"
 
+	"github.com/containerd/containerd/v2/pkg/tracing"
 	"github.com/containerd/log"
 	"github.com/docker/docker/api/types/backend"
 	containertypes "github.com/docker/docker/api/types/container"
@@ -121,36 +124,51 @@ func (daemon *Daemon) Containers(ctx context.Context, config *containertypes.Lis
 		return nil, err
 	}
 
+	var wg sync.WaitGroup
+	results := make(chan *containertypes.Summary, len(containerList))
 	for i := range containerList {
 		currentContainer := &containerList[i]
 		switch includeContainerInList(currentContainer, filter) {
 		case excludeContainer:
 			continue
 		case stopIteration:
-			return containers, nil
-		}
+			break
+		default:
+			wg.Add(1)
+			go func(c *container.Snapshot) {
+				defer wg.Done()
+				log.G(ctx).WithField("id", c.ID).Debug("filtering start")
+				time.Sleep(2 * time.Second)
+				// transform internal container struct into api structs
+				newC, err := daemon.refreshImage(ctx, currentContainer)
+				if err != nil {
+					return
+				}
 
-		// transform internal container struct into api structs
-		newC, err := daemon.refreshImage(ctx, currentContainer)
-		if err != nil {
-			return nil, err
-		}
-
-		// release lock because size calculation is slow
-		if filter.Size {
-			sizeRw, sizeRootFs, err := daemon.imageService.GetContainerLayerSize(ctx, newC.ID)
-			if err != nil {
-				return nil, err
-			}
-			newC.SizeRw = sizeRw
-			newC.SizeRootFs = sizeRootFs
-		}
-		if newC != nil {
-			containers = append(containers, newC)
-			filter.idx++
+				// release lock because size calculation is slow
+				if filter.Size {
+					sizeRw, sizeRootFs, err := daemon.imageService.GetContainerLayerSize(ctx, newC.ID)
+					if err != nil {
+						return
+					}
+					newC.SizeRw = sizeRw
+					newC.SizeRootFs = sizeRootFs
+				}
+				if newC != nil {
+					results <- newC
+					filter.idx++
+				}
+				log.G(ctx).WithField("id", c.ID).Debug("filtering done")
+			}(currentContainer)
 		}
 	}
-
+	go func() {
+		wg.Wait()
+		close(results)
+	}()
+	for c := range results {
+		containers = append(containers, c)
+	}
 	return containers, nil
 }
 
@@ -225,6 +243,8 @@ func (daemon *Daemon) filterByNameIDMatches(view *container.View, filter *listCo
 
 // foldFilter generates the container filter based on the user's filtering options.
 func (daemon *Daemon) foldFilter(ctx context.Context, view *container.View, config *containertypes.ListOptions) (*listContext, error) {
+	ctx, span := tracing.StartSpan(ctx, "daemon.foldFilter")
+	defer span.End()
 	psFilters := config.Filters
 
 	var filtExited []int
@@ -292,7 +312,8 @@ func (daemon *Daemon) foldFilter(ctx context.Context, view *container.View, conf
 	var ancestorFilter bool
 	if psFilters.Contains("ancestor") {
 		ancestorFilter = true
-		err := psFilters.WalkValues("ancestor", func(ancestor string) error {
+		err = psFilters.WalkValues("ancestor", func(ancestor string) error {
+			// FIXME(thaJeztah): this step is only needed to resolve the image ID: GetImage returns the whole image, and filters by platform etc, which may be redundant.
 			img, err := daemon.imageService.GetImage(ctx, ancestor, backend.GetImageOpts{})
 			if err != nil {
 				log.G(ctx).Warnf("Error while looking up for image %v", ancestor)
@@ -343,9 +364,10 @@ func idOrNameFilter(view *container.View, value string) (*container.Snapshot, er
 	if err != nil && errdefs.IsNotFound(err) {
 		// Try name search instead
 		found := ""
+		searchName := strings.TrimPrefix(value, "/")
 		for id, idNames := range view.GetAllNames() {
-			for _, eachName := range idNames {
-				if strings.TrimPrefix(value, "/") == strings.TrimPrefix(eachName, "/") {
+			for _, name := range idNames {
+				if searchName == strings.TrimPrefix(name, "/") {
 					if found != "" && found != id {
 						return nil, err
 					}
