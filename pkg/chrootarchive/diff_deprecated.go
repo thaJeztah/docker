@@ -4,14 +4,17 @@ import (
 	"io"
 
 	"github.com/docker/docker/pkg/archive"
+	"github.com/moby/go-archive/chrootarchive"
 )
 
 // ApplyLayer parses a diff in the standard layer format from `layer`,
 // and applies it to the directory `dest`. The stream `layer` can only be
 // uncompressed.
 // Returns the size in bytes of the contents of the layer.
+//
+// Deprecated: use [chrootarchive.ApplyLayer] insteead.
 func ApplyLayer(dest string, layer io.Reader) (size int64, err error) {
-	return applyLayerHandler(dest, layer, &archive.TarOptions{}, true)
+	return chrootarchive.ApplyLayer(dest, layer)
 }
 
 // ApplyUncompressedLayer parses a diff in the standard layer format from
@@ -19,5 +22,5 @@ func ApplyLayer(dest string, layer io.Reader) (size int64, err error) {
 // can only be uncompressed.
 // Returns the size in bytes of the contents of the layer.
 func ApplyUncompressedLayer(dest string, layer io.Reader, options *archive.TarOptions) (int64, error) {
-	return applyLayerHandler(dest, layer, options, false)
+	return chrootarchive.ApplyUncompressedLayer(dest, layer, archive.ToArchiveOpt(options))
 }
