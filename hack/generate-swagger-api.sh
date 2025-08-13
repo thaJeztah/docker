@@ -30,7 +30,7 @@ swagger generate model -f api/swagger.yaml \
 	-n ContainerWaitExitError \
 	-n ChangeType \
 	-n FilesystemChange \
-	-n Port
+	-n PortMapping
 
 swagger generate model -f api/swagger.yaml \
 	-t api -m types/image -C api/swagger-gen.yaml \

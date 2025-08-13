@@ -309,7 +309,7 @@ func (v *View) transform(ctr *Container) *Snapshot {
 			ID:      ctr.ID,
 			Names:   v.getNames(ctr.ID),
 			ImageID: ctr.ImageID.String(),
-			Ports:   []container.Port{},
+			Ports:   []container.PortMapping{},
 			Mounts:  ctr.GetMountPoints(),
 			State:   ctr.State.StateString(),
 			Status:  ctr.State.String(),
@@ -366,7 +366,7 @@ func (v *View) transform(ctr *Container) *Snapshot {
 		snapshot.Command = ctr.Path
 	}
 
-	snapshot.Ports = []container.Port{}
+	snapshot.Ports = []container.PortMapping{}
 	networks := make(map[string]*network.EndpointSettings)
 	if ctr.NetworkSettings != nil {
 		for name, netw := range ctr.NetworkSettings.Networks {
@@ -393,6 +393,7 @@ func (v *View) transform(ctr *Container) *Snapshot {
 			}
 		}
 		for p, bindings := range ctr.NetworkSettings.Ports {
+			// TODO(thaJeztah): if this is always a port/proto (no range), we can simplify this.
 			proto, port := nat.SplitProtoPort(string(p))
 			p, err := nat.ParsePort(port)
 			if err != nil {
@@ -400,7 +401,7 @@ func (v *View) transform(ctr *Container) *Snapshot {
 				continue
 			}
 			if len(bindings) == 0 {
-				snapshot.Ports = append(snapshot.Ports, container.Port{
+				snapshot.Ports = append(snapshot.Ports, container.PortMapping{
 					PrivatePort: uint16(p),
 					Type:        proto,
 				})
@@ -413,7 +414,7 @@ func (v *View) transform(ctr *Container) *Snapshot {
 					log.G(context.TODO()).WithError(err).Warn("invalid host port map")
 					continue
 				}
-				snapshot.Ports = append(snapshot.Ports, container.Port{
+				snapshot.Ports = append(snapshot.Ports, container.PortMapping{
 					PrivatePort: uint16(p),
 					PublicPort:  uint16(h),
 					Type:        proto,
