@@ -84,9 +84,9 @@ type listContext struct {
 	isTask bool
 
 	// publish is a list of published ports to filter with
-	publish map[containertypes.PortRangeProto]bool // TODO(thaJeztah): could this be a straight map[string]bool?
+	publish map[string]bool
 	// expose is a list of exposed ports to filter with
-	expose map[containertypes.PortRangeProto]bool // TODO(thaJeztah): could this be a straight map[string]bool?
+	expose map[string]bool
 
 	// ListOptions is the filters set by the user
 	*containertypes.ListOptions
@@ -347,13 +347,13 @@ func (daemon *Daemon) foldFilter(ctx context.Context, view *container.View, conf
 	}
 
 	// TODO(thaJeztah): this can probably be a map[string]bool{}? We're converting value (string) to a PortRangeProto in "portOp"
-	publishFilter := map[containertypes.PortRangeProto]bool{}
+	publishFilter := map[string]bool{}
 	err = psFilters.WalkValues("publish", portOp("publish", publishFilter))
 	if err != nil {
 		return nil, err
 	}
 
-	exposeFilter := map[containertypes.PortRangeProto]bool{}
+	exposeFilter := map[string]bool{}
 	err = psFilters.WalkValues("expose", portOp("expose", exposeFilter))
 	if err != nil {
 		return nil, err
@@ -398,20 +398,19 @@ func idOrNameFilter(view *container.View, value string) (*container.Snapshot, er
 	return filter, err
 }
 
-func portOp(key string, filter map[containertypes.PortRangeProto]bool) func(value string) error {
+func portOp(key string, filter map[string]bool) func(value string) error {
 	return func(value string) error {
 		if strings.Contains(value, ":") {
 			return fmt.Errorf("filter for '%s' should not contain ':': %s", key, value)
 		}
 		// support two formats, original format <portnum>/[<proto>] or <startport-endport>/[<proto>]
-		proto, port := nat.SplitProtoPort(value)
-		start, end, err := nat.ParsePortRange(port)
+		proto, portRange := nat.SplitProtoPort(value)
+		start, end, err := nat.ParsePortRange(portRange) // TODO(thaJeztah): use ParsePortRangeToInt, but check for empty ranges.
 		if err != nil {
 			return fmt.Errorf("error while looking up for %s %s: %s", key, value, err)
 		}
-		for i := start; i <= end; i++ {
-			p := containertypes.PortProto(fmt.Sprintf("%d/%s", i, proto))
-			filter[p] = true
+		for portNum := start; portNum <= end; portNum++ {
+			filter[strconv.Itoa(int(portNum))+"/"+proto] = true
 		}
 		return nil
 	}
@@ -566,12 +565,12 @@ func includeContainerInList(container *container.Snapshot, filter *listContext) 
 	if len(filter.expose) > 0 || len(filter.publish) > 0 {
 		var (
 			shouldSkip    = true
-			publishedPort containertypes.PortRangeProto
-			exposedPort   containertypes.PortRangeProto
+			publishedPort string
+			exposedPort   string
 		)
 		for _, port := range container.Ports {
-			publishedPort = containertypes.PortRangeProto(fmt.Sprintf("%d/%s", port.PublicPort, port.Type))
-			exposedPort = containertypes.PortRangeProto(fmt.Sprintf("%d/%s", port.PrivatePort, port.Type))
+			publishedPort = fmt.Sprintf("%d/%s", port.PublicPort, port.Type)
+			exposedPort = fmt.Sprintf("%d/%s", port.PrivatePort, port.Type)
 			if ok := filter.publish[publishedPort]; ok {
 				shouldSkip = false
 				break
