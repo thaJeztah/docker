@@ -115,12 +115,19 @@ func buildSandboxOptions(cfg *config.Config, ctr *container.Container) ([]libnet
 	// Create a deep copy (as [nat.SortPortMap] mutates the map).
 	// Not using a maps.Clone here, as that won't dereference the
 	// slice (PortMap is a map[Port][]PortBinding).
-	bindings := make(containertypes.PortMap)
+	bindings := make(nat.PortMap)
 	for p, b := range ctr.HostConfig.PortBindings {
-		bindings[p] = slices.Clone(b)
+		tmpB := make([]nat.PortBinding, len(b))
+		for i, pb := range b {
+			tmpB[i] = nat.PortBinding{
+				HostIP:   pb.HostIP,
+				HostPort: pb.HostPort,
+			}
+		}
+		bindings[nat.Port(p)] = tmpB
 	}
 
-	ports := slices.Collect(maps.Keys(ctr.Config.ExposedPorts))
+	ports := slices.Collect(maps.Keys(bindings))
 	nat.SortPortMap(ports, bindings)
 
 	var (

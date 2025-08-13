@@ -346,6 +346,7 @@ func (daemon *Daemon) foldFilter(ctx context.Context, view *container.View, conf
 		}
 	}
 
+	// TODO(thaJeztah): this can probably be a map[string]bool{}? We're converting value (string) to a PortRangeProto in "portOp"
 	publishFilter := map[containertypes.PortRangeProto]bool{}
 	err = psFilters.WalkValues("publish", portOp("publish", publishFilter))
 	if err != nil {
@@ -409,10 +410,7 @@ func portOp(key string, filter map[containertypes.PortRangeProto]bool) func(valu
 			return fmt.Errorf("error while looking up for %s %s: %s", key, value, err)
 		}
 		for i := start; i <= end; i++ {
-			p, err := nat.NewPort(proto, strconv.FormatUint(i, 10))
-			if err != nil {
-				return fmt.Errorf("error while looking up for %s %s: %s", key, value, err)
-			}
+			p := containertypes.PortProto(fmt.Sprintf("%d/%s", i, proto))
 			filter[p] = true
 		}
 		return nil
