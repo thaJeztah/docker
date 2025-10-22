@@ -1,8 +1,10 @@
 package plugin
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"os"
 	"os/exec"
@@ -10,10 +12,12 @@ import (
 	"time"
 
 	"github.com/moby/go-archive"
+	"github.com/moby/moby/api/types"
 	"github.com/moby/moby/api/types/events"
 	plugintypes "github.com/moby/moby/api/types/plugin"
 	"github.com/moby/moby/api/types/registry"
 	"github.com/moby/moby/client"
+	"github.com/moby/moby/client/pkg/jsonmessage"
 	"github.com/moby/moby/v2/daemon/pkg/plugin"
 	registrypkg "github.com/moby/moby/v2/daemon/pkg/registry"
 	"github.com/moby/moby/v2/daemon/server/backend"
@@ -138,7 +142,23 @@ func CreateInRegistry(ctx context.Context, repo string, auth *registry.AuthConfi
 	if auth == nil {
 		auth = &registry.AuthConfig{}
 	}
-	err = manager.Push(ctx, repo, nil, auth, io.Discard)
+	var buf bytes.Buffer
+	err = manager.Push(ctx, repo, nil, auth, &buf)
+	if err != nil {
+		return errors.Wrap(err, "error pushing plugin")
+	}
+
+	var r types.PushResult
+	err = jsonmessage.DisplayJSONMessagesStream(&buf, io.Discard, 0, false, func(j jsonmessage.JSONMessage) {
+		if j.Aux != nil {
+			_ = json.Unmarshal(*j.Aux, &r)
+		}
+	})
+	if err != nil {
+		return errors.Wrap(err, "error pushing plugin")
+	}
+
+	fmt.Printf("Push result: %#v\n", r)
 	return errors.Wrap(err, "error pushing plugin")
 }
 
