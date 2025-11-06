@@ -241,13 +241,19 @@ func (w *Worker) LoadRef(ctx context.Context, id string, hidden bool) (cache.Imm
 	return w.CacheManager().Get(ctx, id, nil, opts...)
 }
 
-func (w *Worker) ResolveSourceMetadata(ctx context.Context, op *pb.SourceOp, opt sourceresolver.Opt, sm *session.Manager, g session.Group) (*sourceresolver.MetaResponse, error) {
+func (w *Worker) ResolveSourceMetadata(ctx context.Context, op *pb.SourceOp, opt sourceresolver.Opt, sm *session.Manager, jobCtx solver.JobContext) (*sourceresolver.MetaResponse, error) {
 	if opt.SourcePolicies != nil {
 		return nil, errors.New("source policies can not be set for worker")
 	}
+	var p *ocispec.Platform
+	if imgOpt := opt.ImageOpt; imgOpt != nil && imgOpt.Platform != nil {
+		p = imgOpt.Platform
+	} else if ociOpt := opt.OCILayoutOpt; ociOpt != nil && ociOpt.Platform != nil {
+		p = ociOpt.Platform
+	}
 
 	var platform *pb.Platform
-	if p := opt.Platform; p != nil {
+	if p != nil {
 		platform = &pb.Platform{
 			Architecture: p.Architecture,
 			OS:           p.OS,
@@ -266,7 +272,7 @@ func (w *Worker) ResolveSourceMetadata(ctx context.Context, op *pb.SourceOp, opt
 		if opt.ImageOpt == nil {
 			opt.ImageOpt = &sourceresolver.ResolveImageOpt{}
 		}
-		dgst, config, err := w.ImageSource.ResolveImageConfig(ctx, idt.Reference.String(), opt, sm, g)
+		dgst, config, err := w.ImageSource.ResolveImageConfig(ctx, idt.Reference.String(), opt, sm, jobCtx)
 		if err != nil {
 			return nil, err
 		}
@@ -308,8 +314,8 @@ func (w *Worker) ResolveOp(v solver.Vertex, s frontend.FrontendLLBBridge, sm *se
 }
 
 // ResolveImageConfig returns image config for an image
-func (w *Worker) ResolveImageConfig(ctx context.Context, ref string, opt sourceresolver.Opt, sm *session.Manager, g session.Group) (digest.Digest, []byte, error) {
-	return w.ImageSource.ResolveImageConfig(ctx, ref, opt, sm, g)
+func (w *Worker) ResolveImageConfig(ctx context.Context, ref string, opt sourceresolver.Opt, sm *session.Manager, jobCtx solver.JobContext) (digest.Digest, []byte, error) {
+	return w.ImageSource.ResolveImageConfig(ctx, ref, opt, sm, jobCtx)
 }
 
 // DiskUsage returns disk usage report
