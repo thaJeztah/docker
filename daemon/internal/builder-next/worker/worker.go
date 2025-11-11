@@ -70,16 +70,17 @@ type LayerAccess interface {
 
 // Opt defines a structure for creating a worker.
 type Opt struct {
-	ID                string
-	Labels            map[string]string
-	GCPolicy          []client.PruneInfo
-	Executor          executor.Executor
-	Snapshotter       snapshot.Snapshotter
-	ContentStore      *containerdsnapshot.Store
-	CacheManager      cache.Manager
-	LeaseManager      *leaseutil.Manager
-	GarbageCollect    func(context.Context) (gc.Stats, error)
-	ImageSource       *imageadapter.Source
+	ID             string
+	Labels         map[string]string
+	GCPolicy       []client.PruneInfo
+	Executor       executor.Executor
+	Snapshotter    snapshot.Snapshotter
+	ContentStore   *containerdsnapshot.Store
+	CacheManager   cache.Manager
+	LeaseManager   *leaseutil.Manager
+	GarbageCollect func(context.Context) (gc.Stats, error)
+	ImageSource    *imageadapter.Source
+
 	DownloadManager   *xfer.LayerDownloadManager
 	V2MetadataService distmetadata.V2MetadataService
 	Transport         nethttp.RoundTripper
@@ -94,6 +95,8 @@ type Opt struct {
 type Worker struct {
 	Opt
 	SourceManager *source.Manager
+	GitSource     *git.Source
+	HTTPSource    *http.Source
 }
 
 var _ interface {
@@ -141,6 +144,8 @@ func NewWorker(opt Opt) (*Worker, error) {
 	return &Worker{
 		Opt:           opt,
 		SourceManager: sm,
+		GitSource:     gs,
+		HTTPSource:    hs,
 	}, nil
 }
 
@@ -272,15 +277,62 @@ func (w *Worker) ResolveSourceMetadata(ctx context.Context, op *pb.SourceOp, opt
 		if opt.ImageOpt == nil {
 			opt.ImageOpt = &sourceresolver.ResolveImageOpt{}
 		}
+		if p != nil {
+			opt.ImageOpt.Platform = p
+		}
+		if opt.ImageOpt.AttestationChain {
+			return nil, errors.Errorf("resolving image attestation chain requires containerd image store support in dockerd")
+		}
 		dgst, config, err := w.ImageSource.ResolveImageConfig(ctx, idt.Reference.String(), opt, sm, jobCtx)
 		if err != nil {
 			return nil, err
+		}
+		if opt.ImageOpt.NoConfig {
+			config = nil
 		}
 		return &sourceresolver.MetaResponse{
 			Op: op,
 			Image: &sourceresolver.ResolveImageResponse{
 				Digest: dgst,
 				Config: config,
+			},
+		}, nil
+	case *git.GitIdentifier:
+		if w.GitSource == nil {
+			return nil, errors.New("git source is not supported")
+		}
+		mdOpt := git.MetadataOpts{}
+		if opt.GitOpt != nil {
+			mdOpt.ReturnObject = opt.GitOpt.ReturnObject
+		}
+		md, err := w.GitSource.ResolveMetadata(ctx, idt, sm, jobCtx, mdOpt)
+		if err != nil {
+			return nil, err
+		}
+		return &sourceresolver.MetaResponse{
+			Op: op,
+			Git: &sourceresolver.ResolveGitResponse{
+				Checksum:       md.Checksum,
+				Ref:            md.Ref,
+				CommitChecksum: md.CommitChecksum,
+				CommitObject:   md.CommitObject,
+				TagObject:      md.TagObject,
+			},
+		}, nil
+	case *http.HTTPIdentifier:
+		if w.HTTPSource == nil {
+			return nil, errors.New("http source is not supported")
+		}
+		md, err := w.HTTPSource.ResolveMetadata(ctx, idt, sm, jobCtx)
+		if err != nil {
+			return nil, err
+		}
+		return &sourceresolver.MetaResponse{
+			Op: op,
+			HTTP: &sourceresolver.ResolveHTTPResponse{
+				Digest:       md.Digest,
+				Filename:     md.Filename,
+				LastModified: md.LastModified,
 			},
 		}, nil
 	}
