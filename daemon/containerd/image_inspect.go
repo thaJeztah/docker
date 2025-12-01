@@ -80,14 +80,33 @@ func (i *ImageService) ImageInspect(ctx context.Context, refOrID string, opts im
 		target = multi.Best.Target()
 	}
 
+	var img dockerspec.DockerOCIImage
+	if multi.Best != nil {
+		if err := multi.Best.ReadConfig(ctx, &img); err != nil && !cerrdefs.IsNotFound(err) {
+			return nil, fmt.Errorf("failed to read image config: %w", err)
+		}
+	}
+
+	// Copy the config
+	imgConfig := img.Config
+
 	resp := &imagebackend.InspectData{
 		InspectResponse: imagetypes.InspectResponse{
-			ID:          target.Digest.String(),
-			RepoTags:    repoTags,
-			Descriptor:  &target,
-			RepoDigests: repoDigests,
-			Size:        size,
-			Manifests:   manifests,
+			ID:           target.Digest.String(),
+			RepoTags:     repoTags,
+			Descriptor:   &target,
+			RepoDigests:  repoDigests,
+			Author:       img.Author,
+			Config:       &imgConfig,
+			Architecture: img.Architecture,
+			Variant:      img.Variant,
+			Os:           img.OS,
+			OsVersion:    img.OSVersion,
+			Size:         size,
+			Manifests:    manifests,
+			RootFS: imagetypes.RootFS{
+				Type: img.RootFS.Type,
+			},
 			Metadata: imagetypes.Metadata{
 				LastTagTime: lastUpdated,
 			},
@@ -98,23 +117,6 @@ func (i *ImageService) ImageInspect(ctx context.Context, refOrID string, opts im
 		GraphDriverLegacy: &storage.DriverData{Name: i.snapshotter},
 	}
 
-	var img dockerspec.DockerOCIImage
-	if multi.Best != nil {
-		if err := multi.Best.ReadConfig(ctx, &img); err != nil && !cerrdefs.IsNotFound(err) {
-			return nil, fmt.Errorf("failed to read image config: %w", err)
-		}
-	}
-
-	// Copy the config
-	imgConfig := img.Config
-	resp.Config = &imgConfig
-
-	resp.Author = img.Author
-	resp.Architecture = img.Architecture
-	resp.Variant = img.Variant
-	resp.Os = img.OS
-	resp.OsVersion = img.OSVersion
-
 	if len(img.History) > 0 {
 		resp.Comment = img.History[len(img.History)-1].Comment
 	}
@@ -123,9 +125,6 @@ func (i *ImageService) ImageInspect(ctx context.Context, refOrID string, opts im
 		resp.Created = img.Created.Format(time.RFC3339Nano)
 	}
 
-	resp.RootFS = imagetypes.RootFS{
-		Type: img.RootFS.Type,
-	}
 	for _, layer := range img.RootFS.DiffIDs {
 		resp.RootFS.Layers = append(resp.RootFS.Layers, layer.String())
 	}
