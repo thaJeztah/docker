@@ -1,4 +1,4 @@
-FROM alpine:3.7
+FROM dhi.io/alpine-base:3.22-dev
 ENV PACKAGES="\
     musl \
     linux-headers \

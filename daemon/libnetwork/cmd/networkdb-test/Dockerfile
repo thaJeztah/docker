@@ -1,4 +1,4 @@
-FROM alpine
+FROM dhi.io/alpine-base:3.22
 
 RUN apk --no-cache add curl
 

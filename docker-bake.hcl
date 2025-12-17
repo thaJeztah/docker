@@ -44,6 +44,12 @@ variable "PACKAGER_NAME" {
   default = ""
 }
 
+# Debian distribution codename (e.g., bookworm, trixie, bullseye)
+# This is the user-facing build argument
+variable "BASE_DEBIAN_DISTRO" {
+  default = "bookworm"
+}
+
 # Special target: https://github.com/docker/metadata-action#bake-definition
 target "docker-metadata-action" {
   tags = ["moby-bin:local"]
@@ -56,6 +62,14 @@ variable "DESTDIR" {
 function "bindir" {
   params = [defaultdir]
   result = DESTDIR != "" ? DESTDIR : "./bundles/${defaultdir}"
+}
+
+# Map Debian release codenames to DHI version numbers
+# DHI golang images require numeric versions (debian11, debian12, debian13)
+# while debian-base images use codenames (bullseye, bookworm, trixie)
+function "debian_version" {
+  params = [codename]
+  result = codename == "bullseye" ? "debian11" : codename == "bookworm" ? "debian12" : codename == "trixie" ? "debian13" : "debian12"
 }
 
 target "_common" {
@@ -71,6 +85,8 @@ target "_common" {
     PRODUCT = PRODUCT
     DEFAULT_PRODUCT_LICENSE = DEFAULT_PRODUCT_LICENSE
     PACKAGER_NAME = PACKAGER_NAME
+    BASE_DEBIAN_DISTRO = BASE_DEBIAN_DISTRO
+    DEBIAN_VERSION = debian_version(BASE_DEBIAN_DISTRO)
   }
 }
 

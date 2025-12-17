@@ -2,10 +2,13 @@
 
 ARG GO_VERSION=1.25.5
 ARG BASE_DEBIAN_DISTRO="bookworm"
+# Map Debian release names to version numbers for DHI images
+# bookworm -> debian12, trixie -> debian13
+ARG DEBIAN_VERSION="debian12"
 ARG PROTOC_VERSION=3.11.4
 
 # protoc is dynamically linked to glibc so can't use alpine base
-FROM golang:${GO_VERSION}-${BASE_DEBIAN_DISTRO} AS base
+FROM dhi.io/golang:${GO_VERSION}-${DEBIAN_VERSION}-dev AS base
 RUN apt-get update && apt-get --no-install-recommends install -y git unzip
 ARG PROTOC_VERSION
 ARG TARGETOS

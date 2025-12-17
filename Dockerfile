@@ -2,7 +2,20 @@
 
 ARG GO_VERSION=1.25.5
 ARG BASE_DEBIAN_DISTRO="bookworm"
-ARG GOLANG_IMAGE="golang:${GO_VERSION}-${BASE_DEBIAN_DISTRO}"
+
+# DEBIAN_VERSION is automatically mapped from BASE_DEBIAN_DISTRO in docker-bake.hcl
+# Mapping:
+#   bullseye -> debian11
+#   bookworm -> debian12
+#   trixie   -> debian13
+#
+# When using docker-bake.hcl (via make or CI), pass BASE_DEBIAN_DISTRO as an environment variable:
+#   BASE_DEBIAN_DISTRO=trixie make binary
+#
+# When using docker build directly, you must pass both arguments:
+#   docker build --build-arg BASE_DEBIAN_DISTRO=trixie --build-arg DEBIAN_VERSION=debian13 ...
+ARG DEBIAN_VERSION="debian12"
+ARG GOLANG_IMAGE="dhi.io/golang:${GO_VERSION}-${DEBIAN_VERSION}-dev"
 
 # XX_VERSION specifies the version of the xx utility to use.
 # It must be a valid tag in the docker.io/tonistiigi/xx image repository.
@@ -86,7 +99,7 @@ RUN mkdir /build && mv /bin/registry /build/registry
 # frozen-images
 # See also frozenImages in "testutil/environment/protect.go" (which needs to
 # be updated when adding images to this list)
-FROM debian:${BASE_DEBIAN_DISTRO} AS frozen-images
+FROM dhi.io/debian-base:${BASE_DEBIAN_DISTRO} AS frozen-images
 RUN --mount=type=cache,sharing=locked,id=moby-frozen-images-aptlib,target=/var/lib/apt \
     --mount=type=cache,sharing=locked,id=moby-frozen-images-aptcache,target=/var/cache/apt \
        apt-get update && apt-get install -y --no-install-recommends \

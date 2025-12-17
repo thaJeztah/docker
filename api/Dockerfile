@@ -2,7 +2,7 @@
 
 ARG GO_VERSION=1.25.5
 
-FROM golang:${GO_VERSION}-alpine AS base
+FROM dhi.io/golang:${GO_VERSION}-alpine3.22 AS base
 RUN apk add --no-cache bash make yamllint
 CMD ["/bin/bash"]
 

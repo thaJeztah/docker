@@ -4,7 +4,7 @@ ARG GO_VERSION=1.25.5
 ARG GOVULNCHECK_VERSION=v1.1.4
 ARG FORMAT=text
 
-FROM golang:${GO_VERSION}-alpine AS base
+FROM dhi.io/golang:${GO_VERSION}-alpine3.22-dev AS base
 WORKDIR /go/src/github.com/moby/moby
 RUN apk add --no-cache jq moreutils
 ARG GOVULNCHECK_VERSION
