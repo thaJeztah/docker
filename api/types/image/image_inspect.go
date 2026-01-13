@@ -122,6 +122,7 @@ type Identity struct {
 	Signature []SignatureIdentity `json:"Signature,omitzero"`
 	// Pull contains remote location information if image was created via pull.
 	// If image was pulled via mirror, this contains the original repository location.
+	// After successful push this images also contains the pushed repository location.
 	Pull []PullIdentity `json:"Pull,omitzero"`
 	// Build contains build reference information if image was created via build.
 	Build []BuildIdentity `json:"Build,omitzero"`
