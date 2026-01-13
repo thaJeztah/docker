@@ -26,7 +26,7 @@ import (
 	"github.com/moby/moby/v2/internal/sliceutil"
 	policyimage "github.com/moby/policy-helpers/image"
 	policytypes "github.com/moby/policy-helpers/types"
-	digest "github.com/opencontainers/go-digest"
+	"github.com/opencontainers/go-digest"
 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
 	"github.com/pkg/errors"
 	"golang.org/x/sync/semaphore"
@@ -151,12 +151,12 @@ func (i *ImageService) ImageInspect(ctx context.Context, refOrID string, opts im
 	return resp, nil
 }
 
-func (i *ImageService) imageIdentity(ctx context.Context, desc ocispec.Descriptor, multi *multiPlatformSummary) (*imagetypes.ImageIdentity, error) {
+func (i *ImageService) imageIdentity(ctx context.Context, desc ocispec.Descriptor, multi *multiPlatformSummary) (*imagetypes.Identity, error) {
 	info, err := i.content.Info(ctx, desc.Digest)
 	if err != nil {
 		return nil, err
 	}
-	identity := &imagetypes.ImageIdentity{}
+	identity := &imagetypes.Identity{}
 
 	seenRepos := make(map[string]struct{})
 
@@ -168,7 +168,7 @@ func (i *ImageService) imageIdentity(ctx context.Context, desc ocispec.Descripto
 				if val.CreatedAt != nil {
 					createdAt = *val.CreatedAt
 				}
-				identity.Build = append(identity.Build, imagetypes.ImageBuildIdentity{
+				identity.Build = append(identity.Build, imagetypes.BuildIdentity{
 					Ref:       ref,
 					CreatedAt: createdAt,
 				})
@@ -186,7 +186,7 @@ func (i *ImageService) imageIdentity(ctx context.Context, desc ocispec.Descripto
 					continue
 				}
 				seenRepos[name] = struct{}{}
-				identity.Pull = append(identity.Pull, imagetypes.ImagePullIdentity{
+				identity.Pull = append(identity.Pull, imagetypes.PullIdentity{
 					Repository: name,
 				})
 			}
@@ -194,7 +194,7 @@ func (i *ImageService) imageIdentity(ctx context.Context, desc ocispec.Descripto
 	}
 
 	if multi.Best != nil {
-		si, err := i.signatureIndentity(ctx, desc, multi.Best, multi.BestPlatform)
+		si, err := i.signatureIdentity(ctx, desc, multi.Best, multi.BestPlatform)
 		if err != nil {
 			log.G(ctx).WithError(err).Error("failed to validate image signature")
 		}
@@ -208,14 +208,14 @@ func (i *ImageService) imageIdentity(ctx context.Context, desc ocispec.Descripto
 		return nil, nil
 	}
 
-	slices.SortFunc(identity.Build, func(a, b imagetypes.ImageBuildIdentity) int {
+	slices.SortFunc(identity.Build, func(a, b imagetypes.BuildIdentity) int {
 		return cmp.Compare(a.Ref, b.Ref)
 	})
 
 	return identity, nil
 }
 
-func (i *ImageService) signatureIndentity(ctx context.Context, desc ocispec.Descriptor, img *ImageManifest, platform ocispec.Platform) (*imagetypes.ImageSignatureIdentity, error) {
+func (i *ImageService) signatureIdentity(ctx context.Context, desc ocispec.Descriptor, img *ImageManifest, platform ocispec.Platform) (*imagetypes.SignatureIdentity, error) {
 	rp := &referrersProvider{Store: i.content}
 	sc, err := policyimage.ResolveSignatureChain(ctx, rp, desc, &platform)
 	if err != nil {
@@ -235,7 +235,7 @@ func (i *ImageService) signatureIndentity(ctx context.Context, desc ocispec.Desc
 		return nil, err
 	}
 
-	out := &imagetypes.ImageSignatureIdentity{}
+	out := &imagetypes.SignatureIdentity{}
 
 	si, err := v.VerifyImage(ctx, rp, desc, &platform)
 	if err != nil {
@@ -252,21 +252,21 @@ func (i *ImageService) signatureIndentity(ctx context.Context, desc ocispec.Desc
 
 	switch si.SignatureType {
 	case policytypes.SignatureBundleV03:
-		out.SignatureType = string(imagetypes.ImageSignatureTypeBundleV03)
+		out.SignatureType = string(imagetypes.SignatureTypeBundleV03)
 	case policytypes.SignatureSimpleSigningV1:
-		out.SignatureType = string(imagetypes.ImageSignatureTypeSimpleSigning)
+		out.SignatureType = string(imagetypes.SignatureTypeSimpleSigningV1)
 	}
 
 	for _, ts := range si.Timestamps {
-		out.Timestamps = append(out.Timestamps, imagetypes.ImageSignatureTimestamp{
-			Type:      imagetypes.ImageSignatureTimestampType(ts.Type),
+		out.Timestamps = append(out.Timestamps, imagetypes.SignatureTimestamp{
+			Type:      imagetypes.SignatureTimestampType(ts.Type),
 			URI:       ts.URI,
 			Timestamp: ts.Timestamp,
 		})
 	}
 
 	if signer := si.Signer; signer != nil {
-		out.Signer = &imagetypes.ImageSignatureSigner{
+		out.Signer = &imagetypes.SignerIdentity{
 			CertificateIssuer:                   signer.CertificateIssuer,
 			SubjectAlternativeName:              signer.SubjectAlternativeName,
 			Issuer:                              signer.Issuer,

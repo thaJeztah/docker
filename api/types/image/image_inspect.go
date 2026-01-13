@@ -111,20 +111,24 @@ type InspectResponse struct {
 	// Identity holds information about the identity and origin of the image.
 	// This is trusted information verified by the daemon and cannot be modified
 	// by tagging an image to a different name.
-	Identity *ImageIdentity `json:"Identity,omitempty"`
+	Identity *Identity `json:"Identity,omitempty"`
 }
 
-type ImageIdentity struct {
+// Identity holds information about the identity and origin of the image.
+// This is trusted information verified by the daemon and cannot be modified
+// by tagging an image to a different name.
+type Identity struct {
 	// Signature contains the properties of verified signatures for the image.
-	Signature []ImageSignatureIdentity `json:"Signature,omitempty"`
+	Signature []SignatureIdentity `json:"Signature,omitzero"`
 	// Pull contains remote location information if image was created via pull.
 	// If image was pulled via mirror, this contains the original repository location.
-	Pull []ImagePullIdentity `json:"Pull,omitempty"`
+	Pull []PullIdentity `json:"Pull,omitzero"`
 	// Build contains build reference information if image was created via build.
-	Build []ImageBuildIdentity `json:"Build,omitempty"`
+	Build []BuildIdentity `json:"Build,omitzero"`
 }
 
-type ImageBuildIdentity struct {
+// BuildIdentity contains build reference information if image was created via build.
+type BuildIdentity struct {
 	// Ref is the identifier for the build request. This reference can be used to
 	// look up the build details in BuildKit history API.
 	Ref string `json:"Ref,omitempty"`
@@ -133,23 +137,26 @@ type ImageBuildIdentity struct {
 	CreatedAt time.Time `json:"CreatedAt,omitempty"`
 }
 
-type ImagePullIdentity struct {
+// PullIdentity contains remote location information if image was created via pull.
+// If image was pulled via mirror, this contains the original repository location.
+type PullIdentity struct {
 	// Repository is the remote repository location the image was pulled from.
 	Repository string `json:"Repository,omitempty"`
 }
 
-type ImageSignatureIdentity struct {
+// SignatureIdentity contains the properties of verified signatures for the image.
+type SignatureIdentity struct {
 	// Name is a textual description summarizing the type of signature.
 	Name string `json:"Name,omitempty"`
 	// Timestamps contains a list of verified signed timestamps for the signature.
-	Timestamps []ImageSignatureTimestamp `json:"Timestamps,omitempty"`
+	Timestamps []SignatureTimestamp `json:"Timestamps,omitzero"`
 	// KnownSigner is an identifier for a special signer identity that is known to the implementation.
-	KnownSigner KnownSigner `json:"KnownSigner,omitempty"`
+	KnownSigner KnownSignerIdentity `json:"KnownSigner,omitempty"`
 	// DockerReference is the Docker image reference associated with the signature.
 	// This is an optional field only present in older hashedrecord signatures.
 	DockerReference string `json:"DockerReference,omitempty"`
 	// Signer contains information about the signer certificate used to sign the image.
-	Signer *ImageSignatureSigner `json:"Signer,omitempty"`
+	Signer *SignerIdentity `json:"Signer,omitempty"`
 	// SignatureType is the type of signature format. E.g. "bundle-v0.3" or "hashedrecord".
 	SignatureType string `json:"SignatureType,omitempty"`
 
@@ -159,53 +166,90 @@ type ImageSignatureIdentity struct {
 	// Warnings contains any warnings that occurred during signature verification.
 	// For example, if there was no internet connectivity and cached trust roots were used.
 	// Warning does not indicate a failed verification but may point to configuration issues.
-	Warnings []string `json:"Warnings,omitempty"`
+	Warnings []string `json:"Warnings,omitzero"`
 }
 
-type ImageSignatureTimestamp struct {
-	Type      ImageSignatureTimestampType `json:"Type"`
-	URI       string                      `json:"URI"`
-	Timestamp time.Time                   `json:"Timestamp"`
+// SignatureTimestamp contains information about a verified signed timestamp for an image signature.
+type SignatureTimestamp struct {
+	Type      SignatureTimestampType `json:"Type"`
+	URI       string                 `json:"URI"`
+	Timestamp time.Time              `json:"Timestamp"`
 }
 
-type ImageSignatureTimestampType string
+// SignatureTimestampType is the type of timestamp used in the signature.
+type SignatureTimestampType string
 
 const (
-	ImageSignatureTimestampTlog      = "Tlog"
-	ImageSignatureTimestampAuthority = "TimestampAuthority"
+	SignatureTimestampTlog      SignatureTimestampType = "Tlog"
+	SignatureTimestampAuthority SignatureTimestampType = "TimestampAuthority"
 )
 
-type ImageSignatureType string
+// SignatureType is the type of signature format.
+type SignatureType string
 
 const (
-	ImageSignatureTypeBundleV03     ImageSignatureType = "bundle-v0.3"
-	ImageSignatureTypeSimpleSigning ImageSignatureType = "simplesigning-v1"
+	SignatureTypeBundleV03       SignatureType = "bundle-v0.3"
+	SignatureTypeSimpleSigningV1 SignatureType = "simplesigning-v1"
 )
 
-type KnownSigner string
+// KnownSignerIdentity is an identifier for a special signer identity that is known to the implementation.
+type KnownSignerIdentity string
 
 const (
 	// KnownSignerDHI is the known identity for Docker Hardened Images.
-	KnownSignerDHI = "DHI"
+	KnownSignerDHI KnownSignerIdentity = "DHI"
 )
 
-type ImageSignatureSigner struct {
-	// certificate.Summary with deprecated fields removed and keys in Moby uppercase style
-	CertificateIssuer                   string `json:"CertificateIssuer"`
-	SubjectAlternativeName              string `json:"SubjectAlternativeName"`
-	Issuer                              string `json:"Issuer,omitempty"`                              // OID 1.3.6.1.4.1.57264.1.8 and 1.3.6.1.4.1.57264.1.1 (Deprecated)
-	BuildSignerURI                      string `json:"BuildSignerURI,omitempty"`                      // 1.3.6.1.4.1.57264.1.9
-	BuildSignerDigest                   string `json:"BuildSignerDigest,omitempty"`                   // 1.3.6.1.4.1.57264.1.10
-	RunnerEnvironment                   string `json:"RunnerEnvironment,omitempty"`                   // 1.3.6.1.4.1.57264.1.11
-	SourceRepositoryURI                 string `json:"SourceRepositoryURI,omitempty"`                 // 1.3.6.1.4.1.57264.1.12
-	SourceRepositoryDigest              string `json:"SourceRepositoryDigest,omitempty"`              // 1.3.6.1.4.1.57264.1.13
-	SourceRepositoryRef                 string `json:"SourceRepositoryRef,omitempty"`                 // 1.3.6.1.4.1.57264.1.14
-	SourceRepositoryIdentifier          string `json:"SourceRepositoryIdentifier,omitempty"`          // 1.3.6.1.4.1.57264.1.15
-	SourceRepositoryOwnerURI            string `json:"SourceRepositoryOwnerURI,omitempty"`            // 1.3.6.1.4.1.57264.1.16
-	SourceRepositoryOwnerIdentifier     string `json:"SourceRepositoryOwnerIdentifier,omitempty"`     // 1.3.6.1.4.1.57264.1.17
-	BuildConfigURI                      string `json:"BuildConfigURI,omitempty"`                      // 1.3.6.1.4.1.57264.1.18
-	BuildConfigDigest                   string `json:"BuildConfigDigest,omitempty"`                   // 1.3.6.1.4.1.57264.1.19
-	BuildTrigger                        string `json:"BuildTrigger,omitempty"`                        // 1.3.6.1.4.1.57264.1.20
-	RunInvocationURI                    string `json:"RunInvocationURI,omitempty"`                    // 1.3.6.1.4.1.57264.1.21
-	SourceRepositoryVisibilityAtSigning string `json:"SourceRepositoryVisibilityAtSigning,omitempty"` // 1.3.6.1.4.1.57264.1.22
+// SignerIdentity contains information about the signer certificate used to sign the image.
+// This is certificate.Summary with deprecated fields removed and keys in Moby uppercase style.
+type SignerIdentity struct {
+	CertificateIssuer      string `json:"CertificateIssuer"`
+	SubjectAlternativeName string `json:"SubjectAlternativeName"`
+	// The OIDC issuer. Should match `iss` claim of ID token or, in the case of
+	// a federated login like Dex it should match the issuer URL of the
+	// upstream issuer. The issuer is not set the extensions are invalid and
+	// will fail to render.
+	Issuer string `json:"Issuer,omitempty"` // OID 1.3.6.1.4.1.57264.1.8 and 1.3.6.1.4.1.57264.1.1 (Deprecated)
+
+	// Reference to specific build instructions that are responsible for signing.
+	BuildSignerURI string `json:"buildSignerURI,omitempty"` //nolint:tagliatelle // 1.3.6.1.4.1.57264.1.9
+
+	// Immutable reference to the specific version of the build instructions that is responsible for signing.
+	BuildSignerDigest string `json:"buildSignerDigest,omitempty"` // 1.3.6.1.4.1.57264.1.10
+
+	// Specifies whether the build took place in platform-hosted cloud infrastructure or customer/self-hosted infrastructure.
+	RunnerEnvironment string `json:"runnerEnvironment,omitempty"` // 1.3.6.1.4.1.57264.1.11
+
+	// Source repository URL that the build was based on.
+	SourceRepositoryURI string `json:"sourceRepositoryURI,omitempty"` //nolint:tagliatelle  // 1.3.6.1.4.1.57264.1.12
+
+	// Immutable reference to a specific version of the source code that the build was based upon.
+	SourceRepositoryDigest string `json:"sourceRepositoryDigest,omitempty"` // 1.3.6.1.4.1.57264.1.13
+
+	// Source Repository Ref that the build run was based upon.
+	SourceRepositoryRef string `json:"sourceRepositoryRef,omitempty"` // 1.3.6.1.4.1.57264.1.14
+
+	// Immutable identifier for the source repository the workflow was based upon.
+	SourceRepositoryIdentifier string `json:"sourceRepositoryIdentifier,omitempty"` // 1.3.6.1.4.1.57264.1.15
+
+	// Source repository owner URL of the owner of the source repository that the build was based on.
+	SourceRepositoryOwnerURI string `json:"sourceRepositoryOwnerURI,omitempty"` //nolint:tagliatelle // 1.3.6.1.4.1.57264.1.16
+
+	// Immutable identifier for the owner of the source repository that the workflow was based upon.
+	SourceRepositoryOwnerIdentifier string `json:"sourceRepositoryOwnerIdentifier,omitempty"` // 1.3.6.1.4.1.57264.1.17
+
+	// Build Config URL to the top-level/initiating build instructions.
+	BuildConfigURI string `json:"buildConfigURI,omitempty"` //nolint:tagliatelle // 1.3.6.1.4.1.57264.1.18
+
+	// Immutable reference to the specific version of the top-level/initiating build instructions.
+	BuildConfigDigest string `json:"buildConfigDigest,omitempty"` // 1.3.6.1.4.1.57264.1.19
+
+	// Event or action that initiated the build.
+	BuildTrigger string `json:"buildTrigger,omitempty"` // 1.3.6.1.4.1.57264.1.20
+
+	// Run Invocation URL to uniquely identify the build execution.
+	RunInvocationURI string `json:"runInvocationURI,omitempty"` //nolint:tagliatelle // 1.3.6.1.4.1.57264.1.21
+
+	// Source repository visibility at the time of signing the certificate.
+	SourceRepositoryVisibilityAtSigning string `json:"sourceRepositoryVisibilityAtSigning,omitempty"` // 1.3.6.1.4.1.57264.1.22
 }
