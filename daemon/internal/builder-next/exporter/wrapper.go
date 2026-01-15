@@ -48,7 +48,10 @@ func (e *imageExporterMobyWrapper) Resolve(ctx context.Context, id int, exporter
 	if exporterAttrs == nil {
 		exporterAttrs = make(map[string]string)
 	}
-	log.L.Infof("wrapper.Resolve: id=%d, attrs=%v", id, exporterAttrs)
+	log.G(ctx).WithFields(log.Fields{
+		"id":    id,
+		"attrs": exporterAttrs,
+	}).Info("wrapper.Resolve")
 	reposAndTags, err := overrides.SanitizeRepoAndTags(strings.Split(exporterAttrs[string(exptypes.OptKeyName)], ","))
 	if err != nil {
 		return nil, err
@@ -90,14 +93,19 @@ func (i *imageExporterInstanceWrapper) Export(ctx context.Context, src *exporter
 	desc := ref.Descriptor()
 	imageID := out[exptypes.ExporterImageDigestKey]
 
-	log.L.Infof("wrapper.Export: imageID=%s, desc=%v, out=%+v, buildInfo=%+v", imageID, desc, out, buildInfo)
+	log.G(ctx).WithFields(log.Fields{
+		"imageID":   imageID,
+		"desc":      desc,
+		"out":       out,
+		"buildInfo": buildInfo,
+	}).Info("wrapper.Export")
 
 	now := time.Now()
 	refLabelBytes, err := json.Marshal(BuildRefLabelValue{
 		CreatedAt: &now,
 	})
 	if err != nil {
-		return out, ref, err
+		return nil, nil, err
 	}
 	refLabelKey := BuildRefLabel + buildInfo.Ref
 	_, err = i.content.Update(ctx, content.Info{
