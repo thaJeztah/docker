@@ -1981,7 +1981,10 @@ definitions:
         description: |
           Signature contains the properties of verified signatures for the image.
         type: "array"
+        x-omitempty: true
         items:
+          x-go-type:
+            type: SignatureIdentity
           $ref: "#/definitions/SignatureIdentity"
       Pull:
         description: |
@@ -1989,13 +1992,19 @@ definitions:
           If image was pulled via mirror, this contains the original repository location.
           After successful push this images also contains the pushed repository location.
         type: "array"
+        x-omitempty: true
         items:
+          x-go-type:
+            type: PullIdentity
           $ref: "#/definitions/PullIdentity"
       Build:
         description: |
           Build contains build reference information if image was created via build.
         type: "array"
+        x-omitempty: true
         items:
+          x-go-type:
+            type: BuildIdentity
           $ref: "#/definitions/BuildIdentity"
 
   BuildIdentity:
@@ -2012,7 +2021,12 @@ definitions:
         description: |
           CreatedAt is the time when the build ran.
         type: "string"
-        format: "dateTime"
+        format: "date-time"
+        x-go-type:
+          type: Time
+          import:
+            package: time
+        example: "2016-10-19T04:33:30.360899459Z"
 
   PullIdentity:
     description: |
@@ -2038,7 +2052,10 @@ definitions:
         description: |
           Timestamps contains a list of verified signed timestamps for the signature.
         type: "array"
+        x-omitempty: true
         items:
+          x-go-type:
+            type: SignatureTimestamp
           $ref: "#/definitions/SignatureTimestamp"
       KnownSigner:
         description: |
@@ -2082,7 +2099,12 @@ definitions:
         type: "string"
       Timestamp:
         type: "string"
-        format: "dateTime"
+        format: "date-time"
+        x-go-type:
+          type: Time
+          import:
+            package: time
+        example: "2016-10-19T04:33:30.360899459Z"
 
   SignatureTimestampType:
     description: |

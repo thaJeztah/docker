@@ -51,9 +51,15 @@ generate_model types/container <<- 'EOT'
 EOT
 
 generate_model types/image <<- 'EOT'
+	BuildIdentity
+	Identity
 	ImageDeleteResponseItem
-	ImagesDiskUsage
 	ImageHistoryResponseItem
+	ImagesDiskUsage
+	PullIdentity
+	SignatureIdentity
+	SignatureTimestamp
+	SignerIdentity
 EOT
 #	ImageSummary
 # TODO: Restore when go-swagger is updated
