@@ -5,10 +5,8 @@ import (
 	"net/url"
 )
 
-// BuildCancelOptions holds options for [Client.BuildCancel].
 type BuildCancelOptions struct{}
 
-// BuildCancelResult holds the result of [Client.BuildCancel].
 type BuildCancelResult struct{}
 
 // BuildCancel requests the daemon to cancel the ongoing build request

@@ -9,13 +9,11 @@ import (
 	"github.com/distribution/reference"
 )
 
-// ImageTagOptions holds options for [Client.ImageTag].
 type ImageTagOptions struct {
 	Source string
 	Target string
 }
 
-// ImageTagResult holds the result of [Client.ImageTag].
 type ImageTagResult struct{}
 
 // ImageTag tags an image in the docker host

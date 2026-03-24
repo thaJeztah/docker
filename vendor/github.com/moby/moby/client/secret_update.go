@@ -13,7 +13,6 @@ type SecretUpdateOptions struct {
 	Spec    swarm.SecretSpec
 }
 
-// SecretUpdateResult holds the result of [Client.SecretUpdate].
 type SecretUpdateResult struct{}
 
 // SecretUpdate attempts to update a secret.

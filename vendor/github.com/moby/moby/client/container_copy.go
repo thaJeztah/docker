@@ -14,12 +14,10 @@ import (
 	"github.com/moby/moby/api/types/container"
 )
 
-// ContainerStatPathOptions holds options for [Client.ContainerStatPath].
 type ContainerStatPathOptions struct {
 	Path string
 }
 
-// ContainerStatPathResult holds the result of [Client.ContainerStatPath].
 type ContainerStatPathResult struct {
 	Stat container.PathStat
 }
@@ -55,7 +53,6 @@ type CopyToContainerOptions struct {
 	CopyUIDGID                bool
 }
 
-// CopyToContainerResult holds the result of [Client.CopyToContainer].
 type CopyToContainerResult struct{}
 
 // CopyToContainer copies content into the container filesystem.
@@ -86,12 +83,10 @@ func (cli *Client) CopyToContainer(ctx context.Context, containerID string, opti
 	return CopyToContainerResult{}, nil
 }
 
-// CopyFromContainerOptions holds options for [Client.CopyFromContainer].
 type CopyFromContainerOptions struct {
 	SourcePath string
 }
 
-// CopyFromContainerResult holds the result of [Client.CopyFromContainer].
 type CopyFromContainerResult struct {
 	Content io.ReadCloser
 	Stat    container.PathStat
