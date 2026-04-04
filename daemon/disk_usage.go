@@ -78,12 +78,15 @@ func (daemon *Daemon) imageDiskUsage(ctx context.Context, verbose bool) (*backen
 			TotalSize:  totalSize,
 		}
 
-		for _, i := range images {
-			if i.Containers > 0 {
+		for _, img := range images {
+			if img.Containers > 0 {
 				du.ActiveCount++
-			} else if i.Size != -1 && i.SharedSize != -1 {
+			} else if img.Containers == 0 && img.Size != -1 && img.SharedSize != -1 {
 				// Only count reclaimable size if we have size information
-				du.Reclaimable += (i.Size - i.SharedSize)
+				// and container-count is known to be zero (-1 means no
+				// information was available).
+				reclaimable := img.Size - img.SharedSize
+				du.Reclaimable += reclaimable
 			}
 		}
 
